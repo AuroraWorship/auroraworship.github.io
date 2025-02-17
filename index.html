@@ -4,25 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poesía para mi Reina</title>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: #fff0f5;
-            font-family: 'Great Vibes', cursive;
+            font-family: 'Dancing Script', cursive;
             text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            background-image: url('https://example.com/flowers-background.jpg'); /* Ilustraciones de flores blancas */
+            background-size: cover;
+            background-position: center;
         }
         .container {
             width: 80%;
             max-width: 600px;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ff69b4; /* Borde minimalista */
         }
         .buttons {
             display: flex;
@@ -38,9 +42,16 @@
             border-radius: 20px;
             cursor: pointer;
             margin: 5px;
+            transition: transform 0.2s;
         }
         .btn:hover {
             background-color: #ff1493;
+            transform: scale(1.1); /* Efecto al pasar el cursor */
+        }
+        .dedicatoria {
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 20px;
         }
         .small-text {
             font-size: 12px;
@@ -50,6 +61,7 @@
 </head>
 <body>
     <div class="container" id="page">
+        <p class="dedicatoria">"Desde el día en que Dios nos cruzó en el camino, supe que eras mi destino."</p>
         <h1>¿Estás lista para lo que viene?</h1>
         <div class="buttons">
             <button class="btn" onclick="nextPage()">Sí</button>
@@ -85,6 +97,7 @@
                         ${index < pages.length - 1 ? '<button class="btn" onclick="nextPage()">&#8594;</button>' : ''}
                     </div>
                 `;
+                document.getElementById("page").classList.add("page-animation");
             }
         }
         
