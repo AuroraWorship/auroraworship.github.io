@@ -30,6 +30,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Vista de servicio
 - [x] Vista de estructura de ensayo
 - [x] Fecha y evento del servicio, editables
+- [x] Ensayos programables con bloques, repertorio y reparto
 - [x] Asignaciones por integrante
 - [x] Vista "Mi preparación"
 - [x] Modelo de tutoriales con categorías

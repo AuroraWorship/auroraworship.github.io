@@ -280,3 +280,61 @@ describe('favoritos', () => {
     expect(await repo.listFavorites(ANONYMOUS)).toEqual([]);
   });
 });
+
+describe('ensayos', () => {
+  const ensayo = {
+    id: 'rehearsal-1',
+    date: '2026-09-02',
+    startTime: '16:00',
+    endTime: '18:00',
+    blocks: [{ title: 'Oración', minutes: 20, description: null }],
+    setlistId: 'setlist-base',
+    assignments: [],
+    scope: 'internal' as const,
+  };
+
+  it('arrancan vacíos: no se inventan fechas de ensayo', async () => {
+    expect(await repo.listRehearsals(leader)).toEqual([]);
+  });
+
+  it('el director musical los crea y los borra', async () => {
+    const director = { id: 'd', roles: ['music-director'] as const };
+    await repo.saveRehearsal(director, ensayo);
+    expect(await repo.getRehearsal(director, 'rehearsal-1')).not.toBeNull();
+    await repo.deleteRehearsal(director, 'rehearsal-1');
+    expect(await repo.getRehearsal(director, 'rehearsal-1')).toBeNull();
+  });
+
+  it('un músico los lee pero no los toca', async () => {
+    await repo.saveRehearsal(leader, ensayo);
+    expect((await repo.listRehearsals(musician)).length).toBe(1);
+    await expect(repo.saveRehearsal(musician, ensayo)).rejects.toThrow(PermissionError);
+    await expect(repo.deleteRehearsal(musician, ensayo.id)).rejects.toThrow(PermissionError);
+  });
+
+  it('el anónimo no ve ensayos', async () => {
+    await expect(repo.listRehearsals(ANONYMOUS)).rejects.toThrow(PermissionError);
+  });
+
+  it('se ordenan por fecha ascendente', async () => {
+    await repo.saveRehearsal(leader, { ...ensayo, id: 'b', date: '2026-09-09' });
+    await repo.saveRehearsal(leader, { ...ensayo, id: 'a', date: '2026-09-02' });
+    expect((await repo.listRehearsals(leader)).map((r) => r.date)).toEqual([
+      '2026-09-02',
+      '2026-09-09',
+    ]);
+  });
+
+  it('los bloques son propios de cada ensayo, no compartidos', async () => {
+    await repo.saveRehearsal(leader, { ...ensayo, id: 'x' });
+    await repo.saveRehearsal(leader, {
+      ...ensayo,
+      id: 'y',
+      blocks: [{ title: 'Solo repertorio', minutes: 90, description: null }],
+    });
+    const x = await repo.getRehearsal(leader, 'x');
+    const y = await repo.getRehearsal(leader, 'y');
+    expect(x!.blocks[0].title).toBe('Oración');
+    expect(y!.blocks[0].title).toBe('Solo repertorio');
+  });
+});

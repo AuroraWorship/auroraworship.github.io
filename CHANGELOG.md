@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.6.0] — LOOP 006 · Ensayos reales
+
+El miércoles ya existe en la aplicación.
+
+### Añadido
+
+- **Ensayos programables.** Fecha, horario, repertorio a ensayar y reparto de instrumentos y
+  voces. Antes solo había una plantilla estática que no se podía usar para nada.
+- **Bloques editables por ensayo.** La estructura del manual — oración, preparación, ejercicios,
+  repertorio, revisión, cierre — se copia al crear cada ensayo y se ajusta ahí. Es una costumbre
+  del ministerio, no una regla del software, y el código lo trata como tal.
+- **El próximo ensayo aparece en «Mi preparación»**, con tu parte si te la han asignado.
+- La fecha propuesta al crear es el próximo miércoles, que es cuando Aurora ensaya. Se puede
+  cambiar, y no se guarda ningún ensayo que el ministerio no haya creado.
+
+### Corregido
+
+- El modo ensayo cargaba el repertorio del servicio en lugar del del propio ensayo. Cada modo mira
+  ahora su fuente, y solo cae al repertorio base si no hay nada más.
+
 ## [0.5.0] — LOOP 005 · Favoritos y auditoría
 
 Loop de revisión: poca superficie nueva, y todo lo construido pasado por el cedazo.

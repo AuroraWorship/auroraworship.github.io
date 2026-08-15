@@ -180,6 +180,35 @@ const swRegistrado = await page.evaluate(async () => {
 });
 console.log('SERVICE WORKER REGISTRADO:', swRegistrado);
 
+// --- Ensayos ----------------------------------------------------------------
+
+// El bloque anterior deja el navegador en modo en vivo, que no tiene cabecera
+// ni selector de rol — por diseño. Hay que salir antes de cambiar de rol.
+await page.goto('http://localhost:4173/#/ensayo', { waitUntil: 'networkidle' });
+await page.selectOption('select[aria-label="Rol de demostración"]', 'music-director');
+await page.waitForSelector('text=Ensayos');
+console.log('ENSAYOS ARRANCAN VACIOS:', await page.isVisible('text=No hay ensayos programados'));
+
+await page.getByRole('link', { name: 'Nuevo' }).click();
+await page.waitForSelector('text=Nuevo ensayo');
+const bloquesPorDefecto = await page.getByLabel(/^Nombre del bloque/).count();
+console.log('BLOQUES DEL MANUAL:', bloquesPorDefecto === 6);
+
+const fechaEnsayo = await page.locator('input[type="date"]').inputValue();
+console.log('PROPONE MIERCOLES:', new Date(`${fechaEnsayo}T12:00:00`).getDay() === 3);
+
+await page.getByLabel('Nombre del bloque 1').fill('Oración de apertura');
+await page.getByLabel('Repertorio a ensayar').selectOption({ index: 1 });
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector('text=Ensayos');
+await page.waitForTimeout(400);
+console.log('ENSAYO GUARDADO:', await page.isVisible('text=Oración de apertura'));
+await page.screenshot({ path: `${shots}/12-ensayos.png` });
+
+await page.goto('http://localhost:4173/#/preparacion', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Mi preparación');
+console.log('PREPARACION MUESTRA ENSAYO:', await page.isVisible('text=Próximo ensayo'));
+
 // --- Sin conexión -----------------------------------------------------------
 
 // Primera visita en línea para que el service worker cachee; después se corta

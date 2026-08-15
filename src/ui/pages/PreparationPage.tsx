@@ -6,9 +6,11 @@ import {
   instrumentById,
   type Assignment,
   type Member,
+  type Rehearsal,
   type Service,
   type Song,
 } from '../../domain/model';
+import { formatDate } from './RehearsalPage';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -16,6 +18,7 @@ import { EmptyState, NoAccess, PendingNotice } from '../components/Notices';
 
 interface Loaded {
   service: Service | null;
+  rehearsal: Rehearsal | null;
   songs: readonly { song: Song; key: string; assignments: readonly Assignment[] }[];
   me: Member | null;
 }
@@ -56,8 +59,14 @@ export function PreparationPage() {
         });
       }
 
+      // Próximo ensayo: el primero que no ha pasado todavía.
+      const hoy = new Date().toISOString().slice(0, 10);
+      const rehearsal = can(actor, 'rehearsal:read')
+        ? ((await repository.listRehearsals(actor)).find((r) => r.date >= hoy) ?? null)
+        : null;
+
       const me = memberId ? await repository.getMember(actor, memberId).catch(() => null) : null;
-      if (active) setData({ service, songs, me });
+      if (active) setData({ service, rehearsal, songs, me });
     })();
 
     return () => {
@@ -87,7 +96,41 @@ export function PreparationPage() {
         </PendingNotice>
       )}
 
-      {!data.service && <EmptyState title="No hay servicios programados" />}
+      {data.rehearsal && (
+        <Link
+          to="/ensayo"
+          className="block rounded-xl border border-aurora-border bg-aurora-surface p-4 active:bg-aurora-surface-2"
+        >
+          <p className="text-xs uppercase tracking-wide text-aurora-muted">Próximo ensayo</p>
+          <p className="mt-0.5 font-medium">{formatDate(data.rehearsal.date)}</p>
+          <p className="text-sm text-aurora-muted">
+            {data.rehearsal.startTime}–{data.rehearsal.endTime}
+          </p>
+          {(() => {
+            const mia = data.rehearsal.assignments.find((a) => a.memberId === memberId);
+            if (!mia) return null;
+            const parte =
+              [
+                mia.instrument ? instrumentById(mia.instrument)?.name : null,
+                mia.voicePart ? VOICE_PART_LABELS[mia.voicePart] : null,
+              ]
+                .filter(Boolean)
+                .join(' · ') || 'Sin detalle';
+            return (
+              <p className="mt-2 flex items-center gap-2 text-sm">
+                <span className="rounded bg-aurora-violet/20 px-1.5 py-0.5 text-xs text-aurora-violet-soft">
+                  Tu parte
+                </span>
+                {parte}
+              </p>
+            );
+          })()}
+        </Link>
+      )}
+
+      {!data.service && !data.rehearsal && (
+        <EmptyState title="No hay servicios ni ensayos programados" />
+      )}
 
       {data.service && (
         <>

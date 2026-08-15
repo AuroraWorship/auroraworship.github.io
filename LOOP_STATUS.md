@@ -4,13 +4,15 @@
 
 ## LOOP actual
 
-**LOOP 005 — FAVORITOS Y AUDITORÍA** · completado
+**LOOP 006 — ENSAYOS REALES** · completado
 
 ## Objetivo
 
-Revisar todo lo construido y corregir lo que aparezca. Los cuatro loops anteriores están
-completados y verificados; este no añade superficie nueva salvo favoritos, y se dedica a auditar
-accesibilidad, seguridad, contraste y consistencia.
+Cerrar el ritmo semanal del ministerio. Los servicios ya se planificaban, pero el ensayo del
+miércoles solo mostraba una plantilla estática: no se podía programar, ni asignar repertorio, ni
+repartir tareas.
+
+Loops 001 a 005 completados y verificados.
 
 ## Completado
 
@@ -76,14 +78,24 @@ accesibilidad, seguridad, contraste y consistencia.
 - [x] Comprobación real de funcionamiento sin conexión, cortando la red
 - [x] 137 pruebas de dominio
 
-## Pendiente
+## Añadido en LOOP 006
 
-El producto cubre su objetivo original. Lo que queda depende de los bloqueos de abajo o pertenece
-a fases posteriores del roadmap:
+- [x] Ensayos reales: alta, edición y baja con fecha, horario y repertorio asignado
+- [x] Bloques editables por ensayo — la estructura del manual se copia al crear, no se impone
+- [x] Reparto de instrumentos y voces para el ensayo
+- [x] Próximo ensayo y tu parte en él, dentro de «Mi preparación»
+- [x] El modo ensayo usa el repertorio del ensayo, no el del servicio
+- [x] Fecha propuesta: el próximo miércoles, según la costumbre del manual
+- [x] 155 pruebas; comprobación en navegador y auditoría de accesibilidad ampliadas
 
-1. Autenticación real y sincronización entre dispositivos (B-03).
-2. Subida de archivos a storage: tutoriales con vídeo, audio y PDF (B-03).
-3. Secuencias (click, pads, stems) y Aurora Academy.
+## Pendiente (siguiente loop)
+
+**LOOP 007 — MATERIAL Y MEMORIA**
+
+1. Tutoriales con recursos por enlace (vídeo, audio, PDF) — la subida de archivos sigue bloqueada
+   por B-03, pero enlazar material externo funciona hoy.
+2. Historial: qué se tocó, cuándo y en qué tonalidad.
+3. Exportar e importar los datos, para moverlos entre teléfonos sin backend.
 
 ## Errores corregidos en este loop
 
@@ -102,6 +114,8 @@ a fases posteriores del roadmap:
 | Blanco sobre violeta daba 4.23:1, por debajo de AA | Auditoría de contraste (ADR-012) |
 | Once objetivos táctiles por debajo de 44px: selector de rol, reordenar repertorio, fichas de instrumento, enlaces de volver, cabecera del modo en vivo | `npm run a11y` |
 | La propia auditoría contaba enlaces en línea como botones y no recargaba al cambiar de rol | Revisión de sus hallazgos |
+| El modo ensayo cargaba el repertorio del servicio en lugar del propio ensayo | Revisión al conectar los ensayos |
+| La comprobación intentaba cambiar de rol estando en modo en vivo, que no tiene cabecera | Ejecución de la comprobación |
 
 ## Bloqueos abiertos
 

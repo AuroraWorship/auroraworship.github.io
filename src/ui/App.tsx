@@ -19,6 +19,7 @@ import { PreparationPage } from './pages/PreparationPage';
 import { TeamPage } from './pages/TeamPage';
 import { ServiceEditorPage } from './pages/ServiceEditorPage';
 import { LivePage } from './pages/LivePage';
+import { RehearsalEditorPage } from './pages/RehearsalEditorPage';
 
 const NAV = [
   { to: '/canciones', label: 'Canciones', icon: '♪' },
@@ -111,6 +112,9 @@ function Shell() {
           <Route path="/servicio" element={<ServicePage />} />
           <Route path="/servicio/planificar" element={<ServiceEditorPage />} />
           <Route path="/ensayo" element={<RehearsalPage />} />
+          {/* Estática antes que dinámica: "nuevo" no es un identificador. */}
+          <Route path="/ensayo/nuevo" element={<RehearsalEditorPage />} />
+          <Route path="/ensayo/:rehearsalId" element={<RehearsalEditorPage />} />
           <Route path="/tutoriales" element={<TutorialsPage />} />
           <Route path="*" element={<Navigate to="/canciones" replace />} />
         </Routes>

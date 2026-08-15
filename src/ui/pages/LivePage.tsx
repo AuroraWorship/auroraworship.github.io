@@ -39,10 +39,23 @@ export function LivePage() {
     let active = true;
 
     (async () => {
-      const services = await repository.listServices(actor);
-      const service = services[0] ?? null;
+      // Cada modo mira su propia fuente: el ensayo tiene su repertorio y no
+      // tiene por qué coincidir con el del servicio.
       let setlist: Setlist | null = null;
-      if (service?.setlistId) setlist = await repository.getSetlist(actor, service.setlistId);
+
+      if (mode === 'ensayo' && can(actor, 'rehearsal:read')) {
+        const hoy = new Date().toISOString().slice(0, 10);
+        const rehearsals = await repository.listRehearsals(actor);
+        const proximo = rehearsals.find((r) => r.date >= hoy) ?? rehearsals.at(-1) ?? null;
+        if (proximo?.setlistId) setlist = await repository.getSetlist(actor, proximo.setlistId);
+      }
+
+      if (!setlist && can(actor, 'service:read')) {
+        const service = (await repository.listServices(actor))[0] ?? null;
+        if (service?.setlistId) setlist = await repository.getSetlist(actor, service.setlistId);
+      }
+
+      // Último recurso: el repertorio base, para no dejar la pantalla vacía.
       if (!setlist) setlist = (await repository.listSetlists(actor))[0] ?? null;
 
       const loaded: Item[] = [];
@@ -56,7 +69,7 @@ export function LivePage() {
     return () => {
       active = false;
     };
-  }, [actor, allowed]);
+  }, [actor, allowed, mode]);
 
   // Bloqueo de apagado de pantalla. Es opcional: si el navegador no lo
   // soporta, el modo sigue funcionando igual.

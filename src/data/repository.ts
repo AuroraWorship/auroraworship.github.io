@@ -11,7 +11,7 @@
  *    puede saltarse la regla, porque el repositorio la aplica igualmente.
  */
 
-import type { Id, Member, Service, Setlist, Song, Tutorial } from '../domain/model';
+import type { Id, Member, Rehearsal, Service, Setlist, Song, Tutorial } from '../domain/model';
 import { lyricsOf, parseSongBody } from '../domain/music/song-body';
 import { type Actor, type Permission, can, canView } from '../domain/rbac/roles';
 import { SEED_SERVICES, SEED_SETLISTS, SEED_SONGS, SEED_TUTORIALS } from './seed';
@@ -42,6 +42,10 @@ export interface AuroraRepository {
   saveSetlist(actor: Actor, setlist: Setlist): Promise<Setlist>;
   listServices(actor: Actor): Promise<readonly Service[]>;
   saveService(actor: Actor, service: Service): Promise<Service>;
+  listRehearsals(actor: Actor): Promise<readonly Rehearsal[]>;
+  getRehearsal(actor: Actor, id: Id): Promise<Rehearsal | null>;
+  saveRehearsal(actor: Actor, rehearsal: Rehearsal): Promise<Rehearsal>;
+  deleteRehearsal(actor: Actor, id: Id): Promise<void>;
   listTutorials(actor: Actor): Promise<readonly Tutorial[]>;
   listFavorites(actor: Actor): Promise<readonly Id[]>;
   toggleFavorite(actor: Actor, songId: Id): Promise<readonly Id[]>;
@@ -95,6 +99,7 @@ const KEYS = {
   services: 'services',
   tutorials: 'tutorials',
   members: 'members',
+  rehearsals: 'rehearsals',
 } as const;
 
 /**
@@ -103,6 +108,15 @@ const KEYS = {
  * No se inventa gente: la lista la carga Aurora con sus nombres reales.
  */
 const SEED_MEMBERS: readonly Member[] = [];
+
+/**
+ * Tampoco se inventan ensayos.
+ *
+ * El manual describe un ensayo semanal los miércoles de 4 a 6, pero eso es
+ * la costumbre del ministerio, no un dato del calendario. Las fechas las pone
+ * Aurora; el software solo ofrece la estructura como punto de partida.
+ */
+const SEED_REHEARSALS: readonly Rehearsal[] = [];
 
 /**
  * Repositorio sobre almacenamiento clave-valor.
@@ -190,6 +204,40 @@ export class StoredRepository implements AuroraRepository {
     else services.push(service);
     await this.store.set(KEYS.services, services);
     return service;
+  }
+
+  async listRehearsals(actor: Actor): Promise<readonly Rehearsal[]> {
+    require(actor, 'rehearsal:read');
+    const rehearsals = await this.collection<Rehearsal>(KEYS.rehearsals, SEED_REHEARSALS);
+    // Por fecha ascendente: el ensayo que viene es el que importa.
+    return visible(actor, rehearsals)
+      .slice()
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  async getRehearsal(actor: Actor, id: Id): Promise<Rehearsal | null> {
+    require(actor, 'rehearsal:read');
+    const rehearsals = await this.collection<Rehearsal>(KEYS.rehearsals, SEED_REHEARSALS);
+    return visible(actor, rehearsals).find((r) => r.id === id) ?? null;
+  }
+
+  async saveRehearsal(actor: Actor, rehearsal: Rehearsal): Promise<Rehearsal> {
+    require(actor, 'rehearsal:write');
+    const rehearsals = await this.collection<Rehearsal>(KEYS.rehearsals, SEED_REHEARSALS);
+    const index = rehearsals.findIndex((r) => r.id === rehearsal.id);
+    if (index >= 0) rehearsals[index] = rehearsal;
+    else rehearsals.push(rehearsal);
+    await this.store.set(KEYS.rehearsals, rehearsals);
+    return rehearsal;
+  }
+
+  async deleteRehearsal(actor: Actor, id: Id): Promise<void> {
+    require(actor, 'rehearsal:write');
+    const rehearsals = await this.collection<Rehearsal>(KEYS.rehearsals, SEED_REHEARSALS);
+    await this.store.set(
+      KEYS.rehearsals,
+      rehearsals.filter((r) => r.id !== id),
+    );
   }
 
   async listTutorials(actor: Actor): Promise<readonly Tutorial[]> {
