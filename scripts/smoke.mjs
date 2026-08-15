@@ -85,5 +85,44 @@ await page.waitForTimeout(300);
 const editarVisible = await page.getByRole('link', { name: 'Editar' }).count();
 console.log('MUSICO VE BOTON EDITAR:', editarVisible > 0);
 
+// --- Equipo y preparación personal ------------------------------------------
+
+await page.selectOption('select[aria-label="Rol de demostración"]', 'admin');
+await page.goto('http://localhost:4173/#/equipo', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Equipo');
+console.log('EQUIPO ARRANCA VACIO:', await page.isVisible('text=Todavía no hay integrantes'));
+
+await page.getByRole('button', { name: 'Añadir' }).click();
+await page.getByPlaceholder('Cómo aparece en el equipo').fill('Integrante de prueba');
+await page.getByRole('button', { name: 'Piano', exact: true }).click();
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector('text=Integrante de prueba');
+console.log('INTEGRANTE CREADO: true');
+
+await page.getByRole('button', { name: 'Soy yo' }).click();
+await page.waitForSelector('text=soy yo');
+await page.screenshot({ path: `${shots}/07-equipo.png` });
+
+await page.goto('http://localhost:4173/#/preparacion', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Mi preparación');
+const identidad = await page.locator('main p').first().innerText();
+console.log('PREPARACION RECONOCE IDENTIDAD:', identidad.includes('Integrante de prueba'));
+await page.screenshot({ path: `${shots}/08-preparacion.png` });
+
+// La tonalidad por vocalista debe poder fijarse ahora que hay integrantes.
+await page.goto('http://localhost:4173/#/canciones', { waitUntil: 'networkidle' });
+await songLinks.first().click();
+await page.getByRole('link', { name: 'Editar' }).click();
+await page.waitForSelector('text=Tonalidad por vocalista');
+const selectorVocalista = page.getByLabel('Tonalidad de Integrante de prueba');
+console.log('SELECTOR DE VOCALISTA PRESENTE:', (await selectorVocalista.count()) === 1);
+await selectorVocalista.selectOption('A');
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector('text=Detalle');
+await page.getByRole('tab', { name: 'Detalle' }).click();
+await page.waitForSelector('text=Tonalidades por vocalista');
+const detalle = await page.locator('main').innerText();
+console.log('TONALIDAD POR VOCALISTA GUARDADA:', detalle.includes('Integrante de prueba'));
+
 console.log('ERRORES DE CONSOLA:', errors.length === 0 ? 'ninguno' : errors.join(' | '));
 await browser.close();

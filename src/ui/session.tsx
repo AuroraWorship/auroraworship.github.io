@@ -18,38 +18,57 @@ interface SessionValue {
   actor: Actor;
   role: Role;
   setRole: (role: Role) => void;
+  /**
+   * A qué integrante corresponde quien está usando la aplicación.
+   *
+   * Lo necesita "Mi preparación" para saber qué mostrar. Con autenticación
+   * real vendrá de la cuenta; hoy se elige a mano.
+   */
+  memberId: string | null;
+  setMemberId: (id: string | null) => void;
 }
 
 const SessionContext = createContext<SessionValue | null>(null);
 
-const STORAGE_KEY = 'aurora.demo-role';
+const ROLE_KEY = 'aurora.demo-role';
+const MEMBER_KEY = 'aurora.demo-member';
 
-function readStoredRole(): Role {
+function read(key: string): string | null {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return (stored as Role) ?? 'musician';
+    return localStorage.getItem(key);
   } catch {
-    return 'musician';
+    return null;
+  }
+}
+
+function write(key: string, value: string | null): void {
+  try {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch {
+    // Sin almacenamiento disponible la elección simplemente no persiste.
   }
 }
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [role, setRoleState] = useState<Role>(readStoredRole);
+  const [role, setRoleState] = useState<Role>(() => (read(ROLE_KEY) as Role) ?? 'musician');
+  const [memberId, setMemberIdState] = useState<string | null>(() => read(MEMBER_KEY));
 
   const value = useMemo<SessionValue>(
     () => ({
       role,
-      actor: { id: `demo-${role}`, roles: [role] },
+      memberId,
+      actor: { id: memberId ?? `demo-${role}`, roles: [role] },
       setRole: (next: Role) => {
         setRoleState(next);
-        try {
-          localStorage.setItem(STORAGE_KEY, next);
-        } catch {
-          // Sin almacenamiento disponible el rol simplemente no persiste.
-        }
+        write(ROLE_KEY, next);
+      },
+      setMemberId: (next: string | null) => {
+        setMemberIdState(next);
+        write(MEMBER_KEY, next);
       },
     }),
-    [role],
+    [role, memberId],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

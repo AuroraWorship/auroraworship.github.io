@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.3.0] — LOOP 003 · Equipo y preparación
+
+La aplicación ya sabe quién es cada quien.
+
+### Añadido
+
+- **Equipo.** Alta, edición y baja de integrantes con sus instrumentos y su tesitura cómoda. El
+  ministerio arranca sin nadie cargado: no se inventan integrantes.
+- **Identidad de sesión.** Marcar «soy yo» en el equipo. Con autenticación real vendrá de la
+  cuenta; el contrato de la capa ya es el mismo.
+- **Tonalidad por vocalista.** Editable por canción y visible en el detalle, resolviendo el nombre
+  del integrante en vez de mostrar su identificador.
+- **Mi preparación.** Próximo servicio, canciones en orden, tonalidad de cada una y tu parte
+  cuando la haya. Si no hay asignaciones, lo dice en vez de aparentar.
+- `member:read` para los roles internos, y `saveService` en el repositorio.
+
+### Seguridad y privacidad
+
+- El modelo de integrante sigue sin guardar teléfonos ni correos, y hay una prueba que falla si
+  alguien añade un campo de contacto.
+
+### Corregido
+
+- El encabezado truncaba el nombre del producto en pantalla de teléfono.
+
 ## [0.2.0] — LOOP 002 · Persistencia y edición
 
 El producto pasa de nombre y de naturaleza: ya no es solo lectura.

@@ -60,11 +60,21 @@ export function ServicePage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Servicio</h1>
-        <p className="text-sm text-aurora-muted">
-          {service.date === PENDING ? 'Fecha sin confirmar' : service.date} · {service.event}
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight">Servicio</h1>
+          <p className="truncate text-sm text-aurora-muted">
+            {service.date === PENDING ? 'Fecha sin confirmar' : service.date} · {service.event}
+          </p>
+        </div>
+        {can(actor, 'member:read') && (
+          <Link
+            to="/equipo"
+            className="flex h-11 shrink-0 items-center rounded-xl border border-aurora-border bg-aurora-surface px-4 text-sm"
+          >
+            Equipo
+          </Link>
+        )}
       </div>
 
       {service.date === PENDING && (

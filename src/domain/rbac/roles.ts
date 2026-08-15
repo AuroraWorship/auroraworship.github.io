@@ -58,6 +58,10 @@ export type Permission =
 const READ_ONLY_INTERNAL: readonly Permission[] = [
   'song:read', 'setlist:read', 'service:read', 'rehearsal:read',
   'tutorial:read', 'assignment:read',
+  // Incluye `member:read` porque un músico necesita saber quién canta y en qué
+  // tonalidad. El modelo de `Member` no guarda teléfonos ni correos, así que
+  // leerlo no expone datos personales: solo nombre visible e instrumentos.
+  'member:read',
 ];
 
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { VOICE_PART_LABELS, instrumentById, type Song } from '../../domain/model';
+import { VOICE_PART_LABELS, instrumentById, type Member, type Song } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -21,10 +21,22 @@ export function SongPage() {
   const navigate = useNavigate();
   const { actor } = useSession();
   const [song, setSong] = useState<Song | null | undefined>(undefined);
+  const [members, setMembers] = useState<readonly Member[]>([]);
   const [key, setKey] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('sheet');
 
   const allowed = can(actor, 'song:read');
+
+  useEffect(() => {
+    if (!can(actor, 'member:read')) return;
+    let active = true;
+    repository.listMembers(actor).then((list) => {
+      if (active) setMembers(list);
+    });
+    return () => {
+      active = false;
+    };
+  }, [actor]);
 
   useEffect(() => {
     if (!songId || !allowed) return;
@@ -124,12 +136,12 @@ export function SongPage() {
         />
       )}
 
-      {tab === 'detail' && <SongDetail song={song} />}
+      {tab === 'detail' && <SongDetail song={song} members={members} />}
     </article>
   );
 }
 
-function SongDetail({ song }: { song: Song }) {
+function SongDetail({ song, members }: { song: Song; members: readonly Member[] }) {
   return (
     <div className="space-y-4 text-sm">
       <Block title="Instrumentos">
@@ -192,7 +204,9 @@ function SongDetail({ song }: { song: Song }) {
           <ul className="space-y-1">
             {song.vocalistKeys.map((vk) => (
               <li key={vk.memberId} className="flex justify-between">
-                <span>{vk.memberId}</span>
+                <span>
+                  {members.find((m) => m.id === vk.memberId)?.displayName ?? 'Integrante retirado'}
+                </span>
                 <span className="font-semibold text-aurora-violet-soft">{vk.key}</span>
               </li>
             ))}

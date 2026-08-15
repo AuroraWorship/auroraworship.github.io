@@ -4,6 +4,7 @@ import {
   INSTRUMENTS,
   type Difficulty,
   type InstrumentId,
+  type Member,
   type RightsStatus,
   type Song,
 } from '../../domain/model';
@@ -37,10 +38,22 @@ export function SongEditorPage() {
 
   const isNew = !songId;
   const [song, setSong] = useState<Song | null | undefined>(undefined);
+  const [members, setMembers] = useState<readonly Member[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const allowed = can(actor, 'song:write');
+
+  useEffect(() => {
+    if (!can(actor, 'member:read')) return;
+    let active = true;
+    repository.listMembers(actor).then((list) => {
+      if (active) setMembers(list);
+    });
+    return () => {
+      active = false;
+    };
+  }, [actor]);
 
   useEffect(() => {
     if (!allowed) return;
@@ -257,6 +270,49 @@ export function SongEditorPage() {
           <ChordSheet body={song.body} fromKey={song.originalKey} toKey={song.currentKey} />
         </div>
       )}
+
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-aurora-muted">
+          Tonalidad por vocalista
+        </p>
+        {members.length === 0 ? (
+          <p className="text-sm text-aurora-muted">
+            Aún no hay integrantes cargados. Añádelos en Equipo y podrás fijar aquí la tonalidad de
+            cada vocalista.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {members.map((member) => {
+              const current = song.vocalistKeys.find((vk) => vk.memberId === member.id);
+              return (
+                <li key={member.id} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 truncate text-sm">{member.displayName}</span>
+                  <select
+                    aria-label={`Tonalidad de ${member.displayName}`}
+                    value={current?.key ?? ''}
+                    onChange={(e) => {
+                      const others = song.vocalistKeys.filter((vk) => vk.memberId !== member.id);
+                      patch({
+                        vocalistKeys: e.target.value
+                          ? [...others, { memberId: member.id, key: e.target.value, notes: null }]
+                          : others,
+                      });
+                    }}
+                    className="h-11 shrink-0 rounded-lg border border-aurora-border bg-aurora-surface px-3"
+                  >
+                    <option value="">—</option>
+                    {ALL_KEYS.map((k) => (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    ))}
+                  </select>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
 
       <Field label="Derechos" hint="Solo lo propio y el dominio público pueden hacerse públicos">
         <select

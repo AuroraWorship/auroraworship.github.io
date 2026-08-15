@@ -6,6 +6,8 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 
 ## Fase 1 — Núcleo
 
+- [x] Equipo: integrantes, instrumentos y tesitura
+
 - [x] Motor de notas con modelo diatónico
 - [x] Motor de acordes (mayores, menores, 7as, sus, add, dim, aug, slash, alteraciones)
 - [x] Motor de transposición con preservación de estructura y letra
@@ -19,7 +21,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Hoja de acordes mobile-first
 - [!] Autenticación real — bloqueo B-03
 - [x] Edición de canciones desde la aplicación
-- [ ] Tonalidad por vocalista conectada a la UI
+- [x] Tonalidad por vocalista conectada a la UI
 
 ## Fase 2 — Operación del ministerio
 
@@ -28,8 +30,8 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Vista de servicio
 - [x] Vista de estructura de ensayo
 - [ ] Calendario real de servicios y ensayos
-- [ ] Asignaciones por integrante
-- [ ] Vista "Mi preparación"
+- [~] Asignaciones por integrante (modelo y lectura; falta editarlas)
+- [x] Vista "Mi preparación"
 - [x] Modelo de tutoriales con categorías
 - [ ] Centro de tutoriales con material adjunto
 - [!] Storage cloud para audio, vídeo y PDF — depende de B-03

@@ -153,3 +153,50 @@ describe('integridad de los datos de arranque', () => {
     }
   });
 });
+
+describe('equipo', () => {
+  const member = {
+    id: 'member-1',
+    displayName: 'Integrante de prueba',
+    instruments: ['piano'] as const,
+    comfortableKeys: ['G', 'A'] as const,
+  };
+
+  it('arranca vacío: no se inventan integrantes', async () => {
+    expect(await repo.listMembers(leader)).toEqual([]);
+  });
+
+  it('un músico puede leer el equipo pero no editarlo', async () => {
+    expect(await repo.listMembers(musician)).toEqual([]);
+    await expect(repo.saveMember(musician, member)).rejects.toThrow(PermissionError);
+  });
+
+  it('el anónimo no ve el equipo', async () => {
+    await expect(repo.listMembers(ANONYMOUS)).rejects.toThrow(PermissionError);
+  });
+
+  it('un admin da de alta y de baja', async () => {
+    await repo.saveMember(admin, member);
+    expect(await repo.getMember(admin, 'member-1')).not.toBeNull();
+    await repo.deleteMember(admin, 'member-1');
+    expect(await repo.getMember(admin, 'member-1')).toBeNull();
+  });
+
+  it('un líder no puede modificar el equipo', async () => {
+    await expect(repo.saveMember(leader, member)).rejects.toThrow(PermissionError);
+  });
+
+  it('el modelo no guarda datos de contacto', async () => {
+    await repo.saveMember(admin, member);
+    const stored = await repo.getMember(admin, 'member-1');
+    expect(Object.keys(stored!).sort()).toEqual(
+      ['comfortableKeys', 'displayName', 'id', 'instruments'].sort(),
+    );
+  });
+
+  it('ordena por nombre', async () => {
+    await repo.saveMember(admin, { ...member, id: 'b', displayName: 'Zoe' });
+    await repo.saveMember(admin, { ...member, id: 'a', displayName: 'Ana' });
+    expect((await repo.listMembers(admin)).map((m) => m.displayName)).toEqual(['Ana', 'Zoe']);
+  });
+});

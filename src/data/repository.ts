@@ -11,7 +11,7 @@
  *    puede saltarse la regla, porque el repositorio la aplica igualmente.
  */
 
-import type { Id, Service, Setlist, Song, Tutorial } from '../domain/model';
+import type { Id, Member, Service, Setlist, Song, Tutorial } from '../domain/model';
 import { lyricsOf, parseSongBody } from '../domain/music/song-body';
 import { type Actor, type Permission, can, canView } from '../domain/rbac/roles';
 import { SEED_SERVICES, SEED_SETLISTS, SEED_SONGS, SEED_TUTORIALS } from './seed';
@@ -40,7 +40,12 @@ export interface AuroraRepository {
   listSetlists(actor: Actor): Promise<readonly Setlist[]>;
   getSetlist(actor: Actor, id: Id): Promise<Setlist | null>;
   listServices(actor: Actor): Promise<readonly Service[]>;
+  saveService(actor: Actor, service: Service): Promise<Service>;
   listTutorials(actor: Actor): Promise<readonly Tutorial[]>;
+  listMembers(actor: Actor): Promise<readonly Member[]>;
+  getMember(actor: Actor, id: Id): Promise<Member | null>;
+  saveMember(actor: Actor, member: Member): Promise<Member>;
+  deleteMember(actor: Actor, id: Id): Promise<void>;
 }
 
 /** Filtro de visibilidad aplicado en el repositorio, no en la vista. */
@@ -86,7 +91,15 @@ const KEYS = {
   setlists: 'setlists',
   services: 'services',
   tutorials: 'tutorials',
+  members: 'members',
 } as const;
+
+/**
+ * El ministerio arranca sin integrantes a propósito.
+ *
+ * No se inventa gente: la lista la carga Aurora con sus nombres reales.
+ */
+const SEED_MEMBERS: readonly Member[] = [];
 
 /**
  * Repositorio sobre almacenamiento clave-valor.
@@ -156,9 +169,50 @@ export class StoredRepository implements AuroraRepository {
     return visible(actor, await this.collection<Service>(KEYS.services, SEED_SERVICES));
   }
 
+  async saveService(actor: Actor, service: Service): Promise<Service> {
+    require(actor, 'service:write');
+    const services = await this.collection<Service>(KEYS.services, SEED_SERVICES);
+    const index = services.findIndex((s) => s.id === service.id);
+    if (index >= 0) services[index] = service;
+    else services.push(service);
+    await this.store.set(KEYS.services, services);
+    return service;
+  }
+
   async listTutorials(actor: Actor): Promise<readonly Tutorial[]> {
     require(actor, 'tutorial:read');
     return visible(actor, await this.collection<Tutorial>(KEYS.tutorials, SEED_TUTORIALS));
+  }
+
+  async listMembers(actor: Actor): Promise<readonly Member[]> {
+    require(actor, 'member:read');
+    const members = await this.collection<Member>(KEYS.members, SEED_MEMBERS);
+    return members.slice().sort((a, b) => a.displayName.localeCompare(b.displayName, 'es'));
+  }
+
+  async getMember(actor: Actor, id: Id): Promise<Member | null> {
+    require(actor, 'member:read');
+    const members = await this.collection<Member>(KEYS.members, SEED_MEMBERS);
+    return members.find((m) => m.id === id) ?? null;
+  }
+
+  async saveMember(actor: Actor, member: Member): Promise<Member> {
+    require(actor, 'member:write');
+    const members = await this.collection<Member>(KEYS.members, SEED_MEMBERS);
+    const index = members.findIndex((m) => m.id === member.id);
+    if (index >= 0) members[index] = member;
+    else members.push(member);
+    await this.store.set(KEYS.members, members);
+    return member;
+  }
+
+  async deleteMember(actor: Actor, id: Id): Promise<void> {
+    require(actor, 'member:write');
+    const members = await this.collection<Member>(KEYS.members, SEED_MEMBERS);
+    await this.store.set(
+      KEYS.members,
+      members.filter((m) => m.id !== id),
+    );
   }
 }
 

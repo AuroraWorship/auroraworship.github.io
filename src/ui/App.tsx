@@ -15,9 +15,12 @@ import { SongEditorPage } from './pages/SongEditorPage';
 import { ServicePage } from './pages/ServicePage';
 import { RehearsalPage } from './pages/RehearsalPage';
 import { TutorialsPage } from './pages/TutorialsPage';
+import { PreparationPage } from './pages/PreparationPage';
+import { TeamPage } from './pages/TeamPage';
 
 const NAV = [
   { to: '/canciones', label: 'Canciones', icon: '♪' },
+  { to: '/preparacion', label: 'Yo', icon: '★' },
   { to: '/servicio', label: 'Servicio', icon: '✦' },
   { to: '/ensayo', label: 'Ensayo', icon: '◷' },
   { to: '/tutoriales', label: 'Aprender', icon: '◈' },
@@ -28,8 +31,10 @@ function Header() {
     <header className="sticky top-0 z-20 border-b border-aurora-border bg-aurora-bg/95 backdrop-blur">
       <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
         <div className="min-w-0">
-          <p className="truncate text-lg font-semibold tracking-tight">
-            Aurora<span className="text-aurora-violet"> Worship</span>
+          {/* Forma corta en la interfaz: el nombre completo es Aurora Worship,
+              pero en una cabecera de teléfono se trunca y se lee peor. */}
+          <p className="text-lg font-semibold leading-tight tracking-tight">
+            Aurora<span className="text-aurora-violet">.</span>
           </p>
           <p className="truncate text-xs text-aurora-muted">Ministerio de Alabanza</p>
         </div>
@@ -82,6 +87,8 @@ export function App() {
               <Route path="/canciones/nueva" element={<SongEditorPage />} />
               <Route path="/canciones/:songId" element={<SongPage />} />
               <Route path="/canciones/:songId/editar" element={<SongEditorPage />} />
+              <Route path="/preparacion" element={<PreparationPage />} />
+              <Route path="/equipo" element={<TeamPage />} />
               <Route path="/servicio" element={<ServicePage />} />
               <Route path="/ensayo" element={<RehearsalPage />} />
               <Route path="/tutoriales" element={<TutorialsPage />} />
