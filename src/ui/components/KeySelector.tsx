@@ -1,4 +1,4 @@
-import { commonKeysFor, parseKey, semitoneOffset, tryParseKey } from '../../domain/music/key';
+import { commonKeysFor, semitoneOffset, tryParseKey } from '../../domain/music/key';
 
 interface Props {
   originalKey: string;
@@ -87,13 +87,3 @@ export function KeySelector({ originalKey, value, onChange }: Props) {
     </div>
   );
 }
-
-/** Reexportado para que las pruebas de humo compartan la validación. */
-export const isValidKey = (key: string) => {
-  try {
-    parseKey(key);
-    return true;
-  } catch {
-    return false;
-  }
-};

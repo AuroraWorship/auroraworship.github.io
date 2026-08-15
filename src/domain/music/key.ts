@@ -49,14 +49,6 @@ export function tryParseKey(input: string): Key | null {
   }
 }
 
-export function formatKey(key: Key): string {
-  return formatNote(key.tonic) + (key.mode === 'minor' ? 'm' : '');
-}
-
-export function keysEqual(a: Key, b: Key): boolean {
-  return a.mode === b.mode && pitchClass(a.tonic) === pitchClass(b.tonic);
-}
-
 /**
  * Intervalo que lleva de una tonalidad a otra.
  *

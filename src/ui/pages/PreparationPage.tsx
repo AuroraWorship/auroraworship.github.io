@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  PENDING,
+  isPending,
   VOICE_PART_LABELS,
   instrumentById,
   type Assignment,
@@ -138,7 +138,7 @@ export function PreparationPage() {
             <p className="text-xs uppercase tracking-wide text-aurora-muted">Próximo servicio</p>
             <p className="mt-0.5 font-medium">{data.service.event}</p>
             <p className="text-sm text-aurora-muted">
-              {data.service.date === PENDING ? 'Fecha sin confirmar' : data.service.date}
+              {isPending(data.service.date) ? 'Fecha sin confirmar' : data.service.date}
             </p>
           </div>
 

@@ -6,22 +6,23 @@
  * una ruta profunda (ver DECISIONS.md ADR-003).
  */
 
+import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { SessionProvider } from './session';
 import { RoleSwitcher } from './components/RoleSwitcher';
 import { SongsPage } from './pages/SongsPage';
 import { SongPage } from './pages/SongPage';
-import { SongEditorPage } from './pages/SongEditorPage';
+const SongEditorPage = lazy(() => import('./pages/SongEditorPage').then((m) => ({ default: m.SongEditorPage })));
 import { ServicePage } from './pages/ServicePage';
 import { RehearsalPage } from './pages/RehearsalPage';
 import { TutorialsPage } from './pages/TutorialsPage';
 import { PreparationPage } from './pages/PreparationPage';
-import { TeamPage } from './pages/TeamPage';
-import { ServiceEditorPage } from './pages/ServiceEditorPage';
+const TeamPage = lazy(() => import('./pages/TeamPage').then((m) => ({ default: m.TeamPage })));
+const ServiceEditorPage = lazy(() => import('./pages/ServiceEditorPage').then((m) => ({ default: m.ServiceEditorPage })));
 import { LivePage } from './pages/LivePage';
-import { RehearsalEditorPage } from './pages/RehearsalEditorPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { TutorialEditorPage } from './pages/TutorialEditorPage';
+const RehearsalEditorPage = lazy(() => import('./pages/RehearsalEditorPage').then((m) => ({ default: m.RehearsalEditorPage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
+const TutorialEditorPage = lazy(() => import('./pages/TutorialEditorPage').then((m) => ({ default: m.TutorialEditorPage })));
 
 const NAV = [
   { to: '/canciones', label: 'Canciones', icon: '♪' },
@@ -85,7 +86,36 @@ function BottomNav() {
  * debajo — accesibles al tabulador y al lector de pantalla. En el atril, ese
  * ruido es justo lo que hay que quitar.
  */
+/**
+ * Precarga de las pantallas separadas.
+ *
+ * Sin esto, dividir el paquete rompería el uso sin conexión: un trozo que
+ * nunca se ha visitado no está en la caché, y abrir el editor en el templo sin
+ * datos fallaría. Se piden cuando el navegador está ocioso, así que no compiten
+ * con el primer pintado.
+ */
+function usePrefetchEditors() {
+  useEffect(() => {
+    const cargar = () => {
+      void import('./pages/SongEditorPage');
+      void import('./pages/ServiceEditorPage');
+      void import('./pages/RehearsalEditorPage');
+      void import('./pages/TutorialEditorPage');
+      void import('./pages/SettingsPage');
+      void import('./pages/TeamPage');
+    };
+
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(cargar, { timeout: 5000 });
+      return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(cargar, 2000);
+    return () => clearTimeout(id);
+  }, []);
+}
+
 function Shell() {
+  usePrefetchEditors();
   const { pathname } = useLocation();
   const live = pathname.startsWith('/vivo');
 
@@ -101,6 +131,9 @@ function Shell() {
     <div className="min-h-dvh">
       <Header />
       <main className="mx-auto max-w-2xl px-4 pb-24 pt-4">
+        {/* Las pantallas de edición se cargan aparte: solo las abre el
+            liderazgo, y no tienen por qué pesar en el arranque del músico. */}
+        <Suspense fallback={<p className="text-aurora-muted">Cargando…</p>}>
         <Routes>
           <Route path="/" element={<Navigate to="/canciones" replace />} />
           <Route path="/canciones" element={<SongsPage />} />
@@ -124,6 +157,7 @@ function Shell() {
           <Route path="/ajustes" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/canciones" replace />} />
         </Routes>
+        </Suspense>
       </main>
       <BottomNav />
     </div>

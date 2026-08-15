@@ -24,7 +24,7 @@ import type {
 import { lyricsOf, parseSongBody } from '../domain/music/song-body';
 import { type Actor, type Permission, can, canView } from '../domain/rbac/roles';
 import { SEED_SERVICES, SEED_SETLISTS, SEED_SONGS, SEED_TUTORIALS } from './seed';
-import { type KeyValueStore, MemoryStore, createDefaultStore } from './store';
+import { type KeyValueStore, createDefaultStore } from './store';
 
 export interface SongQuery {
   /** Busca en título, artista, etiquetas y letra. */
@@ -373,13 +373,6 @@ export class StoredRepository implements AuroraRepository {
       KEYS.members,
       members.filter((m) => m.id !== id),
     );
-  }
-}
-
-/** Repositorio en memoria, para pruebas. */
-export class InMemoryRepository extends StoredRepository {
-  constructor() {
-    super(new MemoryStore());
   }
 }
 

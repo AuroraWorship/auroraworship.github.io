@@ -149,10 +149,6 @@ export function can(actor: Actor, permission: Permission): boolean {
   return actor.roles.some((role) => ROLE_PERMISSIONS[role].includes(permission));
 }
 
-export function canAny(actor: Actor, permissions: readonly Permission[]): boolean {
-  return permissions.some((p) => can(actor, p));
-}
-
 export function canAll(actor: Actor, permissions: readonly Permission[]): boolean {
   return permissions.every((p) => can(actor, p));
 }

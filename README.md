@@ -20,7 +20,11 @@ Cinco loops completados. Funciona hoy:
 - «Mi preparación»: qué te toca a ti y en qué tonalidad.
 - Modo en vivo para ensayo y servicio, a pantalla completa y con la pantalla bloqueada para que no
   se apague.
+- Ensayos programables con bloques editables, repertorio y reparto de tareas.
+- Centro de tutoriales con material enlazado, por categoría.
+- Historial: cuándo se tocó cada canción, quién la cantó y en qué tonalidad.
 - Favoritos personales.
+- Copia de datos: exportar e importar para mover el repertorio entre teléfonos.
 - Instalable en el teléfono y funcional sin conexión.
 
 No implementado todavía: autenticación real, sincronización entre dispositivos, subida de archivos,

@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.9.0] — LOOP 009 · Revisión y robustez
+
+Loop de repaso sobre ocho loops de construcción.
+
+### Cambiado
+
+- **Arranque más ligero.** Las seis pantallas de edición se cargan bajo demanda: 90 KB comprimidos
+  en vez de 97. Solo las abre el liderazgo, y el músico no tiene por qué pagarlas al arrancar.
+- **Menos código.** Nueve exportaciones que ya no usaba nadie, fuera.
+- **Menos reglas duplicadas.** `isRedistributable` e `isPending` existían en el dominio mientras dos
+  pantallas repetían su lógica a mano. Ahora la regla vive en un solo sitio.
+
+### Corregido
+
+- **El modo sin conexión era más frágil de lo que aparentaba.** El JS y el CSS de arranque nunca
+  llegaban a la caché del service worker — la página los pide antes de que el worker tome el
+  control — y funcionaban solo por la caché HTTP del navegador, que puede vaciarse. Ahora el worker
+  los precachea él mismo leyéndolos del `index.html` (ADR-015).
+
 ## [0.8.0] — LOOP 008 · Material y memoria
 
 «Aprender» deja de ser una lista vacía, y el sistema empieza a recordar.

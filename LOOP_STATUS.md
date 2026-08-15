@@ -4,14 +4,14 @@
 
 ## LOOP actual
 
-**LOOP 008 — MATERIAL Y MEMORIA** · completado
+**LOOP 009 — REVISIÓN Y ROBUSTEZ** · completado
 
 ## Objetivo
 
-Dos huecos que quedaban: «Aprender» era una lista vacía sin forma de llenarla, y el sistema no
-recordaba nada de lo ya tocado.
+Revisar lo construido en ocho loops: código muerto, reglas duplicadas, peso del paquete y solidez
+real del modo sin conexión.
 
-Loops 001 a 007 completados y verificados.
+Loops 001 a 008 completados y verificados.
 
 ## Completado
 
@@ -96,6 +96,14 @@ Loops 001 a 007 completados y verificados.
 - [x] Los favoritos no viajan en la copia: son personales
 - [x] 173 pruebas; comprobación en navegador con descarga y restauración reales
 
+## Añadido en LOOP 009
+
+- [x] Nueve exportaciones muertas eliminadas
+- [x] `isRedistributable` e `isPending` conectados donde las pantallas duplicaban su lógica a mano
+- [x] Editores cargados aparte: arranque de 97 KB a 90 KB comprimidos (ADR-015)
+- [x] El service worker precachea el JS y el CSS de arranque leyéndolos del `index.html`
+- [x] Comprobado que los editores abren sin conexión
+
 ## Añadido en LOOP 008
 
 - [x] Editor de tutoriales: categoría, descripción, vínculo a canción, instrumento o voz
@@ -135,6 +143,9 @@ El producto cubre las fases 1 a 3 del roadmap. Lo que queda depende de los bloqu
 | El modo ensayo cargaba el repertorio del servicio en lugar del propio ensayo | Revisión al conectar los ensayos |
 | La comprobación intentaba cambiar de rol estando en modo en vivo, que no tiene cabecera | Ejecución de la comprobación |
 | La comprobación del historial abría la primera canción alfabética, que no estaba en el repertorio del servicio | Falso negativo revisado |
+| El JS y el CSS de arranque nunca entraban en la caché del service worker: se piden antes de que tome el control | Inspección de la caché tras dividir el paquete (ADR-015) |
+| Calentar la caché desde la página dependía de ganar una carrera con `clients.claim()` | Tres arranques idénticos con resultados distintos |
+| La comprobación offline fijaba el rol sin recargar, y la aplicación seguía con el anterior | Falso negativo revisado |
 
 ## Bloqueos abiertos
 

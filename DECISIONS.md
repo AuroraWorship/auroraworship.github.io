@@ -253,3 +253,27 @@ eso el archivo se valida entero antes de tocar nada y se muestra su contenido pa
 
 Exportar lo puede hacer el liderazgo; importar, solo admin y super admin. Sobrescribir el trabajo
 de todos no es una acción de uso diario.
+
+---
+
+## ADR-015 — Las pantallas de edición se cargan aparte, y el worker las precachea
+
+**Contexto.** El paquete llegó a 97 KB comprimidos. La mitad son pantallas de edición que solo abre
+el liderazgo, y que el músico —el usuario más frecuente, con el teléfono en el atril— nunca toca.
+
+**Decisión.** Los seis editores se cargan bajo demanda. Y, porque dividir el paquete rompería el
+uso sin conexión, se precargan cuando el navegador está ocioso.
+
+**Lo que apareció al comprobarlo.** El JS y el CSS de arranque nunca llegaban a la caché del
+service worker: la página los pide antes de que el worker tome el control, y `clients.claim()` es
+asíncrono. Funcionaban sin conexión solo por la caché HTTP del navegador, que puede vaciarse —
+así que el modo offline era más frágil de lo que aparentaba.
+
+Se intentó primero calentar la caché desde la página, pero eso dependía de haber ganado la carrera:
+en tres arranques idénticos, unas veces cacheaba y otras no.
+
+**Decisión final.** El worker lee `index.html` en su instalación, extrae de ahí los nombres con
+hash del JS y el CSS, y los precachea él mismo. No depende de la página ni del momento.
+
+**Consecuencias.** Arranque de 90 KB en vez de 97, y un modo sin conexión que ya no descansa sobre
+una caché que no controlamos. Verificado en tres arranques limpios seguidos.

@@ -4,6 +4,7 @@ import {
   INSTRUMENTS,
   type Difficulty,
   type InstrumentId,
+  isRedistributable,
   type Member,
   type RightsStatus,
   type Song,
@@ -352,7 +353,7 @@ export function SongEditorPage() {
         </select>
       </Field>
 
-      {song.scope === 'public' && song.rights.status !== 'own' && song.rights.status !== 'public-domain' && (
+      {song.scope === 'public' && !isRedistributable(song.rights) && (
         <p className="rounded-xl border border-aurora-ember/40 bg-aurora-ember/10 p-3 text-sm">
           Esta canción está marcada como pública pero sus derechos no permiten redistribuirla.
           Cambia la visibilidad o el estado de derechos antes de publicarla.

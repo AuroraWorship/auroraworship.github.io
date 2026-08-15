@@ -78,14 +78,6 @@ export function parseNote(input: string): Note {
   };
 }
 
-export function tryParseNote(input: string): Note | null {
-  try {
-    return parseNote(input);
-  } catch {
-    return null;
-  }
-}
-
 export function formatNote(note: Note): string {
   return note.letter + alterToAccidentals(note.alter);
 }
@@ -97,10 +89,6 @@ export function pitchClass(note: Note): number {
 
 export function letterIndex(letter: Letter): number {
   return LETTERS.indexOf(letter);
-}
-
-export function notesEqual(a: Note, b: Note): boolean {
-  return a.letter === b.letter && a.alter === b.alter;
 }
 
 /** Dos notas suenan igual aunque se escriban distinto (F# / Gb). */
@@ -125,8 +113,6 @@ export function intervalBetween(from: Note, to: Note): Interval {
     semitones: (((pitchClass(to) - pitchClass(from)) % 12) + 12) % 12,
   };
 }
-
-export const UNISON: Interval = { letters: 0, semitones: 0 };
 
 export function isUnison(interval: Interval): boolean {
   return interval.letters === 0 && interval.semitones === 0;

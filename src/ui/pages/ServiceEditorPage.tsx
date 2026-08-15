@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PENDING,
+  isPending,
   VOICE_PART_LABELS,
   instrumentById,
   type Assignment,
@@ -125,11 +126,11 @@ export function ServiceEditorPage() {
         </span>
         <input
           type="date"
-          value={service.date === PENDING ? '' : service.date}
+          value={isPending(service.date) ? '' : service.date}
           onChange={(e) => saveService({ date: e.target.value || PENDING })}
           className={inputClass}
         />
-        {service.date === PENDING && (
+        {isPending(service.date) && (
           <span className="mt-1 block text-xs text-aurora-ember">
             Sin fecha, el equipo no sabe para cuándo prepararse.
           </span>

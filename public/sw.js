@@ -22,15 +22,39 @@ const BASE = new URL(self.registration.scope).pathname;
 
 const PRECACHE = [BASE, `${BASE}manifest.webmanifest`, `${BASE}favicon.svg`];
 
+/**
+ * Averigua el JS y el CSS con los que arranca la aplicación.
+ *
+ * Sus nombres llevan un hash que cambia en cada compilación, así que no se
+ * pueden escribir aquí a mano: se leen del propio index.html.
+ *
+ * Hacerlo desde el worker y no desde la página evita una carrera real —
+ * `clients.claim()` toma el control de forma asíncrona, y una página que pida
+ * sus recursos antes de estar controlada no los mete en esta caché. Sin esto,
+ * abrir la aplicación sin conexión dependía de la caché HTTP del navegador,
+ * que puede vaciarse.
+ */
+async function shellAssets() {
+  try {
+    const respuesta = await fetch(BASE, { cache: 'no-cache' });
+    const html = await respuesta.text();
+    return [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css))"/g)].map(
+      (m) => new URL(m[1], self.registration.scope).href,
+    );
+  } catch {
+    return [];
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches
-      .open(SHELL)
-      .then((cache) => cache.addAll(PRECACHE))
+    (async () => {
+      const cache = await caches.open(SHELL);
       // Un fallo al precachear no debe impedir la instalación: la estrategia
       // de tiempo de ejecución acabará llenando la caché igualmente.
-      .catch(() => undefined)
-      .then(() => self.skipWaiting()),
+      await cache.addAll([...PRECACHE, ...(await shellAssets())]).catch(() => undefined);
+      await self.skipWaiting();
+    })(),
   );
 });
 

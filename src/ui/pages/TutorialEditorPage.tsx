@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   INSTRUMENTS,
+  isRedistributable,
   TUTORIAL_CATEGORY_LABELS,
   VOICE_PART_LABELS,
   type InstrumentId,
@@ -333,7 +334,7 @@ export function TutorialEditorPage() {
         </select>
       </label>
 
-      {tutorial.scope === 'public' && tutorial.rights.status === 'reference' && (
+      {tutorial.scope === 'public' && !isRedistributable(tutorial.rights) && (
         <p className="rounded-xl border border-aurora-ember/40 bg-aurora-ember/10 p-3 text-sm">
           Este tutorial enlaza material de terceros sin licencia registrada. Publicarlo puede no ser
           legítimo: revisa los derechos o déjalo en interno.

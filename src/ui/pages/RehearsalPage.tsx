@@ -5,7 +5,7 @@ import { DEFAULT_BLOCKS, formatDuration, totalMinutes } from '../../domain/rehea
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
-import { EmptyState, NoAccess, PendingNotice } from '../components/Notices';
+import { NoAccess, PendingNotice } from '../components/Notices';
 
 export function RehearsalPage() {
   const { actor } = useSession();
@@ -196,8 +196,4 @@ export function formatDate(iso: string): string {
     day: 'numeric',
     month: 'long',
   }).format(date);
-}
-
-export function EmptyRehearsals() {
-  return <EmptyState title="No hay ensayos" />;
 }

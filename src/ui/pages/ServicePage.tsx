@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PENDING, type HistoryEntry, type Service, type Setlist, type Song } from '../../domain/model';
+import { isPending, type HistoryEntry, type Service, type Setlist, type Song } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -65,7 +65,7 @@ export function ServicePage() {
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight">Servicio</h1>
           <p className="truncate text-sm text-aurora-muted">
-            {service.date === PENDING ? 'Fecha sin confirmar' : service.date} · {service.event}
+            {isPending(service.date) ? 'Fecha sin confirmar' : service.date} · {service.event}
           </p>
         </div>
         {can(actor, 'service:write') && (
@@ -95,7 +95,7 @@ export function ServicePage() {
         )}
       </div>
 
-      {can(actor, 'service:write') && service.date !== PENDING && entries.length > 0 && (
+      {can(actor, 'service:write') && !isPending(service.date) && entries.length > 0 && (
         <button
           type="button"
           onClick={async () => {
@@ -122,7 +122,7 @@ export function ServicePage() {
         </button>
       )}
 
-      {service.date === PENDING && (
+      {isPending(service.date) && (
         <PendingNotice>
           Este es un servicio de demostración. Cuando Aurora cargue su calendario real, aquí
           aparecerán la fecha, los participantes y las tonalidades acordadas.

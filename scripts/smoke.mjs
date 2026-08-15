@@ -309,14 +309,28 @@ console.log('MUSICO BLOQUEADO EN COPIA:', await page.isVisible('text=Sin acceso'
 
 // Primera visita en línea para que el service worker cachee; después se corta
 // la red y se comprueba que la aplicación sigue abriendo y mostrando datos.
+// El rol se fija antes de cortar la red: escribirlo en localStorage no
+// remonta la aplicación, y luego no habría forma de recargar para que lo lea.
 await page.goto('http://localhost:4173/#/canciones', { waitUntil: 'networkidle' });
-await page.waitForTimeout(1200);
+await page.evaluate((r) => localStorage.setItem('aurora.demo-role', r), 'leader');
+await page.reload({ waitUntil: 'networkidle' });
+// La precarga de las pantallas separadas se pide en tiempo ocioso, con un
+// tope de 5 s. Se espera a que ocurra: cortar la red antes mediría el
+// arranque, no el uso real.
+await page.waitForTimeout(7000);
 await page.context().setOffline(true);
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.waitForSelector('text=Canciones', { timeout: 10000 });
 const cancionesOffline = await page.locator('main li a[href*="/canciones/"]').count();
 console.log('ABRE SIN CONEXION:', true);
 console.log('MUESTRA CANCIONES SIN CONEXION:', cancionesOffline > 0);
+
+// Las pantallas separadas se precargan cuando el navegador está ocioso, así
+// que también deben abrir sin red. Si esto falla, dividir el paquete rompió
+// el uso sin conexión.
+await page.goto('http://localhost:4173/#/canciones/nueva', { waitUntil: 'domcontentloaded' });
+await page.waitForSelector('text=Nueva canción', { timeout: 10000 }).catch(() => {});
+console.log('EDITOR ABRE SIN CONEXION:', await page.isVisible('text=Nueva canción'));
 await page.screenshot({ path: `${shots}/11-offline.png` });
 await page.context().setOffline(false);
 
