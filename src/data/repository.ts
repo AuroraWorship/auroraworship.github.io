@@ -11,7 +11,16 @@
  *    puede saltarse la regla, porque el repositorio la aplica igualmente.
  */
 
-import type { Id, Member, Rehearsal, Service, Setlist, Song, Tutorial } from '../domain/model';
+import type {
+  HistoryEntry,
+  Id,
+  Member,
+  Rehearsal,
+  Service,
+  Setlist,
+  Song,
+  Tutorial,
+} from '../domain/model';
 import { lyricsOf, parseSongBody } from '../domain/music/song-body';
 import { type Actor, type Permission, can, canView } from '../domain/rbac/roles';
 import { SEED_SERVICES, SEED_SETLISTS, SEED_SONGS, SEED_TUTORIALS } from './seed';
@@ -47,6 +56,11 @@ export interface AuroraRepository {
   saveRehearsal(actor: Actor, rehearsal: Rehearsal): Promise<Rehearsal>;
   deleteRehearsal(actor: Actor, id: Id): Promise<void>;
   listTutorials(actor: Actor): Promise<readonly Tutorial[]>;
+  getTutorial(actor: Actor, id: Id): Promise<Tutorial | null>;
+  saveTutorial(actor: Actor, tutorial: Tutorial): Promise<Tutorial>;
+  deleteTutorial(actor: Actor, id: Id): Promise<void>;
+  listHistory(actor: Actor, songId?: Id): Promise<readonly HistoryEntry[]>;
+  addHistory(actor: Actor, entries: readonly HistoryEntry[]): Promise<number>;
   listFavorites(actor: Actor): Promise<readonly Id[]>;
   toggleFavorite(actor: Actor, songId: Id): Promise<readonly Id[]>;
   listMembers(actor: Actor): Promise<readonly Member[]>;
@@ -100,6 +114,7 @@ const KEYS = {
   tutorials: 'tutorials',
   members: 'members',
   rehearsals: 'rehearsals',
+  history: 'history',
 } as const;
 
 /**
@@ -117,6 +132,9 @@ const SEED_MEMBERS: readonly Member[] = [];
  * Aurora; el software solo ofrece la estructura como punto de partida.
  */
 const SEED_REHEARSALS: readonly Rehearsal[] = [];
+
+/** El historial lo escribe el uso, no la semilla. */
+const SEED_HISTORY: readonly HistoryEntry[] = [];
 
 /**
  * Repositorio sobre almacenamiento clave-valor.
@@ -243,6 +261,61 @@ export class StoredRepository implements AuroraRepository {
   async listTutorials(actor: Actor): Promise<readonly Tutorial[]> {
     require(actor, 'tutorial:read');
     return visible(actor, await this.collection<Tutorial>(KEYS.tutorials, SEED_TUTORIALS));
+  }
+
+  async getTutorial(actor: Actor, id: Id): Promise<Tutorial | null> {
+    require(actor, 'tutorial:read');
+    const tutorials = await this.collection<Tutorial>(KEYS.tutorials, SEED_TUTORIALS);
+    return visible(actor, tutorials).find((t) => t.id === id) ?? null;
+  }
+
+  async saveTutorial(actor: Actor, tutorial: Tutorial): Promise<Tutorial> {
+    require(actor, 'tutorial:write');
+    const tutorials = await this.collection<Tutorial>(KEYS.tutorials, SEED_TUTORIALS);
+    const index = tutorials.findIndex((t) => t.id === tutorial.id);
+    if (index >= 0) tutorials[index] = tutorial;
+    else tutorials.push(tutorial);
+    await this.store.set(KEYS.tutorials, tutorials);
+    return tutorial;
+  }
+
+  async deleteTutorial(actor: Actor, id: Id): Promise<void> {
+    require(actor, 'tutorial:write');
+    const tutorials = await this.collection<Tutorial>(KEYS.tutorials, SEED_TUTORIALS);
+    await this.store.set(
+      KEYS.tutorials,
+      tutorials.filter((t) => t.id !== id),
+    );
+  }
+
+  /**
+   * Historial de uso.
+   *
+   * Responde a "¿cuándo tocamos esto por última vez?" y "¿en qué tonalidad la
+   * cantó ella?". Se ordena de lo más reciente a lo más antiguo, que es como
+   * se consulta.
+   */
+  async listHistory(actor: Actor, songId?: Id): Promise<readonly HistoryEntry[]> {
+    require(actor, 'service:read');
+    const history = await this.collection<HistoryEntry>(KEYS.history, SEED_HISTORY);
+    return history
+      .filter((h) => (songId ? h.songId === songId : true))
+      .slice()
+      .sort((a, b) => b.date.localeCompare(a.date));
+  }
+
+  /**
+   * Registra lo tocado. Ignora lo ya registrado, para que pulsar dos veces no
+   * duplique el historial de un mismo servicio.
+   */
+  async addHistory(actor: Actor, entries: readonly HistoryEntry[]): Promise<number> {
+    require(actor, 'service:write');
+    const history = await this.collection<HistoryEntry>(KEYS.history, SEED_HISTORY);
+    const nuevas = entries.filter((e) => !history.some((h) => h.id === e.id));
+    if (nuevas.length > 0) {
+      await this.store.set(KEYS.history, [...history, ...nuevas]);
+    }
+    return nuevas.length;
   }
 
   /**

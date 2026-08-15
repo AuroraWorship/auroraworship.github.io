@@ -209,6 +209,57 @@ await page.goto('http://localhost:4173/#/preparacion', { waitUntil: 'networkidle
 await page.waitForSelector('text=Mi preparación');
 console.log('PREPARACION MUESTRA ENSAYO:', await page.isVisible('text=Próximo ensayo'));
 
+// --- Tutoriales e historial -------------------------------------------------
+
+await page.goto('http://localhost:4173/#/tutoriales', { waitUntil: 'networkidle' });
+await page.selectOption('select[aria-label="Rol de demostración"]', 'editor');
+await page.waitForSelector('text=Aprender');
+await page.getByRole('link', { name: 'Nuevo' }).click();
+await page.waitForSelector('text=Nuevo tutorial');
+
+await page.getByPlaceholder('Qué se aprende aquí').fill('Cejilla en guitarra');
+await page.getByLabel('Categoría').selectOption('guitar');
+await page.getByRole('button', { name: 'Añadir material' }).click();
+await page.getByLabel('Título del material 1').fill('Clase en vídeo');
+await page.getByLabel('Enlace del material 1').fill('https://ejemplo.test/cejilla');
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector('text=Cejilla en guitarra');
+console.log('TUTORIAL CREADO:', await page.isVisible('text=Clase en vídeo'));
+const enlaceMaterial = await page.getByRole('link', { name: /Clase en vídeo/ }).getAttribute('href');
+console.log('MATERIAL ENLAZADO:', enlaceMaterial === 'https://ejemplo.test/cejilla');
+await page.screenshot({ path: `${shots}/14-tutoriales.png` });
+
+// Guardar sin enlace debe avisar, no guardar a medias.
+await page.getByRole('link', { name: 'Editar' }).first().click();
+await page.waitForSelector('text=Editar tutorial');
+await page.getByRole('button', { name: 'Añadir material' }).click();
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForTimeout(300);
+console.log('AVISA DE MATERIAL SIN ENLACE:', await page.isVisible('text=Hay material sin enlace'));
+
+// Historial: registrar el servicio y verlo en la canción.
+await page.goto('http://localhost:4173/#/servicio', { waitUntil: 'networkidle' });
+await page.selectOption('select[aria-label="Rol de demostración"]', 'leader');
+await page.waitForSelector('text=Servicio');
+await page.getByRole('button', { name: 'Registrar en el historial' }).click();
+await page.waitForTimeout(400);
+const textoBoton = await page.getByRole('button', { name: /Registradas|Ya estaba/ }).innerText();
+console.log('HISTORIAL REGISTRADO:', /Registradas \d+ canciones/.test(textoBoton));
+
+await page.reload({ waitUntil: 'networkidle' });
+await page.getByRole('button', { name: 'Registrar en el historial' }).click();
+await page.waitForTimeout(400);
+console.log('NO DUPLICA AL REGISTRAR DOS VECES:', await page.isVisible('text=Ya estaba registrado'));
+
+// Se entra desde el servicio, no desde la biblioteca: solo las canciones del
+// repertorio tienen historial, y la lista alfabética empieza por otra.
+await page.goto('http://localhost:4173/#/servicio', { waitUntil: 'networkidle' });
+await page.locator('ol li a[href*="/canciones/"]').first().click();
+await page.getByRole('tab', { name: 'Detalle' }).click();
+await page.waitForSelector('text=Historial');
+const detalleHistorial = await page.locator('main').innerText();
+console.log('HISTORIAL VISIBLE EN LA CANCION:', !detalleHistorial.includes('Todavía no se ha registrado'));
+
 // --- Copia de datos ---------------------------------------------------------
 
 await page.goto('http://localhost:4173/#/ajustes', { waitUntil: 'networkidle' });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PENDING, type Service, type Setlist, type Song } from '../../domain/model';
+import { PENDING, type HistoryEntry, type Service, type Setlist, type Song } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -21,6 +21,7 @@ interface Loaded {
 export function ServicePage() {
   const { actor } = useSession();
   const [data, setData] = useState<Loaded | null | undefined>(undefined);
+  const [registrado, setRegistrado] = useState<number | null>(null);
 
   const allowed = can(actor, 'service:read');
 
@@ -93,6 +94,33 @@ export function ServicePage() {
           </Link>
         )}
       </div>
+
+      {can(actor, 'service:write') && service.date !== PENDING && entries.length > 0 && (
+        <button
+          type="button"
+          onClick={async () => {
+            // El identificador combina servicio y canción, así que registrar
+            // dos veces el mismo servicio no duplica el historial.
+            const nuevas: HistoryEntry[] = entries.map((entry) => ({
+              id: `history-${service.id}-${entry.songId}`,
+              songId: entry.songId,
+              date: service.date,
+              serviceId: service.id,
+              key: entry.key ?? songs.get(entry.songId)?.currentKey ?? '',
+              leadVocalistId: entry.leadVocalistId,
+              memberIds: service.assignments.map((a) => a.memberId),
+            }));
+            setRegistrado(await repository.addHistory(actor, nuevas));
+          }}
+          className="h-12 w-full rounded-xl border border-aurora-border bg-aurora-surface text-sm"
+        >
+          {registrado === null
+            ? 'Registrar en el historial'
+            : registrado === 0
+              ? 'Ya estaba registrado'
+              : `Registradas ${registrado} canciones`}
+        </button>
+      )}
 
       {service.date === PENDING && (
         <PendingNotice>

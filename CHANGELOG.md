@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.0] — LOOP 008 · Material y memoria
+
+«Aprender» deja de ser una lista vacía, y el sistema empieza a recordar.
+
+### Añadido
+
+- **Editor de tutoriales.** Categoría, descripción y vínculo opcional a una canción, un instrumento
+  o una voz. El material se adjunta por enlace: no hay storage todavía, pero enlazar a donde el
+  ministerio ya guarda sus vídeos funciona hoy, y cuando lo haya el modelo no cambia.
+- **Filtro por categoría**, mostrando solo las que tienen contenido. Un filtro vacío es ruido.
+- **Aviso de derechos** al marcar como público un tutorial que enlaza material de terceros sin
+  licencia registrada.
+- **Historial.** Registrar un servicio ya tocado, y verlo en el detalle de cada canción: cuándo se
+  tocó, quién la cantó y en qué tonalidad — la real, no la que tenga la canción hoy.
+- Registrar dos veces el mismo servicio no duplica el historial.
+
 ## [0.7.0] — LOOP 007 · Copia de datos
 
 El repertorio deja de vivir preso en un solo teléfono.

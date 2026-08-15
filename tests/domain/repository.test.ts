@@ -338,3 +338,120 @@ describe('ensayos', () => {
     expect(y!.blocks[0].title).toBe('Solo repertorio');
   });
 });
+
+describe('tutoriales', () => {
+  const tutorial = {
+    id: 'tut-1',
+    title: 'Acordes con cejilla',
+    category: 'guitar' as const,
+    description: null,
+    resources: [],
+    songId: null,
+    instrument: 'acoustic-guitar' as const,
+    voicePart: null,
+    rights: { status: 'own' as const, holder: 'Aurora', notes: null },
+    scope: 'internal' as const,
+  };
+
+  it('el editor puede crearlos y borrarlos', async () => {
+    const editor = { id: 'e', roles: ['editor'] as const };
+    await repo.saveTutorial(editor, tutorial);
+    expect(await repo.getTutorial(editor, 'tut-1')).not.toBeNull();
+    await repo.deleteTutorial(editor, 'tut-1');
+    expect(await repo.getTutorial(editor, 'tut-1')).toBeNull();
+  });
+
+  it('un músico los lee pero no los toca', async () => {
+    await expect(repo.saveTutorial(musician, tutorial)).rejects.toThrow(PermissionError);
+    await expect(repo.deleteTutorial(musician, 'tut-1')).rejects.toThrow(PermissionError);
+  });
+
+  it('el público solo recibe los marcados como públicos', async () => {
+    await repo.saveTutorial(admin, tutorial);
+    await repo.saveTutorial(admin, { ...tutorial, id: 'tut-2', scope: 'public' });
+    const publicos = await repo.listTutorials(ANONYMOUS);
+    expect(publicos.map((t) => t.id)).toEqual(['tut-2']);
+  });
+
+  it('el material se guarda como referencia, no como archivo', async () => {
+    await repo.saveTutorial(admin, {
+      ...tutorial,
+      resources: [
+        {
+          id: 'r1',
+          kind: 'video',
+          title: 'Clase 1',
+          url: 'https://ejemplo.test/clase-1',
+          sizeBytes: null,
+          rights: { status: 'reference', holder: null, notes: null },
+          scope: 'internal',
+        },
+      ],
+    });
+    const guardado = await repo.getTutorial(admin, 'tut-1');
+    expect(guardado!.resources[0].url).toBe('https://ejemplo.test/clase-1');
+    expect(guardado!.resources[0].sizeBytes).toBeNull();
+  });
+});
+
+describe('historial', () => {
+  const entrada = {
+    id: 'history-s1-song-sublime-gracia',
+    songId: 'song-sublime-gracia',
+    date: '2026-08-01',
+    serviceId: 's1',
+    key: 'G',
+    leadVocalistId: null,
+    memberIds: [],
+  };
+
+  it('arranca vacío', async () => {
+    expect(await repo.listHistory(leader)).toEqual([]);
+  });
+
+  it('el líder registra lo tocado', async () => {
+    expect(await repo.addHistory(leader, [entrada])).toBe(1);
+    expect((await repo.listHistory(leader)).length).toBe(1);
+  });
+
+  it('registrar dos veces el mismo servicio no duplica', async () => {
+    await repo.addHistory(leader, [entrada]);
+    expect(await repo.addHistory(leader, [entrada])).toBe(0);
+    expect((await repo.listHistory(leader)).length).toBe(1);
+  });
+
+  it('un músico lo consulta pero no lo escribe', async () => {
+    await repo.addHistory(leader, [entrada]);
+    expect((await repo.listHistory(musician)).length).toBe(1);
+    await expect(repo.addHistory(musician, [entrada])).rejects.toThrow(PermissionError);
+  });
+
+  it('filtra por canción', async () => {
+    await repo.addHistory(leader, [
+      entrada,
+      { ...entrada, id: 'h2', songId: 'song-santo-santo-santo' },
+    ]);
+    const solo = await repo.listHistory(leader, 'song-santo-santo-santo');
+    expect(solo.map((h) => h.songId)).toEqual(['song-santo-santo-santo']);
+  });
+
+  it('ordena de lo más reciente a lo más antiguo', async () => {
+    await repo.addHistory(leader, [
+      { ...entrada, id: 'a', date: '2026-08-01' },
+      { ...entrada, id: 'b', date: '2026-08-15' },
+      { ...entrada, id: 'c', date: '2026-07-01' },
+    ]);
+    expect((await repo.listHistory(leader)).map((h) => h.date)).toEqual([
+      '2026-08-15',
+      '2026-08-01',
+      '2026-07-01',
+    ]);
+  });
+
+  it('guarda la tonalidad realmente usada, no la de la canción', async () => {
+    await repo.addHistory(leader, [{ ...entrada, key: 'Bb' }]);
+    const cancion = await repo.getSong(leader, 'song-sublime-gracia');
+    expect((await repo.listHistory(leader))[0].key).toBe('Bb');
+    expect(cancion!.currentKey).toBe('G');
+  });
+});

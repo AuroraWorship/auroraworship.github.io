@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { VOICE_PART_LABELS, instrumentById, type Member, type Song } from '../../domain/model';
+import {
+  VOICE_PART_LABELS,
+  instrumentById,
+  type HistoryEntry,
+  type Member,
+  type Song,
+} from '../../domain/model';
+import { formatDate } from './RehearsalPage';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -23,6 +30,7 @@ export function SongPage() {
   const [song, setSong] = useState<Song | null | undefined>(undefined);
   const [members, setMembers] = useState<readonly Member[]>([]);
   const [favorite, setFavorite] = useState(false);
+  const [history, setHistory] = useState<readonly HistoryEntry[]>([]);
   const [key, setKey] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('sheet');
 
@@ -38,6 +46,17 @@ export function SongPage() {
       active = false;
     };
   }, [actor]);
+
+  useEffect(() => {
+    if (!songId || !can(actor, 'service:read')) return;
+    let live = true;
+    repository.listHistory(actor, songId).then((entries) => {
+      if (live) setHistory(entries);
+    });
+    return () => {
+      live = false;
+    };
+  }, [actor, songId]);
 
   useEffect(() => {
     if (!songId || !allowed) return;
@@ -167,12 +186,20 @@ export function SongPage() {
         />
       )}
 
-      {tab === 'detail' && <SongDetail song={song} members={members} />}
+      {tab === 'detail' && <SongDetail song={song} members={members} history={history} />}
     </article>
   );
 }
 
-function SongDetail({ song, members }: { song: Song; members: readonly Member[] }) {
+function SongDetail({
+  song,
+  members,
+  history,
+}: {
+  song: Song;
+  members: readonly Member[];
+  history: readonly HistoryEntry[];
+}) {
   return (
     <div className="space-y-4 text-sm">
       <Block title="Instrumentos">
@@ -239,6 +266,32 @@ function SongDetail({ song, members }: { song: Song; members: readonly Member[] 
                   {members.find((m) => m.id === vk.memberId)?.displayName ?? 'Integrante retirado'}
                 </span>
                 <span className="font-semibold text-aurora-violet-soft">{vk.key}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Block>
+
+      <Block title="Historial">
+        {history.length === 0 ? (
+          <p className="text-aurora-muted">
+            Todavía no se ha registrado ninguna vez que se tocara esta canción.
+          </p>
+        ) : (
+          <ul className="space-y-1">
+            {history.slice(0, 8).map((entry) => (
+              <li key={entry.id} className="flex justify-between gap-3">
+                <span className="min-w-0 truncate">
+                  {formatDate(entry.date)}
+                  {entry.leadVocalistId && (
+                    <span className="text-aurora-muted">
+                      {' · '}
+                      {members.find((m) => m.id === entry.leadVocalistId)?.displayName ??
+                        'Integrante retirado'}
+                    </span>
+                  )}
+                </span>
+                <span className="shrink-0 font-semibold text-aurora-violet-soft">{entry.key}</span>
               </li>
             ))}
           </ul>

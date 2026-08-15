@@ -34,10 +34,10 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Asignaciones por integrante
 - [x] Vista "Mi preparación"
 - [x] Modelo de tutoriales con categorías
-- [ ] Centro de tutoriales con material adjunto
+- [x] Centro de tutoriales con material por enlace
 - [!] Storage cloud para audio, vídeo y PDF — depende de B-03
 - [x] Historial (modelo)
-- [ ] Consulta de historial
+- [x] Consulta de historial
 
 ## Fase 3 — Uso en vivo
 

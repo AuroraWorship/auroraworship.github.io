@@ -4,15 +4,14 @@
 
 ## LOOP actual
 
-**LOOP 007 — COPIA DE DATOS** · completado
+**LOOP 008 — MATERIAL Y MEMORIA** · completado
 
 ## Objetivo
 
-Atacar la limitación más seria del producto: los datos viven en un solo teléfono y no llegan al
-resto del equipo. La sincronización real depende de un bloqueo humano, así que se resuelve por el
-camino que sí está disponible.
+Dos huecos que quedaban: «Aprender» era una lista vacía sin forma de llenarla, y el sistema no
+recordaba nada de lo ya tocado.
 
-Loops 001 a 006 completados y verificados.
+Loops 001 a 007 completados y verificados.
 
 ## Completado
 
@@ -97,13 +96,24 @@ Loops 001 a 006 completados y verificados.
 - [x] Los favoritos no viajan en la copia: son personales
 - [x] 173 pruebas; comprobación en navegador con descarga y restauración reales
 
-## Pendiente (siguiente loop)
+## Añadido en LOOP 008
 
-**LOOP 008 — MATERIAL Y MEMORIA**
+- [x] Editor de tutoriales: categoría, descripción, vínculo a canción, instrumento o voz
+- [x] Material por enlace (vídeo, audio, PDF, imagen, enlace, texto), con su tipo y sus derechos
+- [x] Filtro por categoría, mostrando solo las que tienen contenido
+- [x] Aviso al publicar un tutorial que enlaza material de terceros sin licencia
+- [x] Historial: registrar un servicio tocado, sin duplicar si se pulsa dos veces
+- [x] Historial visible en el detalle de la canción, con la tonalidad realmente usada
+- [x] 184 pruebas; comprobación en navegador y accesibilidad ampliadas
 
-1. Tutoriales con recursos por enlace (vídeo, audio, PDF). La subida de archivos sigue bloqueada
-   por B-03, pero enlazar material externo funciona hoy.
-2. Historial: qué se tocó, cuándo y en qué tonalidad.
+## Pendiente
+
+El producto cubre las fases 1 a 3 del roadmap. Lo que queda depende de los bloqueos de abajo:
+
+1. Autenticación real y sincronización entre dispositivos (B-03). Mientras tanto, la copia de
+   datos del LOOP 007 hace de puente.
+2. Subida de archivos a storage. Hoy el material se enlaza, que funciona; subirlo necesita cuenta.
+3. Secuencias, academia y extensiones de IA — fases 4 y 5.
 
 ## Errores corregidos en este loop
 
@@ -124,6 +134,7 @@ Loops 001 a 006 completados y verificados.
 | La propia auditoría contaba enlaces en línea como botones y no recargaba al cambiar de rol | Revisión de sus hallazgos |
 | El modo ensayo cargaba el repertorio del servicio en lugar del propio ensayo | Revisión al conectar los ensayos |
 | La comprobación intentaba cambiar de rol estando en modo en vivo, que no tiene cabecera | Ejecución de la comprobación |
+| La comprobación del historial abría la primera canción alfabética, que no estaba en el repertorio del servicio | Falso negativo revisado |
 
 ## Bloqueos abiertos
 
