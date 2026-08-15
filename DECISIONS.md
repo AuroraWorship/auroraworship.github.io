@@ -152,3 +152,38 @@ se puede intentar, el ámbito dice sobre qué registros. Confundirlos obliga a d
 
 **Consecuencias.** Ninguna filtración: el contenido interno sigue fuera de su alcance por ámbito,
 y sigue sin poder escribir nada.
+
+---
+
+## ADR-010 — Service worker escrito a mano, sin generador
+
+**Contexto.** La aplicación debe funcionar sin conexión: en el templo puede no haber datos, y un
+músico no puede quedarse sin la hoja de acordes por eso.
+
+**Alternativas.** `vite-plugin-pwa` con Workbox — potente, pero añade dependencia y configuración
+para un estático de tres archivos.
+
+**Decisión.** Un service worker propio, con red primero para la navegación y caché primero para los
+recursos.
+
+**Razón.** El bundle es pequeño y la estrategia cabe en 80 líneas legibles. Menos dependencias es
+menos que mantener y menos que auditar.
+
+**Consecuencias.** No hay precacheo de los assets con hash: la primera visita necesita conexión, y
+a partir de ahí funciona sin ella. Los datos del ministerio no dependen de esto — viven en
+IndexedDB, que ya es offline por su cuenta.
+
+---
+
+## ADR-011 — El modo en vivo sale del armazón, no se superpone
+
+**Contexto.** El modo servicio/ensayo empezó como una capa `fixed` sobre la aplicación.
+
+**Problema.** Tapar no es ocultar: la cabecera y la navegación seguían en el DOM debajo,
+alcanzables con el tabulador y anunciadas por un lector de pantalla. Sobre un atril, ese ruido es
+exactamente lo que hay que eliminar.
+
+**Decisión.** El armazón mira la ruta: en `/vivo` no renderiza cabecera ni navegación en absoluto.
+
+**Consecuencias.** La comprobación en navegador verifica que la navegación no existe en modo en
+vivo, no solo que no se ve.

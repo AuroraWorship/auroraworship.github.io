@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { RehearsalBlock } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
 import { useSession } from '../session';
@@ -33,6 +34,13 @@ export function RehearsalPage() {
           Estructura base · {Math.floor(total / 60)} h {total % 60 ? `${total % 60} min` : ''}
         </p>
       </div>
+
+      <Link
+        to="/vivo?modo=ensayo"
+        className="flex h-12 items-center justify-center rounded-xl border border-aurora-violet/50 bg-aurora-violet/10 text-sm font-medium text-aurora-violet-soft"
+      >
+        Modo ensayo
+      </Link>
 
       <PendingNotice>
         No hay ensayos programados todavía. Los bloques de abajo son la estructura del manual de

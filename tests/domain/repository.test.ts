@@ -200,3 +200,52 @@ describe('equipo', () => {
     expect((await repo.listMembers(admin)).map((m) => m.displayName)).toEqual(['Ana', 'Zoe']);
   });
 });
+
+describe('planificación del servicio', () => {
+  it('un líder puede reordenar el repertorio', async () => {
+    const setlist = (await repo.getSetlist(leader, 'setlist-base'))!;
+    const invertido = [...setlist.entries].reverse().map((e, i) => ({ ...e, order: i + 1 }));
+    await repo.saveSetlist(leader, { ...setlist, entries: invertido });
+
+    const guardado = (await repo.getSetlist(leader, 'setlist-base'))!;
+    expect(guardado.entries.map((e) => e.songId)).toEqual(invertido.map((e) => e.songId));
+  });
+
+  it('un músico no puede tocar el repertorio ni el servicio', async () => {
+    const setlist = (await repo.getSetlist(musician, 'setlist-base'))!;
+    await expect(repo.saveSetlist(musician, setlist)).rejects.toThrow(PermissionError);
+
+    const service = (await repo.listServices(musician))[0];
+    await expect(repo.saveService(musician, service)).rejects.toThrow(PermissionError);
+  });
+
+  it('el líder fija fecha y asignaciones, y persisten', async () => {
+    const service = (await repo.listServices(leader))[0];
+    await repo.saveService(leader, {
+      ...service,
+      date: '2026-09-05',
+      assignments: [
+        { memberId: 'member-1', instrument: 'piano', voicePart: null, songId: null, notes: null },
+      ],
+    });
+
+    const guardado = (await repo.listServices(leader))[0];
+    expect(guardado.date).toBe('2026-09-05');
+    expect(guardado.assignments).toHaveLength(1);
+    expect(guardado.assignments[0].instrument).toBe('piano');
+  });
+
+  it('la tonalidad de la entrada manda sobre la de la canción', async () => {
+    const setlist = (await repo.getSetlist(leader, 'setlist-base'))!;
+    const conTonalidad = setlist.entries.map((e) =>
+      e.songId === 'song-sublime-gracia' ? { ...e, key: 'Bb' } : e,
+    );
+    await repo.saveSetlist(leader, { ...setlist, entries: conTonalidad });
+
+    const guardado = (await repo.getSetlist(leader, 'setlist-base'))!;
+    const entrada = guardado.entries.find((e) => e.songId === 'song-sublime-gracia')!;
+    const cancion = (await repo.getSong(leader, 'song-sublime-gracia'))!;
+    expect(entrada.key).toBe('Bb');
+    expect(cancion.currentKey).toBe('G');
+  });
+});

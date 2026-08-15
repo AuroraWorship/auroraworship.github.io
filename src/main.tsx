@@ -11,3 +11,13 @@ createRoot(container).render(
     <App />
   </StrictMode>,
 );
+
+// Solo en la compilación de producción: en desarrollo un service worker
+// cacheando módulos estorba más de lo que ayuda.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {
+      // Sin service worker la aplicación sigue funcionando, solo que en línea.
+    });
+  });
+}

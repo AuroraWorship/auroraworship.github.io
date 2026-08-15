@@ -39,6 +39,7 @@ export interface AuroraRepository {
   deleteSong(actor: Actor, id: Id): Promise<void>;
   listSetlists(actor: Actor): Promise<readonly Setlist[]>;
   getSetlist(actor: Actor, id: Id): Promise<Setlist | null>;
+  saveSetlist(actor: Actor, setlist: Setlist): Promise<Setlist>;
   listServices(actor: Actor): Promise<readonly Service[]>;
   saveService(actor: Actor, service: Service): Promise<Service>;
   listTutorials(actor: Actor): Promise<readonly Tutorial[]>;
@@ -167,6 +168,16 @@ export class StoredRepository implements AuroraRepository {
   async listServices(actor: Actor): Promise<readonly Service[]> {
     require(actor, 'service:read');
     return visible(actor, await this.collection<Service>(KEYS.services, SEED_SERVICES));
+  }
+
+  async saveSetlist(actor: Actor, setlist: Setlist): Promise<Setlist> {
+    require(actor, 'setlist:write');
+    const setlists = await this.collection<Setlist>(KEYS.setlists, SEED_SETLISTS);
+    const index = setlists.findIndex((s) => s.id === setlist.id);
+    if (index >= 0) setlists[index] = setlist;
+    else setlists.push(setlist);
+    await this.store.set(KEYS.setlists, setlists);
+    return setlist;
   }
 
   async saveService(actor: Actor, service: Service): Promise<Service> {

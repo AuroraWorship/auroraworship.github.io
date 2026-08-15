@@ -4,15 +4,15 @@
 
 ## LOOP actual
 
-**LOOP 003 — EQUIPO Y PREPARACIÓN** · completado
+**LOOP 004 — PLANIFICACIÓN Y USO EN VIVO** · completado
 
 ## Objetivo
 
-Que la aplicación sepa quién es cada quien: equipo, tonalidad por vocalista y la pantalla que
-responde a "¿qué me toca a mí?".
+Cerrar el círculo del producto: que el líder pueda planificar el servicio y que el músico pueda
+usar la aplicación sobre el atril, con o sin conexión.
 
-LOOP 001 (bootstrap, motor musical, RBAC, UI) y LOOP 002 (persistencia, edición) completados y
-verificados.
+LOOP 001 (bootstrap, motor musical, RBAC, UI), LOOP 002 (persistencia, edición) y LOOP 003 (equipo,
+preparación) completados y verificados.
 
 ## Completado
 
@@ -57,14 +57,24 @@ verificados.
 - [x] `saveService` en el repositorio, con permiso exigido
 - [x] 128 pruebas; comprobación en navegador ampliada a equipo, identidad y vocalistas
 
+## Añadido en LOOP 004
+
+- [x] Planificación del servicio: fecha, evento, orden del repertorio, tonalidad por canción,
+      voz principal y asignaciones por integrante
+- [x] `saveSetlist` en el repositorio, con permiso exigido
+- [x] Modo en vivo (servicio y ensayo): pantalla completa, texto grande, anterior/siguiente,
+      aviso de la canción que viene y alternancia acordes/solo letra
+- [x] Bloqueo de apagado de pantalla mientras el modo en vivo está abierto
+- [x] PWA: manifiesto, iconos generados, service worker propio y offline (ADR-010)
+- [x] 132 pruebas; comprobación en navegador ampliada a planificar, reordenar, modo en vivo y PWA
+
 ## Pendiente (siguiente loop)
 
-**LOOP 004 — PLANIFICACIÓN Y USO EN VIVO**
+**LOOP 005 — REVISIÓN Y CIERRE**
 
-1. Edición de servicios y repertorios: fechas, orden de canciones, asignaciones.
-2. Modo ensayo y modo servicio: interfaz mínima para el atril.
-3. Favoritos.
-4. PWA instalable y offline.
+1. Favoritos personales.
+2. Auditoría completa: accesibilidad, seguridad, rendimiento y consistencia.
+3. Revisión de todo lo construido, corrección de lo que aparezca.
 
 ## Errores corregidos en este loop
 
@@ -77,6 +87,9 @@ verificados.
 | El `textarea` del editor heredaba altura fija de la clase de input | Revisión del editor |
 | El encabezado truncaba el nombre en pantalla de teléfono | Captura de la comprobación |
 | `Loaded['songs']` era readonly y no admitía construcción incremental | Typecheck |
+| El modo en vivo se superponía, dejando la navegación alcanzable por tabulador y lector de pantalla | Comprobación en navegador (ADR-011) |
+| Faltaban los tipos de `vite/client` para `import.meta.env` | Typecheck |
+| Dos aserciones de la comprobación eran frágiles: buscaban texto que también aparece en `<option>` invisibles | Falso negativo investigado leyendo IndexedDB |
 
 ## Bloqueos abiertos
 

@@ -6,7 +6,7 @@
  * una ruta profunda (ver DECISIONS.md ADR-003).
  */
 
-import { HashRouter, NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { SessionProvider } from './session';
 import { RoleSwitcher } from './components/RoleSwitcher';
 import { SongsPage } from './pages/SongsPage';
@@ -17,6 +17,8 @@ import { RehearsalPage } from './pages/RehearsalPage';
 import { TutorialsPage } from './pages/TutorialsPage';
 import { PreparationPage } from './pages/PreparationPage';
 import { TeamPage } from './pages/TeamPage';
+import { ServiceEditorPage } from './pages/ServiceEditorPage';
+import { LivePage } from './pages/LivePage';
 
 const NAV = [
   { to: '/canciones', label: 'Canciones', icon: '♪' },
@@ -72,31 +74,57 @@ function BottomNav() {
   );
 }
 
+/**
+ * Armazón de la aplicación.
+ *
+ * El modo en vivo se sale del armazón por completo: no basta con taparlo con
+ * una capa encima, porque la cabecera y la navegación seguirían existiendo
+ * debajo — accesibles al tabulador y al lector de pantalla. En el atril, ese
+ * ruido es justo lo que hay que quitar.
+ */
+function Shell() {
+  const { pathname } = useLocation();
+  const live = pathname.startsWith('/vivo');
+
+  if (live) {
+    return (
+      <Routes>
+        <Route path="/vivo" element={<LivePage />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <div className="min-h-dvh">
+      <Header />
+      <main className="mx-auto max-w-2xl px-4 pb-24 pt-4">
+        <Routes>
+          <Route path="/" element={<Navigate to="/canciones" replace />} />
+          <Route path="/canciones" element={<SongsPage />} />
+          {/* La ruta estática va antes que la dinámica para que "nueva"
+              no se lea como un identificador de canción. */}
+          <Route path="/canciones/nueva" element={<SongEditorPage />} />
+          <Route path="/canciones/:songId" element={<SongPage />} />
+          <Route path="/canciones/:songId/editar" element={<SongEditorPage />} />
+          <Route path="/preparacion" element={<PreparationPage />} />
+          <Route path="/equipo" element={<TeamPage />} />
+          <Route path="/servicio" element={<ServicePage />} />
+          <Route path="/servicio/planificar" element={<ServiceEditorPage />} />
+          <Route path="/ensayo" element={<RehearsalPage />} />
+          <Route path="/tutoriales" element={<TutorialsPage />} />
+          <Route path="*" element={<Navigate to="/canciones" replace />} />
+        </Routes>
+      </main>
+      <BottomNav />
+    </div>
+  );
+}
+
 export function App() {
   return (
     <SessionProvider>
       <HashRouter>
-        <div className="min-h-dvh">
-          <Header />
-          <main className="mx-auto max-w-2xl px-4 pb-24 pt-4">
-            <Routes>
-              <Route path="/" element={<Navigate to="/canciones" replace />} />
-              <Route path="/canciones" element={<SongsPage />} />
-              {/* La ruta estática va antes que la dinámica para que "nueva"
-                  no se lea como un identificador de canción. */}
-              <Route path="/canciones/nueva" element={<SongEditorPage />} />
-              <Route path="/canciones/:songId" element={<SongPage />} />
-              <Route path="/canciones/:songId/editar" element={<SongEditorPage />} />
-              <Route path="/preparacion" element={<PreparationPage />} />
-              <Route path="/equipo" element={<TeamPage />} />
-              <Route path="/servicio" element={<ServicePage />} />
-              <Route path="/ensayo" element={<RehearsalPage />} />
-              <Route path="/tutoriales" element={<TutorialsPage />} />
-              <Route path="*" element={<Navigate to="/canciones" replace />} />
-            </Routes>
-          </main>
-          <BottomNav />
-        </div>
+        <Shell />
       </HashRouter>
     </SessionProvider>
   );

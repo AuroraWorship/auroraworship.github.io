@@ -124,5 +124,61 @@ await page.waitForSelector('text=Tonalidades por vocalista');
 const detalle = await page.locator('main').innerText();
 console.log('TONALIDAD POR VOCALISTA GUARDADA:', detalle.includes('Integrante de prueba'));
 
+// --- Planificación y modo en vivo -------------------------------------------
+
+await page.selectOption('select[aria-label="Rol de demostración"]', 'leader');
+await page.goto('http://localhost:4173/#/servicio/planificar', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Planificar servicio');
+
+await page.locator('input[type="date"]').fill('2026-09-05');
+await page.waitForTimeout(300);
+
+const primeraCancion = await page.locator('ol li p.font-medium').first().innerText();
+await page.getByLabel(`Bajar ${primeraCancion}`).click();
+await page.waitForTimeout(300);
+const trasReordenar = await page.locator('ol li p.font-medium').first().innerText();
+console.log('REORDENAR REPERTORIO:', trasReordenar !== primeraCancion);
+
+await page.getByLabel('Integrante', { exact: true }).selectOption({ label: 'Integrante de prueba' });
+await page.getByLabel('Instrumento').selectOption('piano');
+await page.getByRole('button', { name: 'Añadir al servicio' }).click();
+await page.waitForTimeout(300);
+await page.screenshot({ path: `${shots}/09-planificar.png` });
+
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForSelector('text=Planificar servicio');
+console.log('FECHA PERSISTE:', (await page.locator('input[type="date"]').inputValue()) === '2026-09-05');
+// Se cuenta la fila de asignación, no el texto suelto: el nombre aparece
+// también dentro de <option> invisibles y "text=" encontraría esos primero.
+const asignaciones = await page.getByRole('button', { name: 'Quitar asignación' }).count();
+console.log('ASIGNACION PERSISTE:', asignaciones === 1);
+
+await page.goto('http://localhost:4173/#/vivo?modo=servicio', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Modo servicio');
+const tituloVivo = page.locator('h1');
+const enVivo = await tituloVivo.innerText();
+console.log('MODO EN VIVO ABRE:', enVivo.length > 0);
+console.log('NAV OCULTA EN VIVO:', !(await page.getByRole('link', { name: 'Aprender' }).isVisible()));
+await page.screenshot({ path: `${shots}/10-vivo.png` });
+
+await page.getByRole('button', { name: 'Siguiente →' }).click();
+await page.waitForTimeout(200);
+console.log('AVANZA DE CANCION:', (await tituloVivo.innerText()) !== enVivo);
+
+// --- PWA --------------------------------------------------------------------
+
+const manifest = await page.evaluate(async () => {
+  const res = await fetch('./manifest.webmanifest');
+  return res.ok ? await res.json() : null;
+});
+console.log('MANIFIESTO:', manifest?.name ?? 'ausente');
+
+const swRegistrado = await page.evaluate(async () => {
+  if (!('serviceWorker' in navigator)) return false;
+  const reg = await navigator.serviceWorker.getRegistration();
+  return Boolean(reg);
+});
+console.log('SERVICE WORKER REGISTRADO:', swRegistrado);
+
 console.log('ERRORES DE CONSOLA:', errors.length === 0 ? 'ninguno' : errors.join(' | '));
 await browser.close();

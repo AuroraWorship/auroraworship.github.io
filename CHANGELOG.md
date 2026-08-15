@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.4.0] — LOOP 004 · Planificación y uso en vivo
+
+Se cierra el círculo: el líder planifica, el músico toca.
+
+### Añadido
+
+- **Planificar el servicio.** Fecha, evento, orden del repertorio, tonalidad de cada canción, voz
+  principal y reparto de instrumentos y voces por integrante.
+- **Modo en vivo**, para servicio y ensayo. Pantalla completa sin navegación, texto grande,
+  anterior/siguiente, aviso de qué canción viene y alternancia entre acordes y solo letra.
+- **La pantalla no se apaga** mientras el modo en vivo está abierto.
+- **PWA.** Instalable en el teléfono, con manifiesto, iconos y service worker propio. La
+  aplicación abre y funciona sin conexión.
+
+### Corregido
+
+- El modo en vivo se superponía a la aplicación en lugar de sustituirla: cabecera y navegación
+  seguían en el DOM, alcanzables con el tabulador y por un lector de pantalla (ADR-011).
+
+### Notas
+
+- Dos aserciones de la comprobación en navegador daban un falso negativo al buscar texto que
+  también existe dentro de `<option>` invisibles. Se verificó contra IndexedDB que el dato sí se
+  guardaba, y se corrigieron las aserciones, no el producto.
+
 ## [0.3.0] — LOOP 003 · Equipo y preparación
 
 La aplicación ya sabe quién es cada quien.

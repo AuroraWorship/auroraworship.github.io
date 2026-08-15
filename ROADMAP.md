@@ -29,8 +29,8 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Modelo de ensayos con bloques configurables
 - [x] Vista de servicio
 - [x] Vista de estructura de ensayo
-- [ ] Calendario real de servicios y ensayos
-- [~] Asignaciones por integrante (modelo y lectura; falta editarlas)
+- [x] Fecha y evento del servicio, editables
+- [x] Asignaciones por integrante
 - [x] Vista "Mi preparación"
 - [x] Modelo de tutoriales con categorías
 - [ ] Centro de tutoriales con material adjunto
@@ -40,11 +40,11 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 
 ## Fase 3 — Uso en vivo
 
-- [ ] Modo ensayo
-- [ ] Modo servicio (interfaz mínima)
+- [x] Modo ensayo
+- [x] Modo servicio (interfaz mínima)
 - [ ] Favoritos
-- [ ] PWA instalable
-- [ ] Offline con sincronización
+- [x] PWA instalable
+- [~] Offline (funciona sin conexión; la sincronización llega con el backend)
 - [ ] Notificaciones
 - [ ] Secuencias: click, pads, loops, stems
 

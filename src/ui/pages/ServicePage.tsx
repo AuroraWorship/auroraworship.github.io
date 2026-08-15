@@ -67,10 +67,27 @@ export function ServicePage() {
             {service.date === PENDING ? 'Fecha sin confirmar' : service.date} · {service.event}
           </p>
         </div>
+        {can(actor, 'service:write') && (
+          <Link
+            to="/servicio/planificar"
+            className="flex h-11 shrink-0 items-center rounded-xl bg-aurora-violet px-4 text-sm font-medium text-white"
+          >
+            Planificar
+          </Link>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <Link
+          to="/vivo?modo=servicio"
+          className="flex h-12 flex-1 items-center justify-center rounded-xl border border-aurora-violet/50 bg-aurora-violet/10 text-sm font-medium text-aurora-violet-soft"
+        >
+          Modo servicio
+        </Link>
         {can(actor, 'member:read') && (
           <Link
             to="/equipo"
-            className="flex h-11 shrink-0 items-center rounded-xl border border-aurora-border bg-aurora-surface px-4 text-sm"
+            className="flex h-12 items-center rounded-xl border border-aurora-border bg-aurora-surface px-4 text-sm"
           >
             Equipo
           </Link>
