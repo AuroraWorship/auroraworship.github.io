@@ -63,7 +63,7 @@ export function TeamPage() {
             onClick={() =>
               setEditing({ id: newId('member'), displayName: '', instruments: [], comfortableKeys: [] })
             }
-            className="h-11 shrink-0 rounded-xl bg-aurora-violet px-4 text-sm font-medium text-white"
+            className="h-11 shrink-0 rounded-xl bg-aurora-violet-solid px-4 text-sm font-medium text-white"
           >
             Añadir
           </button>
@@ -110,7 +110,7 @@ export function TeamPage() {
                 <button
                   type="button"
                   onClick={() => setMemberId(memberId === member.id ? null : member.id)}
-                  className="h-9 rounded-lg border border-aurora-border px-3 text-xs"
+                  className="h-11 rounded-lg border border-aurora-border px-3 text-xs"
                 >
                   {memberId === member.id ? 'No soy yo' : 'Soy yo'}
                 </button>
@@ -118,7 +118,7 @@ export function TeamPage() {
                   <button
                     type="button"
                     onClick={() => setEditing(member)}
-                    className="h-9 rounded-lg border border-aurora-border px-3 text-xs"
+                    className="h-11 rounded-lg border border-aurora-border px-3 text-xs"
                   >
                     Editar
                   </button>
@@ -197,7 +197,7 @@ function MemberForm({
                 onClick={() => toggle(instrument.id)}
                 aria-pressed={active}
                 className={[
-                  'h-10 rounded-lg border px-3 text-sm',
+                  'h-11 rounded-lg border px-3 text-sm',
                   active
                     ? 'border-aurora-violet bg-aurora-violet/20 text-aurora-violet-soft'
                     : 'border-aurora-border bg-aurora-surface-2 text-aurora-muted',
@@ -227,7 +227,7 @@ function MemberForm({
                 onClick={() => toggleKey(key)}
                 aria-pressed={active}
                 className={[
-                  'h-9 w-12 rounded-lg border text-sm',
+                  'h-11 w-12 rounded-lg border text-sm',
                   active
                     ? 'border-aurora-violet bg-aurora-violet/20 text-aurora-violet-soft'
                     : 'border-aurora-border bg-aurora-surface-2 text-aurora-muted',
@@ -252,7 +252,7 @@ function MemberForm({
             }
             onSave({ ...draft, displayName: draft.displayName.trim() });
           }}
-          className="h-12 flex-1 rounded-xl bg-aurora-violet font-medium text-white"
+          className="h-12 flex-1 rounded-xl bg-aurora-violet-solid font-medium text-white"
         >
           Guardar
         </button>

@@ -1,6 +1,6 @@
 {
   "name": "aurora-worship",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "Aurora Worship — aplicación digital del Ministerio de Alabanza Aurora",
@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b --noEmit",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "a11y": "node scripts/a11y.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",

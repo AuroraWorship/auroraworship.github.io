@@ -19,7 +19,7 @@ export function RoleSwitcher() {
         aria-label="Rol de demostración"
         value={role}
         onChange={(e) => setRole(e.target.value as Role)}
-        className="rounded-lg border border-aurora-border bg-aurora-surface px-2 py-1.5 text-sm text-aurora-text"
+        className="h-11 rounded-lg border border-aurora-border bg-aurora-surface px-2 text-sm text-aurora-text"
       >
         {ROLES.map((r) => (
           <option key={r} value={r}>

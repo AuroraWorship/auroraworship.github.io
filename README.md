@@ -10,13 +10,21 @@ Responde a dos preguntas concretas:
 
 ## Estado
 
-LOOP 002 completado. Funciona hoy: biblioteca de canciones, búsqueda, hoja de acordes con letra,
-motor de transposición, tonalidad original frente a tonalidad actual, edición y persistencia de
-canciones en el dispositivo, roles con permisos reales,
-vista de servicio y estructura de ensayo.
+Cinco loops completados. Funciona hoy:
 
-No implementado todavía: autenticación real, sincronización entre dispositivos, subida de archivos, secuencias,
-academia. Ver `ROADMAP.md` y `LOOP_STATUS.md`.
+- Biblioteca de canciones con búsqueda por título, letra, etiqueta, tonalidad e instrumento.
+- Hoja de acordes con la letra, transposición en vivo y tonalidad original frente a la del equipo.
+- Alta, edición y borrado de canciones, con vista previa mientras escribes.
+- Equipo: integrantes, instrumentos, tesitura y tonalidad por vocalista.
+- Planificación del servicio: fecha, orden del repertorio, tonalidades y reparto de partes.
+- «Mi preparación»: qué te toca a ti y en qué tonalidad.
+- Modo en vivo para ensayo y servicio, a pantalla completa y con la pantalla bloqueada para que no
+  se apague.
+- Favoritos personales.
+- Instalable en el teléfono y funcional sin conexión.
+
+No implementado todavía: autenticación real, sincronización entre dispositivos, subida de archivos,
+secuencias y academia. Ver `ROADMAP.md` y `LOOP_STATUS.md`.
 
 ## Uso
 
@@ -27,6 +35,7 @@ npm test           # pruebas de dominio
 npm run typecheck
 npm run build      # salida estática en dist/
 npm run smoke      # comprobación en navegador real (requiere build + preview)
+npm run a11y       # auditoría de accesibilidad (requiere build + preview)
 ```
 
 ## Cómo se escribe una canción

@@ -102,7 +102,7 @@ export function LivePage() {
             type="button"
             onClick={() => setLyricsOnly((v) => !v)}
             aria-pressed={lyricsOnly}
-            className="h-10 rounded-lg border border-aurora-border px-3 text-xs"
+            className="h-11 rounded-lg border border-aurora-border px-3 text-xs"
           >
             {lyricsOnly ? 'Acordes' : 'Solo letra'}
           </button>
@@ -110,7 +110,7 @@ export function LivePage() {
             type="button"
             onClick={() => navigate(-1)}
             aria-label="Salir del modo en vivo"
-            className="h-10 rounded-lg border border-aurora-border px-3 text-xs"
+            className="h-11 rounded-lg border border-aurora-border px-3 text-xs"
           >
             Salir
           </button>
@@ -168,7 +168,7 @@ export function LivePage() {
                 type="button"
                 onClick={() => setIndex((i) => Math.min(items!.length - 1, i + 1))}
                 disabled={index + 1 >= items!.length}
-                className="h-14 flex-[2] rounded-xl bg-aurora-violet text-base font-medium text-white disabled:opacity-40"
+                className="h-14 flex-[2] rounded-xl bg-aurora-violet-solid text-base font-medium text-white disabled:opacity-40"
               >
                 Siguiente →
               </button>

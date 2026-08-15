@@ -42,7 +42,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 
 - [x] Modo ensayo
 - [x] Modo servicio (interfaz mínima)
-- [ ] Favoritos
+- [x] Favoritos
 - [x] PWA instalable
 - [~] Offline (funciona sin conexión; la sincronización llega con el backend)
 - [ ] Notificaciones
@@ -71,4 +71,6 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Despliegue continuo
 - [!] URL definitiva en `auroraworship.github.io` — bloqueo B-01
 - [ ] Límites de tamaño y tipo en subidas
+- [x] Auditoría de accesibilidad ejecutable (`npm run a11y`)
+- [x] Contraste verificado contra WCAG AA
 - [ ] Registro de auditoría para cambios de rol

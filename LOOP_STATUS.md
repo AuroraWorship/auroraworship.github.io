@@ -4,15 +4,13 @@
 
 ## LOOP actual
 
-**LOOP 004 — PLANIFICACIÓN Y USO EN VIVO** · completado
+**LOOP 005 — FAVORITOS Y AUDITORÍA** · completado
 
 ## Objetivo
 
-Cerrar el círculo del producto: que el líder pueda planificar el servicio y que el músico pueda
-usar la aplicación sobre el atril, con o sin conexión.
-
-LOOP 001 (bootstrap, motor musical, RBAC, UI), LOOP 002 (persistencia, edición) y LOOP 003 (equipo,
-preparación) completados y verificados.
+Revisar todo lo construido y corregir lo que aparezca. Los cuatro loops anteriores están
+completados y verificados; este no añade superficie nueva salvo favoritos, y se dedica a auditar
+accesibilidad, seguridad, contraste y consistencia.
 
 ## Completado
 
@@ -68,13 +66,24 @@ preparación) completados y verificados.
 - [x] PWA: manifiesto, iconos generados, service worker propio y offline (ADR-010)
 - [x] 132 pruebas; comprobación en navegador ampliada a planificar, reordenar, modo en vivo y PWA
 
-## Pendiente (siguiente loop)
+## Añadido en LOOP 005
 
-**LOOP 005 — REVISIÓN Y CIERRE**
+- [x] Favoritos personales, guardados por actor: marcar uno no toca el repertorio del ministerio
+- [x] Filtro «solo mis favoritos» en la biblioteca
+- [x] `npm run a11y`: auditoría de accesibilidad ejecutable sobre las nueve pantallas (ADR-013)
+- [x] Auditoría de contraste de toda la paleta; un par incumplía AA y se corrigió (ADR-012)
+- [x] Auditoría de secretos y de vectores de inyección: sin hallazgos
+- [x] Comprobación real de funcionamiento sin conexión, cortando la red
+- [x] 137 pruebas de dominio
 
-1. Favoritos personales.
-2. Auditoría completa: accesibilidad, seguridad, rendimiento y consistencia.
-3. Revisión de todo lo construido, corrección de lo que aparezca.
+## Pendiente
+
+El producto cubre su objetivo original. Lo que queda depende de los bloqueos de abajo o pertenece
+a fases posteriores del roadmap:
+
+1. Autenticación real y sincronización entre dispositivos (B-03).
+2. Subida de archivos a storage: tutoriales con vídeo, audio y PDF (B-03).
+3. Secuencias (click, pads, stems) y Aurora Academy.
 
 ## Errores corregidos en este loop
 
@@ -90,6 +99,9 @@ preparación) completados y verificados.
 | El modo en vivo se superponía, dejando la navegación alcanzable por tabulador y lector de pantalla | Comprobación en navegador (ADR-011) |
 | Faltaban los tipos de `vite/client` para `import.meta.env` | Typecheck |
 | Dos aserciones de la comprobación eran frágiles: buscaban texto que también aparece en `<option>` invisibles | Falso negativo investigado leyendo IndexedDB |
+| Blanco sobre violeta daba 4.23:1, por debajo de AA | Auditoría de contraste (ADR-012) |
+| Once objetivos táctiles por debajo de 44px: selector de rol, reordenar repertorio, fichas de instrumento, enlaces de volver, cabecera del modo en vivo | `npm run a11y` |
+| La propia auditoría contaba enlaces en línea como botones y no recargaba al cambiar de rol | Revisión de sus hallazgos |
 
 ## Bloqueos abiertos
 

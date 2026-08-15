@@ -43,6 +43,8 @@ export interface AuroraRepository {
   listServices(actor: Actor): Promise<readonly Service[]>;
   saveService(actor: Actor, service: Service): Promise<Service>;
   listTutorials(actor: Actor): Promise<readonly Tutorial[]>;
+  listFavorites(actor: Actor): Promise<readonly Id[]>;
+  toggleFavorite(actor: Actor, songId: Id): Promise<readonly Id[]>;
   listMembers(actor: Actor): Promise<readonly Member[]>;
   getMember(actor: Actor, id: Id): Promise<Member | null>;
   saveMember(actor: Actor, member: Member): Promise<Member>;
@@ -193,6 +195,32 @@ export class StoredRepository implements AuroraRepository {
   async listTutorials(actor: Actor): Promise<readonly Tutorial[]> {
     require(actor, 'tutorial:read');
     return visible(actor, await this.collection<Tutorial>(KEYS.tutorials, SEED_TUTORIALS));
+  }
+
+  /**
+   * Favoritos.
+   *
+   * Son personales, así que se guardan por actor y no en la canción: dos
+   * músicos no comparten los suyos, y marcar uno no modifica el repertorio
+   * del ministerio.
+   */
+  private favoritesKey(actor: Actor): string {
+    return `favorites:${actor.id}`;
+  }
+
+  async listFavorites(actor: Actor): Promise<readonly Id[]> {
+    require(actor, 'song:read');
+    return (await this.store.get<Id[]>(this.favoritesKey(actor))) ?? [];
+  }
+
+  async toggleFavorite(actor: Actor, songId: Id): Promise<readonly Id[]> {
+    require(actor, 'song:read');
+    const current = await this.listFavorites(actor);
+    const next = current.includes(songId)
+      ? current.filter((id) => id !== songId)
+      : [...current, songId];
+    await this.store.set(this.favoritesKey(actor), next);
+    return next;
   }
 
   async listMembers(actor: Actor): Promise<readonly Member[]> {

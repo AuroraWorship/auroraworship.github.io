@@ -101,7 +101,7 @@ export function ServiceEditorPage() {
   return (
     <div className="space-y-5 pb-4">
       <div>
-        <button type="button" onClick={() => navigate('/servicio')} className="text-sm text-aurora-muted">
+        <button type="button" onClick={() => navigate('/servicio')} className="-my-2.5 inline-flex h-11 items-center text-sm text-aurora-muted">
           ← Servicio
         </button>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Planificar servicio</h1>
@@ -157,7 +157,7 @@ export function ServiceEditorPage() {
                       type="button"
                       onClick={() => move(index, -1)}
                       aria-label={`Subir ${song.title}`}
-                      className="h-9 w-9 rounded-lg border border-aurora-border"
+                      className="h-11 w-11 rounded-lg border border-aurora-border"
                     >
                       ↑
                     </button>
@@ -165,7 +165,7 @@ export function ServiceEditorPage() {
                       type="button"
                       onClick={() => move(index, 1)}
                       aria-label={`Bajar ${song.title}`}
-                      className="h-9 w-9 rounded-lg border border-aurora-border"
+                      className="h-11 w-11 rounded-lg border border-aurora-border"
                     >
                       ↓
                     </button>
@@ -173,7 +173,7 @@ export function ServiceEditorPage() {
                       type="button"
                       onClick={() => updateEntries(entries.filter((_, i) => i !== index))}
                       aria-label={`Quitar ${song.title}`}
-                      className="h-9 w-9 rounded-lg border border-red-500/40 text-red-300"
+                      className="h-11 w-11 rounded-lg border border-red-500/40 text-red-300"
                     >
                       ×
                     </button>
@@ -265,7 +265,7 @@ export function ServiceEditorPage() {
         </h2>
 
         {members.length === 0 ? (
-          <p className="text-sm text-aurora-muted">
+          <p className="-my-2.5 inline-flex h-11 items-center text-sm text-aurora-muted">
             No hay integrantes cargados todavía. Añádelos en Equipo para poder repartir el servicio.
           </p>
         ) : (
@@ -295,7 +295,7 @@ export function ServiceEditorPage() {
                       type="button"
                       onClick={() => removeAssignment(index)}
                       aria-label="Quitar asignación"
-                      className="h-9 w-9 shrink-0 rounded-lg border border-red-500/40 text-red-300"
+                      className="h-11 w-11 shrink-0 rounded-lg border border-red-500/40 text-red-300"
                     >
                       ×
                     </button>
@@ -387,7 +387,7 @@ function AssignmentForm({
           setInstrument('');
           setVoicePart('');
         }}
-        className="h-12 w-full rounded-xl bg-aurora-violet font-medium text-white disabled:opacity-50"
+        className="h-12 w-full rounded-xl bg-aurora-violet-solid font-medium text-white disabled:opacity-50"
       >
         Añadir al servicio
       </button>

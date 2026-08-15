@@ -70,7 +70,7 @@ export function ServicePage() {
         {can(actor, 'service:write') && (
           <Link
             to="/servicio/planificar"
-            className="flex h-11 shrink-0 items-center rounded-xl bg-aurora-violet px-4 text-sm font-medium text-white"
+            className="flex h-11 shrink-0 items-center rounded-xl bg-aurora-violet-solid px-4 text-sm font-medium text-white"
           >
             Planificar
           </Link>

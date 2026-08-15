@@ -109,7 +109,7 @@ export function SongEditorPage() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="text-sm text-aurora-muted"
+          className="-my-2.5 inline-flex h-11 items-center text-sm text-aurora-muted"
         >
           ← Cancelar
         </button>
@@ -236,7 +236,7 @@ export function SongEditorPage() {
                 onClick={() => toggleInstrument(instrument.id)}
                 aria-pressed={active}
                 className={[
-                  'h-10 rounded-lg border px-3 text-sm',
+                  'h-11 rounded-lg border px-3 text-sm',
                   active
                     ? 'border-aurora-violet bg-aurora-violet/20 text-aurora-violet-soft'
                     : 'border-aurora-border bg-aurora-surface text-aurora-muted',
@@ -276,7 +276,7 @@ export function SongEditorPage() {
           Tonalidad por vocalista
         </p>
         {members.length === 0 ? (
-          <p className="text-sm text-aurora-muted">
+          <p className="-my-2.5 inline-flex h-11 items-center text-sm text-aurora-muted">
             Aún no hay integrantes cargados. Añádelos en Equipo y podrás fijar aquí la tonalidad de
             cada vocalista.
           </p>
@@ -370,7 +370,7 @@ export function SongEditorPage() {
           type="button"
           onClick={save}
           disabled={saving}
-          className="h-12 flex-1 rounded-xl bg-aurora-violet font-medium text-white disabled:opacity-60"
+          className="h-12 flex-1 rounded-xl bg-aurora-violet-solid font-medium text-white disabled:opacity-60"
         >
           {saving ? 'Guardando…' : 'Guardar'}
         </button>

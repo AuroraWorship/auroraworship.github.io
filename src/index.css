@@ -17,7 +17,12 @@
   --color-aurora-border: #302549;
   --color-aurora-text: #ede9f6;
   --color-aurora-muted: #a297c4;
+  /* `violet` se usa como texto y borde sobre el fondo oscuro: 4.63:1. */
   --color-aurora-violet: #8b5cf6;
+  /* `violet-solid` es el relleno de los botones primarios, que llevan texto
+     blanco encima. El violeta claro daba 4.23:1, por debajo de AA; este da
+     5.70:1. La diferencia no se nota a simple vista y el botón sí se lee. */
+  --color-aurora-violet-solid: #7c3aed;
   --color-aurora-violet-soft: #c4b5fd;
   --color-aurora-ember: #f97316;
 }

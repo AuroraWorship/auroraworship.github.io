@@ -187,3 +187,44 @@ exactamente lo que hay que eliminar.
 
 **Consecuencias.** La comprobación en navegador verifica que la navegación no existe en modo en
 vivo, no solo que no se ve.
+
+---
+
+## ADR-012 — Dos violetas: uno para texto, otro para relleno
+
+**Contexto.** La auditoría de contraste encontró que el blanco sobre el violeta de marca daba
+4.23:1, por debajo del 4.5:1 que exige WCAG AA para texto normal. Afectaba a todos los botones
+primarios de la aplicación.
+
+**Alternativas.** Poner texto oscuro sobre el violeta claro (se ve mal y rompe la jerarquía);
+agrandar el texto para acogerse al umbral de texto grande (esconde el problema en vez de
+resolverlo).
+
+**Decisión.** Dos tokens: `violet` (#8b5cf6) para texto, bordes y tintes sobre el fondo oscuro, y
+`violet-solid` (#7c3aed) como relleno de los botones con texto blanco.
+
+**Razón.** 5.70:1 con blanco. La diferencia entre los dos violetas no se aprecia a simple vista, y
+el botón pasa a leerse bien también con poca luz o con la pantalla al mínimo — que es exactamente
+la condición de uso en el atril.
+
+**Consecuencias.** Al añadir un botón sólido hay que usar `violet-solid`. Hay una comprobación de
+contraste que vigila la paleta.
+
+---
+
+## ADR-013 — Auditoría de accesibilidad ejecutable, no una lista de buenos propósitos
+
+**Contexto.** La aplicación se usa con el instrumento en las manos y con prisa. Un botón de 36px se
+falla al pulsarlo, y eso en mitad de un servicio es un problema real.
+
+**Decisión.** `npm run a11y` recorre las nueve pantallas en un navegador y falla si algo pulsable
+mide menos de 44px de alto, si a algo le falta nombre accesible o si una pantalla no tiene
+exactamente un `h1`.
+
+**Razón.** Una regla que no se ejecuta se incumple sin que nadie se entere. Esta encontró once
+puntos en su primera pasada, incluidos los botones de reordenar el repertorio y las fichas de
+instrumento.
+
+**Consecuencias.** La comprobación también se equivoca: contaba enlaces en línea dentro de una
+frase como si fueran botones, y no recargaba al cambiar de rol, lo que producía un falso «h1 = 0».
+Se corrigió la comprobación, no el producto.

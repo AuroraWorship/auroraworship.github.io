@@ -10,6 +10,8 @@ export function SongsPage() {
   const { actor } = useSession();
   const [text, setText] = useState('');
   const [songs, setSongs] = useState<readonly Song[] | null>(null);
+  const [favorites, setFavorites] = useState<readonly string[]>([]);
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
 
   const allowed = can(actor, 'song:read');
 
@@ -27,7 +29,22 @@ export function SongsPage() {
     };
   }, [actor, text, allowed]);
 
-  const count = useMemo(() => songs?.length ?? 0, [songs]);
+  useEffect(() => {
+    if (!allowed) return;
+    let active = true;
+    repository.listFavorites(actor).then((ids) => {
+      if (active) setFavorites(ids);
+    });
+    return () => {
+      active = false;
+    };
+  }, [actor, allowed]);
+
+  const shown = useMemo(
+    () => (onlyFavorites ? (songs ?? []).filter((s) => favorites.includes(s.id)) : songs),
+    [songs, favorites, onlyFavorites],
+  );
+  const count = shown?.length ?? 0;
 
   if (!allowed) return <NoAccess />;
 
@@ -43,7 +60,7 @@ export function SongsPage() {
         {can(actor, 'song:write') && (
           <Link
             to="/canciones/nueva"
-            className="flex h-11 shrink-0 items-center rounded-xl bg-aurora-violet px-4 text-sm font-medium text-white"
+            className="flex h-11 shrink-0 items-center rounded-xl bg-aurora-violet-solid px-4 text-sm font-medium text-white"
           >
             Nueva
           </Link>
@@ -59,14 +76,30 @@ export function SongsPage() {
         className="h-12 w-full rounded-xl border border-aurora-border bg-aurora-surface px-4 text-base placeholder:text-aurora-muted"
       />
 
-      {songs !== null && songs.length === 0 && (
+      {favorites.length > 0 && (
+        <button
+          type="button"
+          aria-pressed={onlyFavorites}
+          onClick={() => setOnlyFavorites((v) => !v)}
+          className={[
+            'h-10 rounded-lg border px-3 text-sm',
+            onlyFavorites
+              ? 'border-aurora-ember/50 bg-aurora-ember/15 text-aurora-ember'
+              : 'border-aurora-border bg-aurora-surface text-aurora-muted',
+          ].join(' ')}
+        >
+          ★ Solo mis favoritos ({favorites.length})
+        </button>
+      )}
+
+      {shown !== null && shown.length === 0 && (
         <EmptyState title="Sin resultados">
           Prueba con otra palabra, o revisa el repertorio completo dejando la búsqueda vacía.
         </EmptyState>
       )}
 
       <ul className="space-y-2">
-        {songs?.map((song) => (
+        {shown?.map((song) => (
           <li key={song.id}>
             <Link
               to={`/canciones/${song.id}`}

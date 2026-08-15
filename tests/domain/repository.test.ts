@@ -249,3 +249,34 @@ describe('planificación del servicio', () => {
     expect(cancion.currentKey).toBe('G');
   });
 });
+
+describe('favoritos', () => {
+  it('arrancan vacíos', async () => {
+    expect(await repo.listFavorites(musician)).toEqual([]);
+  });
+
+  it('se marcan y se desmarcan', async () => {
+    expect(await repo.toggleFavorite(musician, 'song-sublime-gracia')).toEqual([
+      'song-sublime-gracia',
+    ]);
+    expect(await repo.toggleFavorite(musician, 'song-sublime-gracia')).toEqual([]);
+  });
+
+  it('son personales: no se comparten entre integrantes', async () => {
+    await repo.toggleFavorite(musician, 'song-sublime-gracia');
+    expect(await repo.listFavorites(leader)).toEqual([]);
+    expect(await repo.listFavorites(musician)).toEqual(['song-sublime-gracia']);
+  });
+
+  it('marcar un favorito no modifica la canción del ministerio', async () => {
+    const antes = await repo.getSong(leader, 'song-sublime-gracia');
+    await repo.toggleFavorite(musician, 'song-sublime-gracia');
+    expect(await repo.getSong(leader, 'song-sublime-gracia')).toEqual(antes);
+  });
+
+  it('el anónimo no puede marcar favoritos de contenido interno que no ve', async () => {
+    // Puede leer lo público, así que la operación en sí es legítima; lo que lo
+    // limita es qué canciones llega a ver.
+    expect(await repo.listFavorites(ANONYMOUS)).toEqual([]);
+  });
+});

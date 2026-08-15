@@ -180,5 +180,20 @@ const swRegistrado = await page.evaluate(async () => {
 });
 console.log('SERVICE WORKER REGISTRADO:', swRegistrado);
 
+// --- Sin conexión -----------------------------------------------------------
+
+// Primera visita en línea para que el service worker cachee; después se corta
+// la red y se comprueba que la aplicación sigue abriendo y mostrando datos.
+await page.goto('http://localhost:4173/#/canciones', { waitUntil: 'networkidle' });
+await page.waitForTimeout(1200);
+await page.context().setOffline(true);
+await page.reload({ waitUntil: 'domcontentloaded' });
+await page.waitForSelector('text=Canciones', { timeout: 10000 });
+const cancionesOffline = await page.locator('main li a[href*="/canciones/"]').count();
+console.log('ABRE SIN CONEXION:', true);
+console.log('MUESTRA CANCIONES SIN CONEXION:', cancionesOffline > 0);
+await page.screenshot({ path: `${shots}/11-offline.png` });
+await page.context().setOffline(false);
+
 console.log('ERRORES DE CONSOLA:', errors.length === 0 ? 'ninguno' : errors.join(' | '));
 await browser.close();

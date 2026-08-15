@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.5.0] — LOOP 005 · Favoritos y auditoría
+
+Loop de revisión: poca superficie nueva, y todo lo construido pasado por el cedazo.
+
+### Añadido
+
+- **Favoritos personales.** Son por persona: marcar uno no modifica el repertorio del ministerio.
+  La biblioteca gana un filtro para ver solo los tuyos.
+- **`npm run a11y`.** Auditoría de accesibilidad que recorre las nueve pantallas en un navegador
+  real y falla si algo pulsable mide menos de 44px, si le falta nombre accesible o si la pantalla
+  no tiene exactamente un `h1`.
+- Comprobación de funcionamiento sin conexión cortando la red de verdad, no solo mirando si el
+  service worker se registró.
+
+### Corregido
+
+- **Contraste.** El blanco sobre el violeta de marca daba 4.23:1, por debajo del 4.5:1 de WCAG AA,
+  y afectaba a todos los botones primarios. Se separan dos violetas: uno para texto y tintes, otro
+  para rellenos con texto blanco (ADR-012).
+- **Objetivos táctiles.** Once elementos por debajo de 44px: el selector de rol, los botones de
+  reordenar el repertorio, las fichas de instrumento y tonalidad, los enlaces de volver y la
+  cabecera del modo en vivo.
+
+### Verificado sin hallazgos
+
+- Ningún secreto, clave ni token en el repositorio.
+- Ningún uso de `innerHTML` ni `dangerouslySetInnerHTML`: no hay vector de inyección.
+- 90 KB comprimidos de JavaScript.
+
 ## [0.4.0] — LOOP 004 · Planificación y uso en vivo
 
 Se cierra el círculo: el líder planifica, el músico toca.

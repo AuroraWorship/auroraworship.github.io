@@ -22,6 +22,7 @@ export function SongPage() {
   const { actor } = useSession();
   const [song, setSong] = useState<Song | null | undefined>(undefined);
   const [members, setMembers] = useState<readonly Member[]>([]);
+  const [favorite, setFavorite] = useState(false);
   const [key, setKey] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('sheet');
 
@@ -37,6 +38,17 @@ export function SongPage() {
       active = false;
     };
   }, [actor]);
+
+  useEffect(() => {
+    if (!songId || !allowed) return;
+    let live = true;
+    repository.listFavorites(actor).then((ids) => {
+      if (live) setFavorite(ids.includes(songId));
+    });
+    return () => {
+      live = false;
+    };
+  }, [actor, songId, allowed]);
 
   useEffect(() => {
     if (!songId || !allowed) return;
@@ -72,7 +84,26 @@ export function SongPage() {
         <Link to="/canciones" className="text-sm text-aurora-muted">
           ← Canciones
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">{song.title}</h1>
+        <div className="mt-1 flex items-start justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">{song.title}</h1>
+          <button
+            type="button"
+            aria-pressed={favorite}
+            aria-label={favorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+            onClick={async () => {
+              const ids = await repository.toggleFavorite(actor, song.id);
+              setFavorite(ids.includes(song.id));
+            }}
+            className={[
+              'h-11 w-11 shrink-0 rounded-xl border text-lg',
+              favorite
+                ? 'border-aurora-ember/50 bg-aurora-ember/15 text-aurora-ember'
+                : 'border-aurora-border text-aurora-muted',
+            ].join(' ')}
+          >
+            {favorite ? '★' : '☆'}
+          </button>
+        </div>
         <p className="text-sm text-aurora-muted">
           {[song.artist, song.meter, song.bpm ? `${song.bpm} BPM` : null]
             .filter(Boolean)
@@ -119,7 +150,7 @@ export function SongPage() {
             onClick={() => setTab(id)}
             className={[
               'h-10 flex-1 rounded-lg text-sm font-medium transition-colors',
-              tab === id ? 'bg-aurora-violet text-white' : 'text-aurora-muted',
+              tab === id ? 'bg-aurora-violet-solid text-white' : 'text-aurora-muted',
             ].join(' ')}
           >
             {label}
