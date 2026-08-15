@@ -59,5 +59,31 @@ console.log('PUBLICO VE:', (await page.locator('main').innerText()).split('\n')[
 await page.goto('http://localhost:4173/#/ensayo', { waitUntil: 'networkidle' });
 await page.screenshot({ path: `${shots}/05-ensayo.png` });
 
+// --- Edición y persistencia -------------------------------------------------
+
+await page.selectOption('select[aria-label="Rol de demostración"]', 'leader');
+await page.goto('http://localhost:4173/#/canciones/nueva', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Nueva canción');
+
+const nuevoTitulo = `Prueba ${Date.now()}`;
+await page.getByPlaceholder('Cómo se llama').fill(nuevoTitulo);
+await page.locator('textarea').fill('# Coro\n[C]Cantaré [G]a mi Se[Am]ñor');
+await page.screenshot({ path: `${shots}/06-editor.png` });
+
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector(`text=${nuevoTitulo}`);
+console.log('GUARDADA:', (await page.locator('h1').innerText()).trim() === nuevoTitulo);
+
+// Recargar de cero: si sobrevive, la persistencia funciona de verdad.
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForSelector('text=Tonalidad');
+console.log('PERSISTE TRAS RECARGA:', (await page.locator('h1').innerText()).trim() === nuevoTitulo);
+
+// El músico no debe ver botones de edición.
+await page.selectOption('select[aria-label="Rol de demostración"]', 'musician');
+await page.waitForTimeout(300);
+const editarVisible = await page.getByRole('link', { name: 'Editar' }).count();
+console.log('MUSICO VE BOTON EDITAR:', editarVisible > 0);
+
 console.log('ERRORES DE CONSOLA:', errors.length === 0 ? 'ninguno' : errors.join(' | '));
 await browser.close();

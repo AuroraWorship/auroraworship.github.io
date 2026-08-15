@@ -33,11 +33,21 @@ export function SongsPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Canciones</h1>
-        <p className="text-sm text-aurora-muted">
-          {songs === null ? 'Cargando…' : `${count} ${count === 1 ? 'canción' : 'canciones'}`}
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Canciones</h1>
+          <p className="text-sm text-aurora-muted">
+            {songs === null ? 'Cargando…' : `${count} ${count === 1 ? 'canción' : 'canciones'}`}
+          </p>
+        </div>
+        {can(actor, 'song:write') && (
+          <Link
+            to="/canciones/nueva"
+            className="flex h-11 shrink-0 items-center rounded-xl bg-aurora-violet px-4 text-sm font-medium text-white"
+          >
+            Nueva
+          </Link>
+        )}
       </div>
 
       <input

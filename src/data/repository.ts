@@ -2,16 +2,20 @@
  * Capa de acceso a datos.
  *
  * La UI habla siempre con esta interfaz, nunca con un backend concreto. Hoy
- * hay una implementación en memoria alimentada por `seed.ts`; mañana entra
- * una contra base de datos cloud sin tocar las pantallas. Es la decisión que
- * mantiene reversible el resto de la arquitectura (ver DECISIONS.md ADR-004).
+ * la respalda un almacén clave-valor local (IndexedDB); mañana uno contra
+ * base de datos cloud, sin tocar las pantallas (ADR-004).
+ *
+ * Dos responsabilidades viven aquí y no en las pantallas:
+ *  - Filtrar por ámbito de visibilidad (ADR-005).
+ *  - Exigir permiso antes de escribir. Una pantalla que olvide comprobarlo no
+ *    puede saltarse la regla, porque el repositorio la aplica igualmente.
  */
 
 import type { Id, Service, Setlist, Song, Tutorial } from '../domain/model';
 import { lyricsOf, parseSongBody } from '../domain/music/song-body';
-import type { Actor } from '../domain/rbac/roles';
-import { canView } from '../domain/rbac/roles';
+import { type Actor, type Permission, can, canView } from '../domain/rbac/roles';
 import { SEED_SERVICES, SEED_SETLISTS, SEED_SONGS, SEED_TUTORIALS } from './seed';
+import { type KeyValueStore, MemoryStore, createDefaultStore } from './store';
 
 export interface SongQuery {
   /** Busca en título, artista, etiquetas y letra. */
@@ -21,9 +25,18 @@ export interface SongQuery {
   tag?: string;
 }
 
+export class PermissionError extends Error {
+  constructor(permission: Permission) {
+    super(`Acción no permitida: falta el permiso "${permission}".`);
+    this.name = 'PermissionError';
+  }
+}
+
 export interface AuroraRepository {
   listSongs(actor: Actor, query?: SongQuery): Promise<readonly Song[]>;
   getSong(actor: Actor, id: Id): Promise<Song | null>;
+  saveSong(actor: Actor, song: Song): Promise<Song>;
+  deleteSong(actor: Actor, id: Id): Promise<void>;
   listSetlists(actor: Actor): Promise<readonly Setlist[]>;
   getSetlist(actor: Actor, id: Id): Promise<Setlist | null>;
   listServices(actor: Actor): Promise<readonly Service[]>;
@@ -36,6 +49,10 @@ function visible<T extends { scope: Parameters<typeof canView>[1] }>(
   items: readonly T[],
 ): readonly T[] {
   return items.filter((item) => canView(actor, item.scope));
+}
+
+function require(actor: Actor, permission: Permission): void {
+  if (!can(actor, permission)) throw new PermissionError(permission);
 }
 
 function matches(song: Song, query: SongQuery): boolean {
@@ -64,40 +81,92 @@ function matches(song: Song, query: SongQuery): boolean {
   return true;
 }
 
-export class InMemoryRepository implements AuroraRepository {
-  constructor(
-    private readonly songs: readonly Song[] = SEED_SONGS,
-    private readonly setlists: readonly Setlist[] = SEED_SETLISTS,
-    private readonly services: readonly Service[] = SEED_SERVICES,
-    private readonly tutorials: readonly Tutorial[] = SEED_TUTORIALS,
-  ) {}
+const KEYS = {
+  songs: 'songs',
+  setlists: 'setlists',
+  services: 'services',
+  tutorials: 'tutorials',
+} as const;
+
+/**
+ * Repositorio sobre almacenamiento clave-valor.
+ *
+ * La primera vez que se pide una colección que no existe, se siembra con los
+ * datos de arranque y se guarda. A partir de ahí manda lo guardado: si el
+ * usuario borra una canción semilla, no reaparece.
+ */
+export class StoredRepository implements AuroraRepository {
+  constructor(private readonly store: KeyValueStore) {}
+
+  private async collection<T>(key: string, seed: readonly T[]): Promise<T[]> {
+    const stored = await this.store.get<T[]>(key);
+    if (stored !== null) return stored;
+    const initial = structuredClone(seed) as T[];
+    await this.store.set(key, initial);
+    return initial;
+  }
 
   async listSongs(actor: Actor, query: SongQuery = {}): Promise<readonly Song[]> {
-    return visible(actor, this.songs)
+    require(actor, 'song:read');
+    const songs = await this.collection<Song>(KEYS.songs, SEED_SONGS);
+    return visible(actor, songs)
       .filter((song) => matches(song, query))
       .slice()
       .sort((a, b) => a.title.localeCompare(b.title, 'es'));
   }
 
   async getSong(actor: Actor, id: Id): Promise<Song | null> {
-    return visible(actor, this.songs).find((s) => s.id === id) ?? null;
+    require(actor, 'song:read');
+    const songs = await this.collection<Song>(KEYS.songs, SEED_SONGS);
+    return visible(actor, songs).find((s) => s.id === id) ?? null;
+  }
+
+  async saveSong(actor: Actor, song: Song): Promise<Song> {
+    require(actor, 'song:write');
+    const songs = await this.collection<Song>(KEYS.songs, SEED_SONGS);
+    const index = songs.findIndex((s) => s.id === song.id);
+    if (index >= 0) songs[index] = song;
+    else songs.push(song);
+    await this.store.set(KEYS.songs, songs);
+    return song;
+  }
+
+  async deleteSong(actor: Actor, id: Id): Promise<void> {
+    require(actor, 'song:delete');
+    const songs = await this.collection<Song>(KEYS.songs, SEED_SONGS);
+    await this.store.set(
+      KEYS.songs,
+      songs.filter((s) => s.id !== id),
+    );
   }
 
   async listSetlists(actor: Actor): Promise<readonly Setlist[]> {
-    return visible(actor, this.setlists);
+    require(actor, 'setlist:read');
+    return visible(actor, await this.collection<Setlist>(KEYS.setlists, SEED_SETLISTS));
   }
 
   async getSetlist(actor: Actor, id: Id): Promise<Setlist | null> {
-    return visible(actor, this.setlists).find((s) => s.id === id) ?? null;
+    require(actor, 'setlist:read');
+    const setlists = await this.collection<Setlist>(KEYS.setlists, SEED_SETLISTS);
+    return visible(actor, setlists).find((s) => s.id === id) ?? null;
   }
 
   async listServices(actor: Actor): Promise<readonly Service[]> {
-    return visible(actor, this.services);
+    require(actor, 'service:read');
+    return visible(actor, await this.collection<Service>(KEYS.services, SEED_SERVICES));
   }
 
   async listTutorials(actor: Actor): Promise<readonly Tutorial[]> {
-    return visible(actor, this.tutorials);
+    require(actor, 'tutorial:read');
+    return visible(actor, await this.collection<Tutorial>(KEYS.tutorials, SEED_TUTORIALS));
   }
 }
 
-export const repository: AuroraRepository = new InMemoryRepository();
+/** Repositorio en memoria, para pruebas. */
+export class InMemoryRepository extends StoredRepository {
+  constructor() {
+    super(new MemoryStore());
+  }
+}
+
+export const repository: AuroraRepository = new StoredRepository(createDefaultStore());

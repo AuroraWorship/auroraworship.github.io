@@ -4,12 +4,14 @@
 
 ## LOOP actual
 
-**LOOP 001 — CLOUD BOOTSTRAP** · completado
+**LOOP 002 — PERSISTENCIA Y EDICIÓN** · completado
 
 ## Objetivo
 
-Levantar el proyecto desde cero en la nube: stack, arquitectura, modelo de datos, RBAC, motor
-musical probado y una aplicación que se pueda abrir y usar.
+Que la aplicación deje de ser de solo lectura: persistencia real en el dispositivo y edición
+completa de canciones, con los permisos aplicados donde importa.
+
+LOOP 001 (bootstrap cloud, motor musical, RBAC, UI base) quedó completado y verificado.
 
 ## Completado
 
@@ -31,16 +33,26 @@ musical probado y una aplicación que se pueda abrir y usar.
       cero errores de consola
 - [x] Despliegue continuo a GitHub Pages configurado
 
+## Añadido en LOOP 002
+
+- [x] Renombrado del producto a **Aurora Worship** (forma corta: Aurora)
+- [x] `KeyValueStore` con IndexedDB, respaldo en localStorage y memoria para pruebas (ADR-008)
+- [x] `StoredRepository`: siembra en el primer arranque, después manda lo guardado
+- [x] Escritura con permiso exigido en el repositorio, no en la pantalla
+- [x] Editor de canciones completo, con vista previa en vivo de la hoja de acordes
+- [x] Borrado con confirmación, restringido a admin y super admin
+- [x] Aviso cuando una canción se marca pública sin derechos que lo permitan
+- [x] El rol público puede leer contenido público (ADR-009)
+- [x] 121 pruebas; comprobación en navegador ampliada a crear, guardar y recargar
+
 ## Pendiente (siguiente loop)
 
-**LOOP 002 — PERSISTENCIA Y EDICIÓN**
+**LOOP 003 — EQUIPO Y PREPARACIÓN**
 
-1. Edición de canciones desde la aplicación (hoy solo lectura).
-2. Persistencia local (IndexedDB) tras la interfaz de repositorio: hace la aplicación usable de
-   verdad sin depender aún de cuenta externa.
-3. Modelo de vocalista + tonalidad por vocalista, conectado a la vista de servicio.
-4. Vista "Mi preparación".
-5. PWA instalable.
+1. Integrantes y vocalistas, con tonalidad por vocalista conectada a la vista de servicio.
+2. Asignaciones: quién toca qué en cada servicio y ensayo.
+3. Vista "Mi preparación".
+4. Edición de repertorios y servicios.
 
 ## Errores corregidos en este loop
 
@@ -49,6 +61,8 @@ musical probado y una aplicación que se pueda abrir y usar.
 | `Coro` se parseaba como acorde (`C` + sufijo `oro`) | Prueba `isChord('Coro')` |
 | La búsqueda no encontraba palabras partidas por un acorde (`omnipo[A]tente`) | Prueba de búsqueda por letra |
 | 404 de consola por favicon ausente | Comprobación en navegador |
+| El rol público no podía leer nada, lo que hacía imposible la app pública | Refactor de persistencia (ADR-009) |
+| El `textarea` del editor heredaba altura fija de la clase de input | Revisión del editor |
 
 ## Bloqueos abiertos
 

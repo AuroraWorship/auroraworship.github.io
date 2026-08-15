@@ -115,3 +115,40 @@ estorba.
 
 **Consecuencias.** La paleta es **provisional**. Hereda el morado y naranja de MARCADOS para que se
 lean como familia, pero la identidad oficial de Aurora está pendiente de confirmación.
+
+---
+
+## ADR-008 — Persistencia local tras la interfaz de repositorio
+
+**Contexto.** La aplicación necesitaba dejar de ser de solo lectura, pero la base de datos cloud
+está bloqueada por requerir cuenta externa (B-03). Sin persistencia, editar no sirve de nada.
+
+**Alternativas.** Esperar a tener backend (deja el producto inservible mientras tanto);
+`localStorage` a secas (simple, pero techo de ~5 MB y sin transacciones).
+
+**Decisión.** Interfaz `KeyValueStore` con tres implementaciones: IndexedDB, `localStorage` como
+respaldo y memoria para las pruebas. `StoredRepository` la usa sin saber cuál está activa.
+
+**Razón.** El ministerio puede empezar a cargar su repertorio hoy, en su propio teléfono. Cuando
+llegue el backend, se añade una implementación más; las pantallas no cambian.
+
+**Consecuencias.** Los datos viven por dispositivo y aún no se sincronizan entre integrantes. Es
+una limitación conocida y aceptada para esta fase, no un descuido. La sincronización llega con el
+backend.
+
+---
+
+## ADR-009 — El rol público puede leer; el ámbito decide qué
+
+**Contexto.** El rol `public` arrancó sin ningún permiso. Al construir la persistencia se vio que
+eso hacía imposible la aplicación pública prevista en el roadmap: sin `song:read` no hay nada que
+enseñar a un visitante, ni siquiera lo marcado como público.
+
+**Decisión.** `public` tiene `song:read` y `tutorial:read`. El filtro de `scope` le entrega
+únicamente el contenido marcado como público.
+
+**Razón.** Permiso y ámbito son ejes distintos y conviene no mezclarlos: el permiso dice qué acción
+se puede intentar, el ámbito dice sobre qué registros. Confundirlos obliga a duplicar reglas.
+
+**Consecuencias.** Ninguna filtración: el contenido interno sigue fuera de su alcance por ámbito,
+y sigue sin poder escribir nada.

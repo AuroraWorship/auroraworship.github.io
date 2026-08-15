@@ -1,4 +1,4 @@
-# Instrucciones de trabajo — Aurora OS
+# Instrucciones de trabajo — Aurora Worship
 
 ## Antes de tocar nada
 

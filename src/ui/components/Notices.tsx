@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /**
  * Aviso de dato no confirmado.
  *
- * Aurora OS nunca rellena con suposiciones lo que el ministerio no ha
+ * Aurora Worship nunca rellena con suposiciones lo que el ministerio no ha
  * confirmado: lo dice en pantalla.
  */
 export function PendingNotice({ children }: { children: ReactNode }) {

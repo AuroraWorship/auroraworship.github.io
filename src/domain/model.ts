@@ -1,5 +1,5 @@
 /**
- * Modelo de datos de Aurora OS.
+ * Modelo de datos de Aurora Worship.
  *
  * Todo lo que la aplicación muestra se describe aquí. Las entidades se
  * definen completas desde el principio aunque la UI todavía no use todos los

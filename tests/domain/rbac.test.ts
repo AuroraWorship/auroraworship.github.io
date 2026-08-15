@@ -57,9 +57,12 @@ describe('permisos por rol', () => {
     expect(allowed).toEqual(['super-admin', 'admin']);
   });
 
-  it('el público no tiene ningún permiso', () => {
-    expect(permissionsOf('public')).toEqual([]);
-    expect(can(ANONYMOUS, 'song:read')).toBe(false);
+  it('el público lee canciones y tutoriales, y nada más', () => {
+    // El alcance real lo recorta el ámbito: solo recibe lo marcado público.
+    expect([...permissionsOf('public')].sort()).toEqual(['song:read', 'tutorial:read']);
+    expect(can(ANONYMOUS, 'song:write')).toBe(false);
+    expect(can(ANONYMOUS, 'service:read')).toBe(false);
+    expect(can(ANONYMOUS, 'setlist:read')).toBe(false);
   });
 
   it('suma los permisos cuando hay varios roles', () => {

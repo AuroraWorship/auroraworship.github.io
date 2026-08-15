@@ -1,9 +1,9 @@
 {
-  "name": "aurora-os",
-  "version": "0.1.0",
+  "name": "aurora-worship",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Aurora OS — aplicación digital del Ministerio de Alabanza Aurora",
+  "description": "Aurora Worship — aplicación digital del Ministerio de Alabanza Aurora",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

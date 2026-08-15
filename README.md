@@ -1,4 +1,4 @@
-# Aurora OS
+# Aurora Worship
 
 Aplicación digital del **Ministerio de Alabanza Aurora**, ligado al ministerio juvenil MARCADOS de
 Fuente de Vida.
@@ -10,11 +10,12 @@ Responde a dos preguntas concretas:
 
 ## Estado
 
-LOOP 001 completado. Funciona hoy: biblioteca de canciones, búsqueda, hoja de acordes con letra,
-motor de transposición, tonalidad original frente a tonalidad actual, roles con permisos reales,
+LOOP 002 completado. Funciona hoy: biblioteca de canciones, búsqueda, hoja de acordes con letra,
+motor de transposición, tonalidad original frente a tonalidad actual, edición y persistencia de
+canciones en el dispositivo, roles con permisos reales,
 vista de servicio y estructura de ensayo.
 
-No implementado todavía: autenticación real, base de datos, subida de archivos, secuencias,
+No implementado todavía: autenticación real, sincronización entre dispositivos, subida de archivos, secuencias,
 academia. Ver `ROADMAP.md` y `LOOP_STATUS.md`.
 
 ## Uso

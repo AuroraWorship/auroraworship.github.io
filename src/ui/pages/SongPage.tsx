@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { VOICE_PART_LABELS, instrumentById, type Song } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
@@ -18,6 +18,7 @@ const TABS: Array<[Tab, string]> = [
 
 export function SongPage() {
   const { songId } = useParams();
+  const navigate = useNavigate();
   const { actor } = useSession();
   const [song, setSong] = useState<Song | null | undefined>(undefined);
   const [key, setKey] = useState<string | null>(null);
@@ -66,6 +67,34 @@ export function SongPage() {
             .join(' · ')}
         </p>
       </div>
+
+      {(can(actor, 'song:write') || can(actor, 'song:delete')) && (
+        <div className="flex gap-2">
+          {can(actor, 'song:write') && (
+            <Link
+              to={`/canciones/${song.id}/editar`}
+              className="flex h-11 flex-1 items-center justify-center rounded-xl border border-aurora-border bg-aurora-surface text-sm font-medium"
+            >
+              Editar
+            </Link>
+          )}
+          {can(actor, 'song:delete') && (
+            <button
+              type="button"
+              onClick={async () => {
+                // Borrar una canción se lleva por delante su historial de uso;
+                // una confirmación explícita es lo mínimo razonable.
+                if (!confirm(`¿Borrar "${song.title}"? No se puede deshacer.`)) return;
+                await repository.deleteSong(actor, song.id);
+                navigate('/canciones');
+              }}
+              className="h-11 rounded-xl border border-red-500/40 bg-red-500/10 px-4 text-sm font-medium text-red-300"
+            >
+              Borrar
+            </button>
+          )}
+        </div>
+      )}
 
       <KeySelector originalKey={song.originalKey} value={activeKey} onChange={setKey} />
 

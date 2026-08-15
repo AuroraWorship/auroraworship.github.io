@@ -11,6 +11,7 @@ import { SessionProvider } from './session';
 import { RoleSwitcher } from './components/RoleSwitcher';
 import { SongsPage } from './pages/SongsPage';
 import { SongPage } from './pages/SongPage';
+import { SongEditorPage } from './pages/SongEditorPage';
 import { ServicePage } from './pages/ServicePage';
 import { RehearsalPage } from './pages/RehearsalPage';
 import { TutorialsPage } from './pages/TutorialsPage';
@@ -28,9 +29,9 @@ function Header() {
       <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
         <div className="min-w-0">
           <p className="truncate text-lg font-semibold tracking-tight">
-            Aurora<span className="text-aurora-violet"> OS</span>
+            Aurora<span className="text-aurora-violet"> Worship</span>
           </p>
-          <p className="truncate text-xs text-aurora-muted">Ministerio de Alabanza Aurora</p>
+          <p className="truncate text-xs text-aurora-muted">Ministerio de Alabanza</p>
         </div>
         <RoleSwitcher />
       </div>
@@ -76,7 +77,11 @@ export function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/canciones" replace />} />
               <Route path="/canciones" element={<SongsPage />} />
+              {/* La ruta estática va antes que la dinámica para que "nueva"
+                  no se lea como un identificador de canción. */}
+              <Route path="/canciones/nueva" element={<SongEditorPage />} />
               <Route path="/canciones/:songId" element={<SongPage />} />
+              <Route path="/canciones/:songId/editar" element={<SongEditorPage />} />
               <Route path="/servicio" element={<ServicePage />} />
               <Route path="/ensayo" element={<RehearsalPage />} />
               <Route path="/tutoriales" element={<TutorialsPage />} />

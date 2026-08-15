@@ -115,7 +115,10 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   tech: READ_ONLY_INTERNAL,
   student: ['tutorial:read', 'song:read'],
   member: ['song:read', 'tutorial:read'],
-  public: [],
+  // Permiso y ámbito son ejes distintos: el público puede leer canciones y
+  // tutoriales, pero el filtro de `scope` solo le entrega los marcados como
+  // públicos. Sin este permiso no habría aplicación pública posible.
+  public: ['song:read', 'tutorial:read'],
 };
 
 export interface Actor {

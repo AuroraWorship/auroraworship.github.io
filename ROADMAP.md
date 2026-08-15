@@ -18,7 +18,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Biblioteca de canciones con búsqueda
 - [x] Hoja de acordes mobile-first
 - [!] Autenticación real — bloqueo B-03
-- [ ] Edición de canciones desde la aplicación
+- [x] Edición de canciones desde la aplicación
 - [ ] Tonalidad por vocalista conectada a la UI
 
 ## Fase 2 — Operación del ministerio
@@ -62,6 +62,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 
 ## Transversal
 
+- [x] Persistencia local (IndexedDB) tras la interfaz de repositorio
 - [x] Separación metadata / storage en el modelo
 - [x] Estados de derechos de autor
 - [x] Marcado de información pendiente
