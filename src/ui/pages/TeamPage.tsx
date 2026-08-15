@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { INSTRUMENTS, type InstrumentId, type Member } from '../../domain/model';
 import { COMMON_MAJOR_KEYS, COMMON_MINOR_KEYS } from '../../domain/music/key';
 import { newId } from '../../domain/song-factory';
@@ -79,6 +80,15 @@ export function TeamPage() {
       )}
 
       {editing && <MemberForm member={editing} onSave={save} onCancel={() => setEditing(null)} />}
+
+      {can(actor, 'data:export') && (
+        <Link
+          to="/ajustes"
+          className="flex h-12 items-center justify-center rounded-xl border border-aurora-border bg-aurora-surface text-sm"
+        >
+          Copia de datos
+        </Link>
+      )}
 
       <ul className="space-y-2">
         {members?.map((member) => (

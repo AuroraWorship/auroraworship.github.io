@@ -4,15 +4,15 @@
 
 ## LOOP actual
 
-**LOOP 006 — ENSAYOS REALES** · completado
+**LOOP 007 — COPIA DE DATOS** · completado
 
 ## Objetivo
 
-Cerrar el ritmo semanal del ministerio. Los servicios ya se planificaban, pero el ensayo del
-miércoles solo mostraba una plantilla estática: no se podía programar, ni asignar repertorio, ni
-repartir tareas.
+Atacar la limitación más seria del producto: los datos viven en un solo teléfono y no llegan al
+resto del equipo. La sincronización real depende de un bloqueo humano, así que se resuelve por el
+camino que sí está disponible.
 
-Loops 001 a 005 completados y verificados.
+Loops 001 a 006 completados y verificados.
 
 ## Completado
 
@@ -88,14 +88,22 @@ Loops 001 a 005 completados y verificados.
 - [x] Fecha propuesta: el próximo miércoles, según la costumbre del manual
 - [x] 155 pruebas; comprobación en navegador y auditoría de accesibilidad ampliadas
 
+## Añadido en LOOP 007
+
+- [x] Exportar todos los datos del ministerio a un archivo JSON versionado
+- [x] Importar con validación previa: se comprueba el archivo entero antes de tocar nada
+- [x] Se muestra qué contiene la copia y se avisa de que sustituye, antes de confirmar
+- [x] Permisos separados: el liderazgo exporta, solo admin y super admin importan (ADR-014)
+- [x] Los favoritos no viajan en la copia: son personales
+- [x] 173 pruebas; comprobación en navegador con descarga y restauración reales
+
 ## Pendiente (siguiente loop)
 
-**LOOP 007 — MATERIAL Y MEMORIA**
+**LOOP 008 — MATERIAL Y MEMORIA**
 
-1. Tutoriales con recursos por enlace (vídeo, audio, PDF) — la subida de archivos sigue bloqueada
+1. Tutoriales con recursos por enlace (vídeo, audio, PDF). La subida de archivos sigue bloqueada
    por B-03, pero enlazar material externo funciona hoy.
 2. Historial: qué se tocó, cuándo y en qué tonalidad.
-3. Exportar e importar los datos, para moverlos entre teléfonos sin backend.
 
 ## Errores corregidos en este loop
 

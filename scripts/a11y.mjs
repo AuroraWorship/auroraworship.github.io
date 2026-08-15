@@ -27,6 +27,7 @@ const RUTAS = [
   ['/equipo', 'admin'],
   ['/canciones/nueva', 'leader'],
   ['/ensayo/nuevo', 'music-director'],
+  ['/ajustes', 'admin'],
   ['/vivo?modo=servicio', 'musician'],
 ];
 

@@ -228,3 +228,28 @@ instrumento.
 **Consecuencias.** La comprobación también se equivoca: contaba enlaces en línea dentro de una
 frase como si fueran botones, y no recargaba al cambiar de rol, lo que producía un falso «h1 = 0».
 Se corrigió la comprobación, no el producto.
+
+---
+
+## ADR-014 — Copia y restauración antes que sincronización
+
+**Contexto.** Sin backend, los datos viven en cada teléfono por separado. Es la limitación más
+seria del producto: el líder carga el repertorio y el equipo no lo ve. La sincronización real
+depende de un bloqueo humano (B-03) que puede tardar.
+
+**Alternativas.** Esperar al backend, dejando el problema abierto; sincronizar por un servicio de
+terceros, que reintroduce el bloqueo de cuenta y de coste.
+
+**Decisión.** Exportar e importar un archivo JSON versionado. El liderazgo saca la copia y la
+comparte por el medio que ya use el ministerio; el equipo la importa.
+
+**Razón.** Resuelve hoy el 80% del problema con cero infraestructura, y de paso da copia de
+seguridad a un repertorio que puede costar meses de cargar. No pretende ser sincronización: es lo
+que permite trabajar hasta que llegue.
+
+**Consecuencias.** La importación **sustituye**, no fusiona. Fusionar exigiría resolver conflictos
+por registro, y hacerlo mal perdería datos en silencio — que es peor que avisar y sobrescribir. Por
+eso el archivo se valida entero antes de tocar nada y se muestra su contenido para confirmar.
+
+Exportar lo puede hacer el liderazgo; importar, solo admin y super admin. Sobrescribir el trabajo
+de todos no es una acción de uso diario.

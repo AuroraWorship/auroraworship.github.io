@@ -66,6 +66,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 ## Transversal
 
 - [x] Persistencia local (IndexedDB) tras la interfaz de repositorio
+- [x] Exportar e importar datos entre dispositivos
 - [x] Separación metadata / storage en el modelo
 - [x] Estados de derechos de autor
 - [x] Marcado de información pendiente

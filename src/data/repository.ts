@@ -310,4 +310,13 @@ export class InMemoryRepository extends StoredRepository {
   }
 }
 
-export const repository: AuroraRepository = new StoredRepository(createDefaultStore());
+/**
+ * Almacén de la aplicación.
+ *
+ * Se expone porque copia y restauración trabajan sobre las colecciones
+ * enteras, por debajo del repositorio: restaurar sustituye los datos, no los
+ * edita uno a uno.
+ */
+export const appStore = createDefaultStore();
+
+export const repository: AuroraRepository = new StoredRepository(appStore);

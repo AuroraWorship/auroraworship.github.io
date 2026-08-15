@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.7.0] — LOOP 007 · Copia de datos
+
+El repertorio deja de vivir preso en un solo teléfono.
+
+### Añadido
+
+- **Exportar.** Un archivo JSON con canciones, repertorios, servicios, ensayos, tutoriales e
+  integrantes. Sirve para pasar los datos al resto del equipo y como copia de seguridad de un
+  repertorio que puede costar meses de cargar.
+- **Importar.** Se valida el archivo entero antes de tocar nada, se muestra qué contiene y se
+  avisa de que sustituye lo que hay. Un archivo equivocado no llega a la mitad del proceso.
+- **Permisos separados.** El liderazgo exporta; solo admin y super admin importan. Sobrescribir el
+  trabajo de todos no es una acción de uso diario.
+- Los favoritos no viajan en la copia: son personales de cada quien.
+
+### Notas
+
+- La importación sustituye, no fusiona. Fusionar exigiría resolver conflictos por registro, y
+  hacerlo mal perdería datos en silencio — peor que avisar y sobrescribir (ADR-014).
+- Esto no es sincronización, y no pretende serlo. Es lo que permite trabajar hasta que haya
+  backend.
+
 ## [0.6.0] — LOOP 006 · Ensayos reales
 
 El miércoles ya existe en la aplicación.

@@ -20,6 +20,7 @@ import { TeamPage } from './pages/TeamPage';
 import { ServiceEditorPage } from './pages/ServiceEditorPage';
 import { LivePage } from './pages/LivePage';
 import { RehearsalEditorPage } from './pages/RehearsalEditorPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 const NAV = [
   { to: '/canciones', label: 'Canciones', icon: '♪' },
@@ -116,6 +117,7 @@ function Shell() {
           <Route path="/ensayo/nuevo" element={<RehearsalEditorPage />} />
           <Route path="/ensayo/:rehearsalId" element={<RehearsalEditorPage />} />
           <Route path="/tutoriales" element={<TutorialsPage />} />
+          <Route path="/ajustes" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/canciones" replace />} />
         </Routes>
       </main>

@@ -22,5 +22,6 @@ npm-debug.log*
 .cache/
 coverage/
 
-# Capturas de la comprobación en navegador
+# Salidas de la comprobación en navegador
 scripts/screenshots/
+scripts/copia-prueba.json

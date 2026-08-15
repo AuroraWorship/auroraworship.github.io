@@ -6,7 +6,7 @@
  *
  * Requiere `npm run build` y `npm run preview` corriendo en el puerto 4173.
  */
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
 const errors = [];
@@ -208,6 +208,51 @@ await page.screenshot({ path: `${shots}/12-ensayos.png` });
 await page.goto('http://localhost:4173/#/preparacion', { waitUntil: 'networkidle' });
 await page.waitForSelector('text=Mi preparación');
 console.log('PREPARACION MUESTRA ENSAYO:', await page.isVisible('text=Próximo ensayo'));
+
+// --- Copia de datos ---------------------------------------------------------
+
+await page.goto('http://localhost:4173/#/ajustes', { waitUntil: 'networkidle' });
+await page.selectOption('select[aria-label="Rol de demostración"]', 'admin');
+await page.waitForSelector('text=Copia de datos');
+console.log('AJUSTES ACCESIBLES PARA ADMIN:', await page.isVisible('text=Descargar copia'));
+
+// Exportar de verdad e interceptar la descarga.
+const descarga = page.waitForEvent('download');
+await page.getByRole('button', { name: 'Descargar copia' }).click();
+const archivo = await descarga;
+const ruta = `${shots}/../copia-prueba.json`;
+await archivo.saveAs(ruta);
+const contenido = JSON.parse(await readFile(ruta, 'utf8'));
+console.log('COPIA DESCARGADA:', archivo.suggestedFilename());
+console.log('COPIA TRAE CANCIONES:', contenido.datos.songs.length > 0);
+console.log('COPIA NO LLEVA FAVORITOS:', !JSON.stringify(contenido).includes('favorites'));
+
+// Borrar todo y restaurar desde el archivo.
+await page.evaluate(async () => {
+  const req = indexedDB.open('aurora', 1);
+  const db = await new Promise((res) => { req.onsuccess = () => res(req.result); });
+  await new Promise((res) => {
+    const r = db.transaction('kv', 'readwrite').objectStore('kv').put([], 'songs');
+    r.onsuccess = () => res(undefined);
+  });
+});
+await page.reload({ waitUntil: 'networkidle' });
+await page.setInputFiles('input[aria-label="Archivo de copia"]', ruta);
+await page.waitForSelector('text=Esta copia contiene');
+console.log('MUESTRA QUE CONTIENE ANTES DE SOBRESCRIBIR:', true);
+await page.screenshot({ path: `${shots}/13-copia.png` });
+await page.getByRole('button', { name: 'Sustituir datos' }).click();
+await page.waitForTimeout(2500);
+await page.goto('http://localhost:4173/#/canciones', { waitUntil: 'networkidle' });
+await page.waitForTimeout(500);
+const tras = await page.locator('main li a[href*="/canciones/"]').count();
+console.log('RESTAURA LAS CANCIONES BORRADAS:', tras > 0);
+
+// El músico no debe poder ni exportar ni importar.
+await page.selectOption('select[aria-label="Rol de demostración"]', 'musician');
+await page.goto('http://localhost:4173/#/ajustes', { waitUntil: 'networkidle' });
+await page.waitForTimeout(400);
+console.log('MUSICO BLOQUEADO EN COPIA:', await page.isVisible('text=Sin acceso'));
 
 // --- Sin conexión -----------------------------------------------------------
 

@@ -52,7 +52,11 @@ export type Permission =
   | 'assignment:read' | 'assignment:write'
   | 'file:upload'
   | 'role:assign'
-  | 'settings:write';
+  | 'settings:write'
+  /** Sacar una copia de todos los datos del ministerio. */
+  | 'data:export'
+  /** Sobrescribir los datos del ministerio con una copia. Destructivo. */
+  | 'data:import';
 
 /** Permisos de cada rol. La herencia es explícita: se leen tal cual. */
 const READ_ONLY_INTERNAL: readonly Permission[] = [
@@ -74,6 +78,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'member:read', 'member:write',
     'assignment:read', 'assignment:write',
     'file:upload', 'role:assign', 'settings:write',
+    'data:export', 'data:import',
   ],
   admin: [
     'song:read', 'song:write', 'song:delete',
@@ -84,6 +89,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'member:read', 'member:write',
     'assignment:read', 'assignment:write',
     'file:upload', 'role:assign',
+    'data:export', 'data:import',
   ],
   leader: [
     'song:read', 'song:write',
@@ -94,6 +100,9 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'member:read',
     'assignment:read', 'assignment:write',
     'file:upload',
+    // El líder puede sacar copia para repartirla al equipo, pero no
+    // sobrescribir los datos de todos: importar es destructivo.
+    'data:export',
   ],
   'music-director': [
     'song:read', 'song:write',
@@ -104,6 +113,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'member:read',
     'assignment:read', 'assignment:write',
     'file:upload',
+    'data:export',
   ],
   editor: [
     'song:read', 'song:write',
