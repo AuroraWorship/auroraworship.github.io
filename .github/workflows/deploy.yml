@@ -1,0 +1,88 @@
+name: Verificar y desplegar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Permisos mínimos: solo lectura del código salvo en el despliegue.
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tipos
+        run: npm run typecheck
+
+      - name: Pruebas
+        run: npm test
+
+      # Aquí basta con comprobar que compila; la ruta base solo importa al
+      # desplegar, y la calcula el job siguiente.
+      - name: Compilar
+        run: npm run build
+
+  desplegar:
+    # Solo desde main, y solo si la verificación pasó.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: verificar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Un sitio de organización (auroraworship.github.io) cuelga de la raíz;
+      # un repo de proyecto cuelga de /<repo>/. Se resuelve solo.
+      - name: Calcular ruta base
+        id: base
+        run: |
+          repo="${GITHUB_REPOSITORY#*/}"
+          if [[ "$repo" == *.github.io ]]; then
+            echo "path=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=/$repo/" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compilar
+        run: npm run build
+        env:
+          AURORA_BASE_PATH: ${{ steps.base.outputs.path }}
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

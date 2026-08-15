@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Aurora OS">
+  <rect width="64" height="64" rx="14" fill="#0d0a14" />
+  <path d="M14 46 L32 16 L50 46" fill="none" stroke="#8b5cf6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M22 38 H42" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
+</svg>

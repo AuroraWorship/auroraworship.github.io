@@ -1,118 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poesía para mi Reina</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #fff0f5;
-            font-family: 'Dancing Script', cursive;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-image: url('https://example.com/flowers-background.jpg'); /* Ilustraciones de flores blancas */
-            background-size: cover;
-            background-position: center;
-        }
-        .container {
-            width: 80%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            border: 2px solid #ff69b4; /* Borde minimalista */
-        }
-        .buttons {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .btn {
-            background-color: #ff69b4;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin: 5px;
-            transition: transform 0.2s;
-        }
-        .btn:hover {
-            background-color: #ff1493;
-            transform: scale(1.1); /* Efecto al pasar el cursor */
-        }
-        .dedicatoria {
-            font-style: italic;
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-        .small-text {
-            font-size: 12px;
-            color: gray;
-        }
-    </style>
-</head>
-<body>
-    <div class="container" id="page">
-        <p class="dedicatoria">"Desde el día en que Dios nos cruzó en el camino, supe que eras mi destino."</p>
-        <h1>¿Estás lista para lo que viene?</h1>
-        <div class="buttons">
-            <button class="btn" onclick="nextPage()">Sí</button>
-            <span class="small-text">(no hay más opción)</span>
-        </div>
-    </div>
-    
-    <script>
-        const pages = [
-            "Eres mi reina, corona de mi vida, la obra más pura que Dios bendijo un día.",
-            "Morena de miel, tus ojos me atrapan, hablan sin palabras, al alma me abrazan.",
-            "Tu voz es un canto que al cielo sublima, y en tu forma de ser, lo eterno germina.",
-            "Carisma y bondad caminan contigo, y en tu inteligencia, encuentro un abrigo.",
-            "Dios está en medio de este amor divino, Él guía mis pasos hacia tu destino.",
-            "Un propósito juntos, un sueño en su plan, tomados de Su mano, jamás caerán.",
-            "Tus curvas, tus formas, tu cuerpo esculpido, son arte en el lienzo que Dios ha tejido.",
-            "Pero más que la vista, me llena el alma, tu esencia, tu risa, tu paz que me calma.",
-            "Cuando te miro, mi mundo se detiene, y siento que el cielo contigo conviene.",
-            "Caricias y abrazos, besos en tu mejilla, son notas de amor que mi espíritu brilla.",
-            "Reina de mi vida, mi musa, mi todo, a tu lado, el tiempo es un sueño, un modo.",
-            "De amarte en lo eterno, en la fe y la verdad, encontré en ti el amor: mi hogar, mi paz.",
-            "¿Quieres ser mi San Valentín por siempre?"
-        ];
-        
-        let index = -1;
-        function nextPage() {
-            index++;
-            if (index < pages.length) {
-                document.getElementById("page").innerHTML = `
-                    <h2>${pages[index]}</h2>
-                    <div class="buttons">
-                        ${index > 0 ? '<button class="btn" onclick="prevPage()">&#8592;</button>' : ''}
-                        ${index < pages.length - 1 ? '<button class="btn" onclick="nextPage()">&#8594;</button>' : ''}
-                    </div>
-                `;
-                document.getElementById("page").classList.add("page-animation");
-            }
-        }
-        
-        function prevPage() {
-            index--;
-            if (index >= 0) {
-                document.getElementById("page").innerHTML = `
-                    <h2>${pages[index]}</h2>
-                    <div class="buttons">
-                        ${index > 0 ? '<button class="btn" onclick="prevPage()">&#8592;</button>' : ''}
-                        ${index < pages.length - 1 ? '<button class="btn" onclick="nextPage()">&#8594;</button>' : ''}
-                    </div>
-                `;
-            }
-        }
-    </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0d0a14" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta
+      name="description"
+      content="Aurora OS — aplicación del Ministerio de Alabanza Aurora: canciones, acordes, tonalidades, repertorios y ensayos."
+    />
+    <title>Aurora OS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+/*
+ * Paleta PROVISIONAL.
+ *
+ * MARCADOS usa morado y naranja; Aurora hereda esa raíz para que se lean
+ * como familia, con un violeta propio. No es identidad oficial: queda
+ * pendiente de confirmación del ministerio (ver LOOP_STATUS.md).
+ *
+ * El fondo oscuro no es estética: la aplicación se usa sobre un atril, en
+ * penumbra, durante el ensayo y el servicio.
+ */
+@theme {
+  --color-aurora-bg: #0d0a14;
+  --color-aurora-surface: #171226;
+  --color-aurora-surface-2: #221a38;
+  --color-aurora-border: #302549;
+  --color-aurora-text: #ede9f6;
+  --color-aurora-muted: #a297c4;
+  --color-aurora-violet: #8b5cf6;
+  --color-aurora-violet-soft: #c4b5fd;
+  --color-aurora-ember: #f97316;
+}
+
+html {
+  background-color: var(--color-aurora-bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-aurora-bg);
+  color: var(--color-aurora-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Respeta la zona segura de los teléfonos con muesca. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Los acordes se leen de un vistazo a un metro de distancia. */
+.chord {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
