@@ -15,6 +15,7 @@ import { can, type Scope } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
 import { ChordSheet } from '../components/ChordSheet';
+import { InstrumentPartsEditor, VoicesEditor } from '../components/VoicesEditor';
 import { EmptyState, NoAccess } from '../components/Notices';
 
 const ALL_KEYS = [...COMMON_MAJOR_KEYS, ...COMMON_MINOR_KEYS];
@@ -271,6 +272,25 @@ export function SongEditorPage() {
           <ChordSheet body={song.body} fromKey={song.originalKey} toKey={song.currentKey} />
         </div>
       )}
+
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-aurora-muted">
+          Voces
+        </p>
+        <VoicesEditor voices={song.voices} onChange={(voices) => patch({ voices })} />
+      </div>
+
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-aurora-muted">
+          Partes por instrumento
+        </p>
+        <InstrumentPartsEditor
+          body={song.body}
+          instruments={song.instruments}
+          parts={song.instrumentParts}
+          onChange={(instrumentParts) => patch({ instrumentParts })}
+        />
+      </div>
 
       <div>
         <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-aurora-muted">

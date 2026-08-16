@@ -32,6 +32,12 @@ export interface SongQuery {
   key?: string;
   instrument?: string;
   tag?: string;
+  difficulty?: number;
+  /** Filtra por quién canta la canción, según sus tonalidades registradas. */
+  vocalistId?: string;
+  /** Rango de tempo, para armar un bloque que no rompa la dinámica. */
+  bpmMin?: number;
+  bpmMax?: number;
 }
 
 export class PermissionError extends Error {
@@ -85,6 +91,13 @@ function matches(song: Song, query: SongQuery): boolean {
   if (query.key && song.currentKey !== query.key && song.originalKey !== query.key) return false;
   if (query.instrument && !song.instruments.includes(query.instrument as never)) return false;
   if (query.tag && !song.tags.includes(query.tag)) return false;
+  if (query.difficulty && song.difficulty !== query.difficulty) return false;
+  if (query.vocalistId && !song.vocalistKeys.some((vk) => vk.memberId === query.vocalistId)) {
+    return false;
+  }
+  // Una canción sin BPM no se cuela en un filtro de tempo: no sabemos si cabe.
+  if (query.bpmMin !== undefined && (song.bpm === null || song.bpm < query.bpmMin)) return false;
+  if (query.bpmMax !== undefined && (song.bpm === null || song.bpm > query.bpmMax)) return false;
 
   if (query.text) {
     const needle = query.text.toLowerCase().trim();

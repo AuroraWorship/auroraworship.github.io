@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.10.0] — LOOP 010 · Búsqueda, voces y partes
+
+Tres cosas que estaban en los datos pero no llegaban a la pantalla.
+
+### Añadido
+
+- **Filtros del repertorio.** Tonalidad, instrumento, vocalista, etiqueta, dificultad y rango de
+  tempo. Van plegados: en un teléfono un panel abierto empuja la lista fuera de la pantalla.
+- Los filtros **solo ofrecen valores que existen** en el repertorio. Un filtro que no devuelve nada
+  es peor que no tenerlo.
+- **Editor de voces.** Melodía principal y armonías, con su intervalo e indicaciones para quien las
+  canta. El intervalo va como texto libre — «3ª arriba», «6ª abajo» — porque es como lo dice un
+  equipo de alabanza.
+- **Editor de partes por instrumento.** Qué hace cada instrumento en cada sección. Las secciones se
+  leen del propio cuerpo de la canción, así que no se puede escribir una que no exista; y si se
+  renombra una sección, la parte huérfana se marca en vez de perderse en silencio.
+
+### Notas
+
+- Una canción sin BPM no aparece al filtrar por tempo: no sabemos si cabe en el rango.
+
 ## [0.9.0] — LOOP 009 · Revisión y robustez
 
 Loop de repaso sobre ocho loops de construcción.

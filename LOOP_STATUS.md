@@ -4,14 +4,15 @@
 
 ## LOOP actual
 
-**LOOP 009 — REVISIÓN Y ROBUSTEZ** · completado
+**LOOP 010 — BÚSQUEDA, VOCES Y PARTES** · completado
 
 ## Objetivo
 
-Revisar lo construido en ocho loops: código muerto, reglas duplicadas, peso del paquete y solidez
-real del modo sin conexión.
+Cerrar tres huecos entre el modelo y la interfaz: la búsqueda solo exponía texto aunque el
+repositorio filtraba por más, y las voces y las partes por instrumento existían en los datos pero
+no se podían editar desde ninguna pantalla.
 
-Loops 001 a 008 completados y verificados.
+Loops 001 a 009 completados y verificados.
 
 ## Completado
 
@@ -95,6 +96,14 @@ Loops 001 a 008 completados y verificados.
 - [x] Permisos separados: el liderazgo exporta, solo admin y super admin importan (ADR-014)
 - [x] Los favoritos no viajan en la copia: son personales
 - [x] 173 pruebas; comprobación en navegador con descarga y restauración reales
+
+## Añadido en LOOP 010
+
+- [x] Filtros de repertorio: tonalidad, instrumento, vocalista, etiqueta, dificultad y rango de BPM
+- [x] Los filtros solo ofrecen valores que existen en el repertorio
+- [x] Editor de voces: melodía y armonías, con intervalo e indicaciones
+- [x] Editor de partes por instrumento, con las secciones leídas del propio cuerpo de la canción
+- [x] 189 pruebas; comprobación en navegador ampliada a filtros, voces y partes
 
 ## Añadido en LOOP 009
 

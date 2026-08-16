@@ -455,3 +455,45 @@ describe('historial', () => {
     expect(cancion!.currentKey).toBe('G');
   });
 });
+
+describe('búsqueda avanzada', () => {
+  it('filtra por dificultad', async () => {
+    const faciles = await repo.listSongs(leader, { difficulty: 1 });
+    expect(faciles.map((s) => s.id)).toEqual(['song-sublime-gracia']);
+  });
+
+  it('filtra por rango de tempo', async () => {
+    expect((await repo.listSongs(leader, { bpmMin: 80 })).map((s) => s.id)).toEqual([
+      'song-santo-santo-santo',
+    ]);
+    expect((await repo.listSongs(leader, { bpmMax: 75 })).map((s) => s.id)).toEqual([
+      'song-sublime-gracia',
+    ]);
+    expect((await repo.listSongs(leader, { bpmMin: 70, bpmMax: 90 })).length).toBe(2);
+  });
+
+  it('una canción sin BPM no se cuela en un filtro de tempo', async () => {
+    const song = (await repo.getSong(leader, 'song-sublime-gracia'))!;
+    await repo.saveSong(leader, { ...song, bpm: null });
+    expect((await repo.listSongs(leader, { bpmMin: 0 })).map((s) => s.id)).toEqual([
+      'song-santo-santo-santo',
+    ]);
+  });
+
+  it('filtra por vocalista', async () => {
+    const song = (await repo.getSong(leader, 'song-santo-santo-santo'))!;
+    await repo.saveSong(leader, {
+      ...song,
+      vocalistKeys: [{ memberId: 'm1', key: 'E', notes: null }],
+    });
+    expect((await repo.listSongs(leader, { vocalistId: 'm1' })).map((s) => s.id)).toEqual([
+      'song-santo-santo-santo',
+    ]);
+    expect(await repo.listSongs(leader, { vocalistId: 'nadie' })).toEqual([]);
+  });
+
+  it('los filtros se acumulan', async () => {
+    expect(await repo.listSongs(leader, { tag: 'himno', difficulty: 1, bpmMax: 75 })).toHaveLength(1);
+    expect(await repo.listSongs(leader, { tag: 'himno', difficulty: 1, bpmMin: 80 })).toEqual([]);
+  });
+});

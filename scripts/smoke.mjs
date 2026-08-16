@@ -209,6 +209,48 @@ await page.goto('http://localhost:4173/#/preparacion', { waitUntil: 'networkidle
 await page.waitForSelector('text=Mi preparación');
 console.log('PREPARACION MUESTRA ENSAYO:', await page.isVisible('text=Próximo ensayo'));
 
+// --- Búsqueda avanzada, voces y partes --------------------------------------
+
+await page.goto('http://localhost:4173/#/canciones', { waitUntil: 'networkidle' });
+await page.selectOption('select[aria-label="Rol de demostración"]', 'leader');
+await page.waitForSelector('text=Canciones');
+const totalCanciones = await songLinks.count();
+
+await page.getByRole('button', { name: /^Filtros/ }).click();
+await page.getByLabel('Filtrar por tonalidad').selectOption('D');
+await page.waitForTimeout(400);
+const trasFiltrar = await songLinks.count();
+console.log('FILTRO POR TONALIDAD REDUCE:', trasFiltrar > 0 && trasFiltrar < totalCanciones);
+
+await page.getByLabel('BPM mínimo').fill('200');
+await page.waitForTimeout(400);
+console.log('FILTRO DE TEMPO SIN RESULTADOS AVISA:', await page.isVisible('text=Sin resultados'));
+
+await page.getByRole('button', { name: 'Limpiar' }).click();
+await page.waitForTimeout(400);
+console.log('LIMPIAR RESTAURA LA LISTA:', (await songLinks.count()) === totalCanciones);
+await page.screenshot({ path: `${shots}/15-filtros.png` });
+
+// Voces y partes por instrumento, que antes solo existían en el modelo.
+await page.goto('http://localhost:4173/#/servicio', { waitUntil: 'networkidle' });
+await page.locator('ol li a[href*="/canciones/"]').first().click();
+await page.getByRole('link', { name: 'Editar' }).click();
+await page.waitForSelector('text=Partes por instrumento');
+
+await page.getByLabel('Añadir voz').selectOption('third');
+await page.waitForTimeout(200);
+await page.getByLabel('Intervalo de Tercera voz').fill('5ª abajo');
+await page.getByRole('button', { name: 'Añadir parte' }).click();
+await page.getByLabel('Instrucciones de la parte 1').fill('Entrar solo en el coro');
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector('text=Detalle');
+await page.getByRole('tab', { name: 'Detalle' }).click();
+await page.waitForTimeout(300);
+const detalleVoces = await page.locator('main').innerText();
+console.log('VOZ GUARDADA:', detalleVoces.includes('5ª abajo'));
+console.log('PARTE GUARDADA:', detalleVoces.includes('Entrar solo en el coro'));
+await page.screenshot({ path: `${shots}/16-voces.png` });
+
 // --- Tutoriales e historial -------------------------------------------------
 
 await page.goto('http://localhost:4173/#/tutoriales', { waitUntil: 'networkidle' });

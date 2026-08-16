@@ -6,6 +6,9 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 
 ## Fase 1 — Núcleo
 
+- [x] Búsqueda por tonalidad, instrumento, vocalista, etiqueta, dificultad y tempo
+- [x] Voces y partes por instrumento editables
+
 - [x] Equipo: integrantes, instrumentos y tesitura
 
 - [x] Motor de notas con modelo diatónico

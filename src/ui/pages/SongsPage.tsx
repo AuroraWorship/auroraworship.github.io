@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Song } from '../../domain/model';
+import type { Member, Song } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
-import { repository } from '../../data/repository';
+import { repository, type SongQuery } from '../../data/repository';
 import { useSession } from '../session';
 import { EmptyState, NoAccess } from '../components/Notices';
+import { SongFilters } from '../components/SongFilters';
 
 export function SongsPage() {
   const { actor } = useSession();
-  const [text, setText] = useState('');
+  const [query, setQuery] = useState<SongQuery>({});
   const [songs, setSongs] = useState<readonly Song[] | null>(null);
+  /** Sin filtrar: los filtros necesitan saber qué valores existen de verdad. */
+  const [todas, setTodas] = useState<readonly Song[]>([]);
+  const [members, setMembers] = useState<readonly Member[]>([]);
   const [favorites, setFavorites] = useState<readonly string[]>([]);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
 
@@ -21,20 +25,28 @@ export function SongsPage() {
       return;
     }
     let active = true;
-    repository.listSongs(actor, { text }).then((result) => {
+    repository.listSongs(actor, query).then((result) => {
       if (active) setSongs(result);
     });
     return () => {
       active = false;
     };
-  }, [actor, text, allowed]);
+  }, [actor, query, allowed]);
 
   useEffect(() => {
     if (!allowed) return;
     let active = true;
-    repository.listFavorites(actor).then((ids) => {
-      if (active) setFavorites(ids);
-    });
+    (async () => {
+      const [completas, ids, equipo] = await Promise.all([
+        repository.listSongs(actor),
+        repository.listFavorites(actor),
+        can(actor, 'member:read') ? repository.listMembers(actor) : Promise.resolve([]),
+      ]);
+      if (!active) return;
+      setTodas(completas);
+      setFavorites(ids);
+      setMembers(equipo);
+    })();
     return () => {
       active = false;
     };
@@ -69,32 +81,35 @@ export function SongsPage() {
 
       <input
         type="search"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        value={query.text ?? ''}
+        onChange={(e) => setQuery({ ...query, text: e.target.value })}
         placeholder="Buscar por título, letra o etiqueta"
         aria-label="Buscar canciones"
         className="h-12 w-full rounded-xl border border-aurora-border bg-aurora-surface px-4 text-base placeholder:text-aurora-muted"
       />
 
-      {favorites.length > 0 && (
-        <button
-          type="button"
-          aria-pressed={onlyFavorites}
-          onClick={() => setOnlyFavorites((v) => !v)}
-          className={[
-            'h-10 rounded-lg border px-3 text-sm',
-            onlyFavorites
-              ? 'border-aurora-ember/50 bg-aurora-ember/15 text-aurora-ember'
-              : 'border-aurora-border bg-aurora-surface text-aurora-muted',
-          ].join(' ')}
-        >
-          ★ Solo mis favoritos ({favorites.length})
-        </button>
-      )}
+      <div className="flex flex-wrap gap-2">
+        {favorites.length > 0 && (
+          <button
+            type="button"
+            aria-pressed={onlyFavorites}
+            onClick={() => setOnlyFavorites((v) => !v)}
+            className={[
+              'h-11 rounded-lg border px-3 text-sm',
+              onlyFavorites
+                ? 'border-aurora-ember/50 bg-aurora-ember/15 text-aurora-ember'
+                : 'border-aurora-border bg-aurora-surface text-aurora-muted',
+            ].join(' ')}
+          >
+            ★ Favoritos ({favorites.length})
+          </button>
+        )}
+        <SongFilters songs={todas} members={members} query={query} onChange={setQuery} />
+      </div>
 
       {shown !== null && shown.length === 0 && (
         <EmptyState title="Sin resultados">
-          Prueba con otra palabra, o revisa el repertorio completo dejando la búsqueda vacía.
+          Prueba con otra palabra o quita algún filtro.
         </EmptyState>
       )}
 
