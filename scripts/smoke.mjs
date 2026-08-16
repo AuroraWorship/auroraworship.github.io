@@ -38,6 +38,26 @@ const before = await page.locator('.chord').allInnerTexts();
 console.log('ACORDES ORIGINAL:', before.filter(Boolean).slice(0, 6).join(' '));
 await page.screenshot({ path: `${shots}/02-cancion.png` });
 
+// Digitaciones: al elegir instrumento, cada acorde abre su diagrama.
+await page.selectOption('#diagram-instrument', 'acoustic-guitar');
+const acorde = page.locator('button.chord').first();
+const nombreAcorde = await acorde.innerText();
+await acorde.click();
+const ficha = page.locator('[role="dialog"]');
+await ficha.waitFor({ state: 'visible' });
+// El diagrama se calcula y se dibuja: no es una imagen guardada.
+const puntos = await ficha.locator('svg circle').count();
+console.log('DIAGRAMA ABRE:', await ficha.isVisible(), `(${nombreAcorde})`);
+console.log('DIAGRAMA SE DIBUJA:', puntos > 0);
+await page.screenshot({ path: `${shots}/02b-digitacion.png` });
+
+// El teclado es otro dibujo distinto al mástil.
+await page.selectOption('#diagram-instrument', 'piano');
+await page.locator('button.chord').first().click();
+console.log('TECLADO SE DIBUJA:', (await ficha.locator('svg rect').count()) > 0);
+await ficha.locator('button[aria-label="Cerrar"]').click();
+await page.selectOption('#diagram-instrument', '');
+
 // Subir un semitono y comprobar que los acordes cambian de verdad.
 await page.getByLabel('Subir un semitono').click();
 await page.waitForTimeout(200);

@@ -4,15 +4,35 @@
 
 ## LOOP actual
 
-**LOOP 014 — ARQUITECTURA DE SECUENCIAS** · completado
+**LOOP 015 — DIGITACIONES DE ACORDES** · completado
 
 ## Objetivo
 
-Cerrar el último hueco de `BRIEF_COVERAGE.md` que no dependía de ningún bloqueo: §27 pedía
-preparar la arquitectura de secuencias (click, pads, loops, stems) aunque la función en sí esté
-diferida a una fase posterior por el propio brief. Ese hueco llevaba trece loops sin tocarse.
+Primera de las once mejoras que pidió el ministerio tras ver la aplicación funcionando: tocar un
+acorde y ver cómo se hace en el instrumento propio.
 
-Loops 001 a 013 completados y verificados.
+Ninguna digitación está guardada a mano. Se calculan desde las notas del acorde y la afinación del
+instrumento, así que funcionan igual con un `Am` que con un `Am7b5` o con lo que alguien escriba
+dentro de tres años (ADR-019).
+
+Loops 001 a 014 completados y verificados.
+
+## Añadido en LOOP 015
+
+- [x] `chord-tones.ts`: de la estructura del acorde a las notas que suenan, marcando cuáles se
+      pueden omitir. La quinta justa es opcional; la alterada nunca, porque es el color del acorde.
+- [x] `voicing.ts`: buscador de digitaciones con afinaciones de guitarra, bajo y ukelele, que
+      puntúa cada postura como lo haría un guitarrista — fundamental en el bajo, sin omitir
+      tercera ni séptima, mano abierta como mucho cuatro trastes, sin cuerdas muteadas en medio.
+- [x] Piano aparte: no hay postura que buscar, se marcan las teclas que se pulsan.
+- [x] `ChordDiagram.tsx`: mástil y teclado en SVG generado, hasta cuatro posturas por acorde.
+- [x] Acordes de la hoja pulsables, con la ficha anclada abajo para no tapar lo que se lee.
+- [x] Preferencia de instrumento guardada en el teléfono, no en los datos del ministerio.
+- [x] 235 pruebas (16 nuevas). El algoritmo encuentra solo el Am estándar (x02210) y el Do
+      estándar (x32010): no están escritos en ninguna parte.
+- [x] Excepción de objetivo táctil marcada una a una en la auditoría, no por tipo de elemento:
+      WCAG 2.5.5 exceptúa los objetivos dentro de un bloque de texto, y estirar el acorde a 44px
+      lo despegaría de su sílaba.
 
 ## Añadido en LOOP 014
 

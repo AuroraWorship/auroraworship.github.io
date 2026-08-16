@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.15.0] — LOOP 015 · Digitaciones de acordes
+
+Primera de las mejoras que pidió el ministerio tras ver la aplicación en uso. Tocar un
+acorde en la hoja muestra cómo se hace en el instrumento propio.
+
+### Añadido
+
+- **Diagramas de acordes** por instrumento: mástil para guitarra, bajo y ukelele, teclado
+  para piano. Hasta cuatro posturas alternativas por acorde.
+- **Selector de instrumento** en la hoja de acordes, con la preferencia guardada en el
+  teléfono. «Sin diagramas» deja la hoja exactamente como estaba.
+- **Motor de notas del acorde** (`chord-tones.ts`), que además distingue qué notas se
+  pueden omitir cuando no caben todas bajo la mano.
+
+### Detalle
+
+Ninguna digitación está guardada: se calculan desde la estructura del acorde y la
+afinación del instrumento (ADR-019). Por eso funcionan igual con un `Am` que con un
+`Am7b5`, y un instrumento de cuerda nuevo solo necesita su afinación.
+
+### Interno
+
+- 235 pruebas de dominio.
+
 ## [0.14.0] — LOOP 014 · Arquitectura de secuencias
 
 Cierra el último hueco que quedaba abierto en `BRIEF_COVERAGE.md` sin depender de ningún

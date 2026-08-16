@@ -333,3 +333,25 @@ tener el hueco ya tipado evita una migración de datos cuando llegue la fase 3 t
 **Consecuencias.** `Song.sequences` y `SetlistEntry.sequencePlanId` viajan vacíos/nulos en todas
 partes hasta que exista una pantalla que los rellene. Ningún flujo actual los usa, así que no hay
 riesgo de mostrar algo a medio construir.
+
+## ADR-019 — Las digitaciones se calculan, no se guardan
+
+**Contexto.** El ministerio pidió que al tocar un acorde aparezca cómo se hace en el
+instrumento seleccionado. La vía obvia es un archivo de diagramas: unas cuantas imágenes
+por acorde y por instrumento.
+
+**Decisión.** No hay ni una digitación guardada. Se buscan a partir de las notas del
+acorde y de la afinación del instrumento, puntuando cada postura posible.
+
+**Motivo.** Aurora ya guarda los acordes como estructura musical y no como texto
+(ADR-002), así que las notas de cualquier acorde son un dato disponible. Un archivo de
+imágenes cubriría los treinta acordes previsibles y fallaría justo en los que hacen falta
+—un `Am7b5`, un `F#7#9`, un slash chord—, que son los que nadie se sabe de memoria. Y
+habría que rehacerlo entero al añadir un instrumento al catálogo, cosa que el ministerio
+puede hacer desde ajustes (ADR-016).
+
+**Consecuencias.** Un instrumento de cuerda nuevo se soporta añadiendo su afinación: seis
+números. Los diagramas heredan el tema y pesan bytes, porque son SVG generado. A cambio,
+el buscador tiene que puntuar bien: las reglas están en `voicing.ts`, y las pruebas las
+fijan comprobando que el algoritmo encuentra solo las posturas estándar de Am y Do — que
+es la verificación de que no se ha inventado nada.

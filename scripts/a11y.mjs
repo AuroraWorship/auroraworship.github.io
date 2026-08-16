@@ -77,6 +77,12 @@ for (const [ruta, rol] of RUTAS) {
         // Un enlace en línea dentro de una frase es texto, no un botón:
         // exigirle 44px de alto no tiene sentido.
         if (el.tagName === 'A' && getComputedStyle(el).display === 'inline') return false;
+        // WCAG 2.5.5 exceptúa expresamente los objetivos que van dentro de un
+        // bloque de texto. El acorde sobre su sílaba es ese caso: estirarlo a
+        // 44px lo despegaría de la palabra a la que pertenece, que es justo lo
+        // que el acorde tiene que comunicar. Se marca uno a uno y no por tipo
+        // de elemento, para que la excepción siga siendo revisable de un vistazo.
+        if (el.dataset.inlineTarget === 'true') return false;
         return r.height < minTap;
       })
       .map((el) => `${el.tagName} "${nombreDe(el).slice(0, 24)}" ${Math.round(el.getBoundingClientRect().height)}px`);
