@@ -38,6 +38,7 @@ export function emptySong(): Song {
     vocalistKeys: [],
     resources: [],
     versions: [],
+    status: 'draft',
     rights: { status: 'reference', holder: null, notes: null },
     scope: 'internal',
   };

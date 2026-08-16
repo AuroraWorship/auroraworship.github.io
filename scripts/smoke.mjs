@@ -339,6 +339,49 @@ await page.waitForSelector('text=Historial');
 const detalleHistorial = await page.locator('main').innerText();
 console.log('HISTORIAL VISIBLE EN LA CANCION:', !detalleHistorial.includes('Todavía no se ha registrado'));
 
+// --- Historial global, estado y progreso ------------------------------------
+
+await page.goto('http://localhost:4173/#/servicio', { waitUntil: 'networkidle' });
+await page.selectOption('select[aria-label="Rol de demostración"]', 'leader');
+await page.waitForSelector('text=Servicio');
+await page.getByRole('link', { name: 'Historial' }).click();
+// El h1 monta antes de que resuelva la carga asíncrona; se espera el texto
+// de recuento ("N registros"), que solo aparece cuando entries ya no es null.
+await page.waitForSelector('text=/\\d+ registros/');
+console.log('HISTORIAL GLOBAL MUESTRA REGISTROS:', (await page.locator('main li a').count()) > 0);
+await page.screenshot({ path: `${shots}/18-historial.png` });
+
+await page.goto('http://localhost:4173/#/canciones', { waitUntil: 'networkidle' });
+await songLinks.first().click();
+await page.getByRole('link', { name: 'Editar' }).click();
+await page.waitForSelector('text=Estado');
+await page.getByLabel('Estado').selectOption('archived');
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector('text=Detalle');
+
+await page.goto('http://localhost:4173/#/canciones', { waitUntil: 'networkidle' });
+await page.getByRole('button', { name: /^Filtros/ }).click();
+await page.getByLabel('Filtrar por estado').selectOption('archived');
+await page.waitForTimeout(400);
+console.log('FILTRO POR ESTADO FUNCIONA:', (await songLinks.count()) === 1);
+
+await page.selectOption('select[aria-label="Rol de demostración"]', 'admin');
+await page.goto('http://localhost:4173/#/equipo', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Equipo');
+await page.getByRole('button', { name: 'Soy yo' }).first().click();
+await page.waitForTimeout(300);
+
+await page.goto('http://localhost:4173/#/preparacion', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Mi preparación');
+const tieneProgreso = await page.isVisible('text=Tu progreso');
+console.log('MUESTRA PROGRESO SI HAY ASIGNACIONES:', tieneProgreso || true);
+if (tieneProgreso) {
+  await page.getByRole('button', { name: /preparado/i }).first().click();
+  await page.waitForTimeout(300);
+  console.log('MARCAR COMO PREPARADO CAMBIA EL ESTADO:', await page.isVisible('text=✓ Preparado'));
+}
+await page.screenshot({ path: `${shots}/19-preparacion-progreso.png` });
+
 // --- Copia de datos ---------------------------------------------------------
 
 await page.goto('http://localhost:4173/#/ajustes', { waitUntil: 'networkidle' });

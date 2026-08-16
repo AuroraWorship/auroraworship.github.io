@@ -636,3 +636,40 @@ describe('recursos y versiones de canción', () => {
     expect(guardada!.versions[0].resources[0].url).toBe('https://ejemplo.test/acustica');
   });
 });
+
+describe('estado de canción', () => {
+  it('la semilla arranca "ready"; una canción nueva arranca "draft"', async () => {
+    const song = await repo.getSong(leader, 'song-sublime-gracia');
+    expect(song!.status).toBe('ready');
+  });
+
+  it('filtra por estado', async () => {
+    const song = (await repo.getSong(leader, 'song-sublime-gracia'))!;
+    await repo.saveSong(leader, { ...song, status: 'archived' });
+    expect((await repo.listSongs(leader, { status: 'archived' })).map((s) => s.id)).toEqual([
+      'song-sublime-gracia',
+    ]);
+    expect((await repo.listSongs(leader, { status: 'ready' })).map((s) => s.id)).toEqual([
+      'song-santo-santo-santo',
+    ]);
+  });
+});
+
+describe('progreso personal de preparación', () => {
+  it('arranca vacío', async () => {
+    expect(await repo.listPrepared(musician)).toEqual([]);
+  });
+
+  it('se marca y se desmarca', async () => {
+    expect(await repo.togglePrepared(musician, 'service-1:song-1')).toEqual([
+      'service-1:song-1',
+    ]);
+    expect(await repo.togglePrepared(musician, 'service-1:song-1')).toEqual([]);
+  });
+
+  it('es personal: no se comparte entre integrantes', async () => {
+    await repo.togglePrepared(musician, 'service-1:song-1');
+    expect(await repo.listPrepared(leader)).toEqual([]);
+    expect(await repo.listPrepared(musician)).toEqual(['service-1:song-1']);
+  });
+});

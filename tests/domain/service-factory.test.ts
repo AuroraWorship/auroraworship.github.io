@@ -67,3 +67,10 @@ describe('nextSaturday', () => {
     }
   });
 });
+
+describe('emptySong (status por defecto)', () => {
+  it('una canción nueva arranca como borrador', async () => {
+    const { emptySong } = await import('../../src/domain/song-factory');
+    expect(emptySong().status).toBe('draft');
+  });
+});

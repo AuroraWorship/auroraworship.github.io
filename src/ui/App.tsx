@@ -14,6 +14,7 @@ import { SongsPage } from './pages/SongsPage';
 import { SongPage } from './pages/SongPage';
 const SongEditorPage = lazy(() => import('./pages/SongEditorPage').then((m) => ({ default: m.SongEditorPage })));
 import { ServicePage, ServicesPage } from './pages/ServicePage';
+import { HistoryPage } from './pages/HistoryPage';
 import { RehearsalPage } from './pages/RehearsalPage';
 import { TutorialsPage } from './pages/TutorialsPage';
 import { PreparationPage } from './pages/PreparationPage';
@@ -146,6 +147,7 @@ function Shell() {
           <Route path="/equipo" element={<TeamPage />} />
           <Route path="/servicio" element={<ServicePage />} />
           <Route path="/servicios" element={<ServicesPage />} />
+          <Route path="/historial" element={<HistoryPage />} />
           {/* Estática antes que dinámica: "nuevo" no es un identificador. */}
           <Route path="/servicio/nuevo" element={<ServiceEditorPage />} />
           <Route path="/servicio/:serviceId" element={<ServicePage />} />

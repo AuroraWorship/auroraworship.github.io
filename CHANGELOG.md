@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.0] — LOOP 013 · Historial global, progreso y estado
+
+Cierra el último barrido de `BRIEF_COVERAGE.md` que no dependía de ningún bloqueo. Fases 1-3
+del brief quedan completas.
+
+### Añadido
+
+- **Historial global** (`/historial`), enlazado desde Servicio: qué se tocó, cuándo, quién cantó
+  y en qué tonalidad, por fecha en vez de por canción.
+- **Estado de canción** (borrador / lista / archivada), con su filtro en la búsqueda.
+- **Progreso personal** en Mi preparación: marcar cada parte asignada como preparada, con una
+  barra de avance. Es personal — el mismo patrón de almacenamiento que los favoritos.
+
 ## [0.12.0] — LOOP 012 · Huecos del brief
 
 Auditoría completa contra las 59 secciones del encargo original (`BRIEF_COVERAGE.md`),

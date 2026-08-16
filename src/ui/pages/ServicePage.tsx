@@ -144,6 +144,12 @@ export function ServicePage() {
             Equipo
           </Link>
         )}
+        <Link
+          to="/historial"
+          className="flex h-12 items-center rounded-xl border border-aurora-border bg-aurora-surface px-4 text-sm"
+        >
+          Historial
+        </Link>
       </div>
 
       {can(actor, 'service:write') && <BotonNuevo />}

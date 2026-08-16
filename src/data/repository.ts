@@ -20,6 +20,7 @@ import type {
   Service,
   Setlist,
   Song,
+  SongStatus,
   Tutorial,
 } from '../domain/model';
 import { lyricsOf, parseSongBody } from '../domain/music/song-body';
@@ -34,6 +35,7 @@ export interface SongQuery {
   instrument?: string;
   tag?: string;
   difficulty?: number;
+  status?: SongStatus;
   /** Filtra por quién canta la canción, según sus tonalidades registradas. */
   vocalistId?: string;
   /** Rango de tempo, para armar un bloque que no rompa la dinámica. */
@@ -76,6 +78,9 @@ export interface AuroraRepository {
   listInstruments(actor: Actor): Promise<readonly Instrument[]>;
   saveInstrument(actor: Actor, instrument: Instrument): Promise<Instrument>;
   deleteInstrument(actor: Actor, id: string): Promise<void>;
+  /** Progreso personal: qué asignaciones ya se dieron por preparadas. */
+  listPrepared(actor: Actor): Promise<readonly Id[]>;
+  togglePrepared(actor: Actor, key: Id): Promise<readonly Id[]>;
   listMembers(actor: Actor): Promise<readonly Member[]>;
   getMember(actor: Actor, id: Id): Promise<Member | null>;
   saveMember(actor: Actor, member: Member): Promise<Member>;
@@ -99,6 +104,7 @@ function matches(song: Song, query: SongQuery): boolean {
   if (query.instrument && !song.instruments.includes(query.instrument as never)) return false;
   if (query.tag && !song.tags.includes(query.tag)) return false;
   if (query.difficulty && song.difficulty !== query.difficulty) return false;
+  if (query.status && song.status !== query.status) return false;
   if (query.vocalistId && !song.vocalistKeys.some((vk) => vk.memberId === query.vocalistId)) {
     return false;
   }
@@ -378,6 +384,23 @@ export class StoredRepository implements AuroraRepository {
       await this.store.set(KEYS.history, [...history, ...nuevas]);
     }
     return nuevas.length;
+  }
+
+  private preparedKey(actor: Actor): string {
+    return `prepared:${actor.id}`;
+  }
+
+  async listPrepared(actor: Actor): Promise<readonly Id[]> {
+    require(actor, 'service:read');
+    return (await this.store.get<Id[]>(this.preparedKey(actor))) ?? [];
+  }
+
+  async togglePrepared(actor: Actor, key: Id): Promise<readonly Id[]> {
+    require(actor, 'service:read');
+    const current = await this.listPrepared(actor);
+    const next = current.includes(key) ? current.filter((k) => k !== key) : [...current, key];
+    await this.store.set(this.preparedKey(actor), next);
+    return next;
   }
 
   /**

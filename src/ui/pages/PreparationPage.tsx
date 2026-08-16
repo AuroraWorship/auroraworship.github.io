@@ -21,6 +21,7 @@ interface Loaded {
   rehearsal: Rehearsal | null;
   songs: readonly { song: Song; key: string; assignments: readonly Assignment[] }[];
   me: Member | null;
+  prepared: readonly string[];
 }
 
 /**
@@ -67,7 +68,8 @@ export function PreparationPage() {
         : null;
 
       const me = memberId ? await repository.getMember(actor, memberId).catch(() => null) : null;
-      if (active) setData({ service, rehearsal, songs, me });
+      const prepared = await repository.listPrepared(actor);
+      if (active) setData({ service, rehearsal, songs, me, prepared });
     })();
 
     return () => {
@@ -77,6 +79,15 @@ export function PreparationPage() {
 
   if (!allowed) return <NoAccess />;
   if (data === null) return <p className="text-aurora-muted">Cargando…</p>;
+
+  const preparedKey = (songId: string) => `${data.service?.id}:${songId}`;
+  const conAsignacion = data.songs.filter((s) => s.assignments.length > 0);
+  const listas = conAsignacion.filter((s) => data.prepared.includes(preparedKey(s.song.id)));
+
+  const alternarPreparado = async (songId: string) => {
+    const siguiente = await repository.togglePrepared(actor, preparedKey(songId));
+    setData({ ...data, prepared: siguiente });
+  };
 
   return (
     <div className="space-y-4">
@@ -143,11 +154,28 @@ export function PreparationPage() {
             </p>
           </div>
 
-          {memberId && data.songs.every((s) => s.assignments.length === 0) && (
+          {memberId && conAsignacion.length === 0 && (
             <PendingNotice>
               No tienes ninguna asignación en este servicio todavía. Cuando el liderazgo reparta
               instrumentos y voces, aparecerán aquí junto a cada canción.
             </PendingNotice>
+          )}
+
+          {memberId && conAsignacion.length > 0 && (
+            <div className="rounded-xl border border-aurora-border bg-aurora-surface p-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-aurora-muted">Tu progreso</span>
+                <span className="font-medium">
+                  {listas.length} de {conAsignacion.length} partes preparadas
+                </span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-aurora-surface-2">
+                <div
+                  className="h-full rounded-full bg-aurora-violet-solid transition-all"
+                  style={{ width: `${(listas.length / conAsignacion.length) * 100}%` }}
+                />
+              </div>
+            </div>
           )}
 
           <ol className="space-y-2">
@@ -199,6 +227,21 @@ export function PreparationPage() {
                     )}
                   </p>
                 </Link>
+                {memberId && assignments.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => alternarPreparado(song.id)}
+                    aria-pressed={data.prepared.includes(preparedKey(song.id))}
+                    className={[
+                      'mt-1.5 flex h-10 w-full items-center justify-center rounded-lg border text-sm',
+                      data.prepared.includes(preparedKey(song.id))
+                        ? 'border-aurora-violet/50 bg-aurora-violet/10 text-aurora-violet-soft'
+                        : 'border-aurora-border text-aurora-muted',
+                    ].join(' ')}
+                  >
+                    {data.prepared.includes(preparedKey(song.id)) ? '✓ Preparado' : 'Marcar como preparado'}
+                  </button>
+                )}
               </li>
             ))}
           </ol>

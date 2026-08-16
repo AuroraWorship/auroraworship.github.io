@@ -4,15 +4,15 @@
 
 ## LOOP actual
 
-**LOOP 012 — HUECOS DEL BRIEF (RECURSOS, CATÁLOGO, VERSIONES)** · completado
+**LOOP 013 — HISTORIAL GLOBAL, PROGRESO Y ESTADO** · completado
 
 ## Objetivo
 
-Auditar el proyecto entero contra el brief original (59 secciones) — no de memoria, grep contra
-el código — y cerrar los huecos que no dependían de ningún bloqueo. Resultado completo en
-`BRIEF_COVERAGE.md`, que sustituye a este resumen para esa pregunta específica.
+Cerrar los tres últimos huecos de `BRIEF_COVERAGE.md` que no dependían de ningún bloqueo: vista
+global de historial, progreso personal en Mi preparación, y estado de canción para buscar. Con
+esto, fases 1-3 del brief quedan completas.
 
-Loops 001 a 011 completados y verificados.
+Loops 001 a 012 completados y verificados.
 
 ## Completado
 
@@ -97,6 +97,15 @@ Loops 001 a 011 completados y verificados.
 - [x] Los favoritos no viajan en la copia: son personales
 - [x] 173 pruebas; comprobación en navegador con descarga y restauración reales
 
+## Añadido en LOOP 013
+
+- [x] `/historial`: vista global de lo tocado, por fecha, enlazada desde Servicio
+- [x] `SongStatus` (borrador/lista/archivada) — campo, filtro y editor
+- [x] Progreso personal en Mi preparación: marcar cada parte como preparada, barra de avance
+- [x] `listPrepared`/`togglePrepared` en el repositorio, personal por actor (mismo patrón que favoritos)
+- [x] Fases 1-3 del brief completas — detalle en `BRIEF_COVERAGE.md`
+- [x] 218 pruebas; comprobación en navegador y accesibilidad ampliadas
+
 ## Añadido en LOOP 012
 
 - [x] `BRIEF_COVERAGE.md`: checklist de las 59 secciones del brief, para no re-auditar desde cero
@@ -177,6 +186,7 @@ El producto cubre las fases 1 a 3 del roadmap. Lo que queda depende de los bloqu
 | La comprobación offline fijaba el rol sin recargar, y la aplicación seguía con el anterior | Falso negativo revisado |
 | La comprobación de varios servicios abría «el primero» de una lista ordenada por fecha, que ya era el nuevo | Falso negativo revisado |
 | `waitForSelector('h1')` resolvía contra el h1 de la página vieja antes de que terminara la navegación SPA | Falso negativo revisado, se espera el encabezado específico |
+| El historial global se comprobaba antes de que resolviera la carga asíncrona | Falso negativo revisado, se espera el texto de recuento |
 
 ## Bloqueos abiertos
 

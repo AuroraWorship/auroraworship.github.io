@@ -156,6 +156,18 @@ export interface VocalistKey {
 export type Difficulty = 1 | 2 | 3 | 4 | 5;
 
 /**
+ * Estado de preparación de la canción (§30), no de publicación: `scope` ya
+ * decide quién la ve. Este campo responde «¿la damos por lista para tocar?».
+ */
+export type SongStatus = 'draft' | 'ready' | 'archived';
+
+export const SONG_STATUS_LABELS: Record<SongStatus, string> = {
+  draft: 'Borrador',
+  ready: 'Lista',
+  archived: 'Archivada',
+};
+
+/**
  * Variante de arreglo de la misma canción: acústica, en vivo, original del
  * artista. NO duplica letra ni acordes — eso viviría en el `body` principal
  * si el equipo decide adoptar el arreglo — sino que anota que existe y enlaza
@@ -192,6 +204,7 @@ export interface Song {
   vocalistKeys: readonly VocalistKey[];
   resources: readonly ResourceRef[];
   versions: readonly SongVersion[];
+  status: SongStatus;
   rights: Rights;
   scope: Scope;
 }

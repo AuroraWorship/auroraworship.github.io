@@ -1,5 +1,12 @@
 import { useMemo, useState } from 'react';
-import { INSTRUMENTS, type Difficulty, type Member, type Song } from '../../domain/model';
+import {
+  INSTRUMENTS,
+  SONG_STATUS_LABELS,
+  type Difficulty,
+  type Member,
+  type Song,
+  type SongStatus,
+} from '../../domain/model';
 import type { SongQuery } from '../../data/repository';
 
 interface Props {
@@ -51,6 +58,7 @@ export function SongFilters({ songs, members, query, onChange }: Props) {
     query.vocalistId,
     query.bpmMin,
     query.bpmMax,
+    query.status,
   ].filter((v) => v !== undefined && v !== '').length;
 
   const set = (cambios: Partial<SongQuery>) => onChange({ ...query, ...cambios });
@@ -177,6 +185,22 @@ export function SongFilters({ songs, members, query, onChange }: Props) {
               </select>
             </Campo>
           )}
+
+          <Campo etiqueta="Estado">
+            <select
+              aria-label="Filtrar por estado"
+              value={query.status ?? ''}
+              onChange={(e) => set({ status: (e.target.value || undefined) as SongStatus | undefined })}
+              className={selectClass}
+            >
+              <option value="">Cualquiera</option>
+              {(Object.keys(SONG_STATUS_LABELS) as SongStatus[]).map((s) => (
+                <option key={s} value={s}>
+                  {SONG_STATUS_LABELS[s]}
+                </option>
+              ))}
+            </select>
+          </Campo>
 
           <Campo etiqueta="Tempo (BPM)">
             <div className="flex items-center gap-2">

@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   INSTRUMENTS,
+  SONG_STATUS_LABELS,
   type Difficulty,
   type Instrument,
   type InstrumentId,
@@ -9,6 +10,7 @@ import {
   type Member,
   type RightsStatus,
   type Song,
+  type SongStatus,
 } from '../../domain/model';
 import { COMMON_MAJOR_KEYS, COMMON_MINOR_KEYS, tryParseKey } from '../../domain/music/key';
 import { emptySong } from '../../domain/song-factory';
@@ -223,6 +225,20 @@ export function SongEditorPage() {
           </select>
         </Field>
       </div>
+
+      <Field label="Estado">
+        <select
+          value={song.status}
+          onChange={(e) => patch({ status: e.target.value as SongStatus })}
+          className={inputClass}
+        >
+          {(Object.keys(SONG_STATUS_LABELS) as SongStatus[]).map((s) => (
+            <option key={s} value={s}>
+              {SONG_STATUS_LABELS[s]}
+            </option>
+          ))}
+        </select>
+      </Field>
 
       <Field label="Etiquetas" hint="Separadas por comas">
         <input

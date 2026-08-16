@@ -25,17 +25,17 @@ privacidad, copyright, diseño, MVP, calidad, testing, auto-recovery, deploy:
 
 ## Servicios, ensayos, preparación (§22–29)
 - §22 servicios — OK; campo de secuencias del servicio — **DIFERIDO** (ligado a §27)
-- §23 historial — PARCIAL: por canción sí, vista global no (LOOP 013)
+- §23 historial — OK (LOOP 013: vista global en /historial)
 - §24 ensayos — OK (LOOP 006)
-- §25 «Mi preparación» — PARCIAL: próximas canciones/ensayo sí; tareas y progreso no (LOOP 013)
+- §25 «Mi preparación» — OK (LOOP 013: progreso personal por parte asignada, barra de avance)
 - §26 tutoriales — OK (LOOP 008)
 - §27 secuencias — **DIFERIDO**, el brief pide solo preparar arquitectura; ni eso se hizo
 - §28 modo ensayo — OK (LOOP 004 pantalla, LOOP 012 parte instrumental)
 - §29 modo servicio — OK, mismo componente que ensayo
 
 ## Uso (§30–32, §41)
-- §30 búsqueda — PARCIAL: título/letra/tonalidad/instrumento/vocalista/etiqueta/dificultad/tempo
-  sí (LOOP 010); por «estado» de canción no existe ese campo (LOOP 013)
+- §30 búsqueda — OK: título/letra/tonalidad/instrumento/vocalista/etiqueta/dificultad/tempo/estado
+  (LOOP 010 + LOOP 013)
 - §31 favoritos — OK (LOOP 005)
 - §32 notificaciones — **DIFERIDO**, el brief las marca «a futuro»
 - §41 aplicación pública — el ámbito `public` filtra correctamente; no hay pantalla dedicada — **DIFERIDO** (fase 5)
@@ -46,6 +46,7 @@ privacidad, copyright, diseño, MVP, calidad, testing, auto-recovery, deploy:
 - §37 Academia, §54 pagos → **DIFERIDO**, fase 4 explícita del brief
 - §38 IA → **DIFERIDO**, fase 5 explícita del brief
 
-## Próximo barrido pendiente (LOOP 013)
-Historial global, tareas/progreso en Mi preparación, campo de estado de
-canción para búsqueda. Ninguno bloqueado; son los últimos huecos de fase 1-3.
+## Fases 1–3: completas
+Todo lo que no dependía de un bloqueo (§1–36, §42–59) está hecho a fecha del
+LOOP 013. Lo que queda son las fases 4–5 (diferidas por el propio brief) y
+los tres bloqueos B-01/B-02/B-03.
