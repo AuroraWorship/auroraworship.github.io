@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { PENDING, type Setlist, type Song } from '../../domain/model';
+import { PENDING, instrumentById, type Setlist, type Song } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -153,6 +153,23 @@ export function LivePage() {
               {index + 1} / {items!.length}
             </span>
           </div>
+
+          {current.song.instrumentParts.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto border-b border-aurora-border bg-aurora-surface-2/50 px-4 py-2 text-xs">
+              {current.song.instrumentParts.map((part, i) => (
+                <span
+                  key={i}
+                  className="shrink-0 rounded-lg border border-aurora-border bg-aurora-surface px-2.5 py-1"
+                >
+                  <span className="font-semibold text-aurora-violet-soft">
+                    {instrumentById(part.instrument)?.name ?? part.instrument}
+                  </span>
+                  <span className="text-aurora-muted"> · {part.section}: </span>
+                  {part.instructions}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Texto más grande que en el resto de la aplicación: aquí se lee a
               un metro de distancia, no en la mano. */}

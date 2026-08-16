@@ -574,3 +574,65 @@ describe('varios servicios', () => {
     expect(historial.map((h) => h.key)).toEqual(['A', 'G']);
   });
 });
+
+describe('catálogo de instrumentos', () => {
+  const superAdmin: Actor = { id: 'sa', roles: ['super-admin'] };
+
+  it('empieza solo con los de fábrica, sin nada añadido', async () => {
+    expect(await repo.listInstruments(leader)).toEqual([]);
+  });
+
+  it('el super admin añade y borra; el líder no puede', async () => {
+    await repo.saveInstrument(superAdmin, { id: 'custom-cajon', name: 'Cajón', family: 'other' });
+    expect((await repo.listInstruments(leader)).map((i) => i.id)).toEqual(['custom-cajon']);
+
+    await expect(
+      repo.saveInstrument(leader, { id: 'custom-x', name: 'X', family: 'other' }),
+    ).rejects.toThrow(PermissionError);
+    await expect(repo.deleteInstrument(leader, 'custom-cajon')).rejects.toThrow(PermissionError);
+
+    await repo.deleteInstrument(superAdmin, 'custom-cajon');
+    expect(await repo.listInstruments(leader)).toEqual([]);
+  });
+
+  it('marca como personalizado lo añadido, aunque no se declare', async () => {
+    await repo.saveInstrument(superAdmin, { id: 'custom-violin', name: 'Violín', family: 'strings' });
+    expect((await repo.listInstruments(leader))[0].custom).toBe(true);
+  });
+});
+
+describe('recursos y versiones de canción', () => {
+  it('una canción trae resources y versions vacíos por defecto', async () => {
+    const song = await repo.getSong(leader, 'song-sublime-gracia');
+    expect(song!.resources).toEqual([]);
+    expect(song!.versions).toEqual([]);
+  });
+
+  it('se pueden guardar versiones con su propio material', async () => {
+    const song = (await repo.getSong(leader, 'song-sublime-gracia'))!;
+    await repo.saveSong(leader, {
+      ...song,
+      versions: [
+        {
+          id: 'v1',
+          label: 'Acústica',
+          notes: 'Más lenta',
+          resources: [
+            {
+              id: 'r1',
+              kind: 'video',
+              title: 'Referencia',
+              url: 'https://ejemplo.test/acustica',
+              sizeBytes: null,
+              rights: { status: 'reference', holder: null, notes: null },
+              scope: 'internal',
+            },
+          ],
+        },
+      ],
+    });
+    const guardada = await repo.getSong(leader, 'song-sublime-gracia');
+    expect(guardada!.versions[0].label).toBe('Acústica');
+    expect(guardada!.versions[0].resources[0].url).toBe('https://ejemplo.test/acustica');
+  });
+});

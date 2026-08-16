@@ -55,16 +55,23 @@ export function isRedistributable(rights: Rights): boolean {
 
 // ---------------------------------------------------------------- Personas
 
-export type InstrumentId =
-  | 'piano' | 'acoustic-guitar' | 'electric-guitar' | 'bass' | 'drums' | 'voice';
+/**
+ * Cadena libre, no una unión cerrada: el catálogo lo puede ampliar el
+ * ministerio (§19), así que el tipo no puede fijar de antemano qué
+ * instrumentos existen.
+ */
+export type InstrumentId = string;
 
 export interface Instrument {
   id: InstrumentId;
   name: string;
   /** Familia, para agrupar en la UI y ampliar el catálogo sin migraciones. */
   family: 'keys' | 'strings' | 'rhythm' | 'vocal' | 'other';
+  /** Falso en los seis de fábrica; verdadero en los que añade el ministerio. */
+  custom?: boolean;
 }
 
+/** Catálogo de fábrica. Nunca se edita ni se borra: es la base común. */
 export const INSTRUMENTS: readonly Instrument[] = [
   { id: 'piano', name: 'Piano', family: 'keys' },
   { id: 'acoustic-guitar', name: 'Guitarra acústica', family: 'strings' },
@@ -74,8 +81,25 @@ export const INSTRUMENTS: readonly Instrument[] = [
   { id: 'voice', name: 'Voz', family: 'vocal' },
 ];
 
+/**
+ * Instrumentos añadidos por el ministerio, en memoria.
+ *
+ * `instrumentById` se llama en decenas de sitios de forma síncrona (mostrar
+ * el nombre de un instrumento en una lista), y enhebrar el catálogo completo
+ * como prop hasta cada uno de ellos sería una cascada de cambios por un dato
+ * que rara vez cambia. `repository.listInstruments` rellena esta caché la
+ * primera vez que se pide el catálogo; a partir de ahí toda la aplicación ve
+ * los instrumentos añadidos sin pedirlos de nuevo.
+ */
+const customInstrumentCache = new Map<string, Instrument>();
+
+export function registerCustomInstruments(instruments: readonly Instrument[]): void {
+  customInstrumentCache.clear();
+  for (const instrument of instruments) customInstrumentCache.set(instrument.id, instrument);
+}
+
 export function instrumentById(id: InstrumentId): Instrument | undefined {
-  return INSTRUMENTS.find((i) => i.id === id);
+  return INSTRUMENTS.find((i) => i.id === id) ?? customInstrumentCache.get(id);
 }
 
 /**
@@ -131,6 +155,19 @@ export interface VocalistKey {
 
 export type Difficulty = 1 | 2 | 3 | 4 | 5;
 
+/**
+ * Variante de arreglo de la misma canción: acústica, en vivo, original del
+ * artista. NO duplica letra ni acordes — eso viviría en el `body` principal
+ * si el equipo decide adoptar el arreglo — sino que anota que existe y enlaza
+ * su referencia, para no perder de vista que "hay otra forma de tocarla".
+ */
+export interface SongVersion {
+  id: Id;
+  label: string;
+  notes: string | null;
+  resources: readonly ResourceRef[];
+}
+
 export interface Song {
   id: Id;
   title: string;
@@ -154,6 +191,7 @@ export interface Song {
   voices: readonly VoiceLine[];
   vocalistKeys: readonly VocalistKey[];
   resources: readonly ResourceRef[];
+  versions: readonly SongVersion[];
   rights: Rights;
   scope: Scope;
 }

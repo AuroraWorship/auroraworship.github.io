@@ -10,6 +10,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Voces y partes por instrumento editables
 
 - [x] Equipo: integrantes, instrumentos y tesitura
+- [x] Catálogo de instrumentos ampliable por el ministerio
 
 - [x] Motor de notas con modelo diatónico
 - [x] Motor de acordes (mayores, menores, 7as, sus, add, dim, aug, slash, alteraciones)

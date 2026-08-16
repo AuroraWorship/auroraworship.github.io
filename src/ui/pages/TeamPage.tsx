@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { INSTRUMENTS, type InstrumentId, type Member } from '../../domain/model';
+import { INSTRUMENTS, type Instrument, type InstrumentId, type Member } from '../../domain/model';
 import { COMMON_MAJOR_KEYS, COMMON_MINOR_KEYS } from '../../domain/music/key';
 import { newId } from '../../domain/song-factory';
 import { can } from '../../domain/rbac/roles';
@@ -160,8 +160,14 @@ function MemberForm({
   onSave: (member: Member) => void;
   onCancel: () => void;
 }) {
+  const { actor } = useSession();
   const [draft, setDraft] = useState<Member>(member);
   const [error, setError] = useState<string | null>(null);
+  const [catalogo, setCatalogo] = useState<readonly Instrument[]>(INSTRUMENTS);
+
+  useEffect(() => {
+    repository.listInstruments(actor).then((custom) => setCatalogo([...INSTRUMENTS, ...custom]));
+  }, [actor]);
 
   const toggle = (id: InstrumentId) =>
     setDraft({
@@ -198,7 +204,7 @@ function MemberForm({
           Instrumentos
         </p>
         <div className="flex flex-wrap gap-2">
-          {INSTRUMENTS.map((instrument) => {
+          {catalogo.map((instrument) => {
             const active = draft.instruments.includes(instrument.id);
             return (
               <button

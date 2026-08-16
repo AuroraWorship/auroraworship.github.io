@@ -12,6 +12,7 @@ import { appStore } from '../../data/repository';
 import { can } from '../../domain/rbac/roles';
 import { useSession } from '../session';
 import { NoAccess, PendingNotice } from '../components/Notices';
+import { InstrumentCatalog } from '../components/InstrumentCatalog';
 
 const ETIQUETAS: Record<keyof ImportSummary, string> = {
   songs: 'canciones',
@@ -180,6 +181,8 @@ export function SettingsPage() {
           )}
         </section>
       )}
+
+      <InstrumentCatalog />
 
       {error && (
         <p role="alert" className="rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm">

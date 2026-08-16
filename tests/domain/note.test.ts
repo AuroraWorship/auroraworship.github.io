@@ -93,3 +93,15 @@ describe('respell', () => {
     expect(formatNote(respell(0, 'flat'))).toBe('C');
   });
 });
+
+describe('registerCustomInstruments (catálogo)', () => {
+  it('instrumentById resuelve un instrumento registrado dinámicamente', async () => {
+    const { registerCustomInstruments, instrumentById } = await import(
+      '../../src/domain/model'
+    );
+    registerCustomInstruments([{ id: 'custom-saxo', name: 'Saxofón', family: 'other' }]);
+    expect(instrumentById('custom-saxo')?.name).toBe('Saxofón');
+    expect(instrumentById('piano')?.name).toBe('Piano');
+    registerCustomInstruments([]);
+  });
+});

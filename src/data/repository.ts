@@ -11,7 +11,7 @@
  *    puede saltarse la regla, porque el repositorio la aplica igualmente.
  */
 
-import { PENDING } from '../domain/model';
+import { PENDING, registerCustomInstruments, type Instrument } from '../domain/model';
 import type {
   HistoryEntry,
   Id,
@@ -73,6 +73,9 @@ export interface AuroraRepository {
   addHistory(actor: Actor, entries: readonly HistoryEntry[]): Promise<number>;
   listFavorites(actor: Actor): Promise<readonly Id[]>;
   toggleFavorite(actor: Actor, songId: Id): Promise<readonly Id[]>;
+  listInstruments(actor: Actor): Promise<readonly Instrument[]>;
+  saveInstrument(actor: Actor, instrument: Instrument): Promise<Instrument>;
+  deleteInstrument(actor: Actor, id: string): Promise<void>;
   listMembers(actor: Actor): Promise<readonly Member[]>;
   getMember(actor: Actor, id: Id): Promise<Member | null>;
   saveMember(actor: Actor, member: Member): Promise<Member>;
@@ -132,6 +135,7 @@ const KEYS = {
   members: 'members',
   rehearsals: 'rehearsals',
   history: 'history',
+  customInstruments: 'customInstruments',
 } as const;
 
 /**
@@ -152,6 +156,9 @@ const SEED_REHEARSALS: readonly Rehearsal[] = [];
 
 /** El historial lo escribe el uso, no la semilla. */
 const SEED_HISTORY: readonly HistoryEntry[] = [];
+
+/** Sin instrumentos añadidos al arrancar: solo el catálogo de fábrica. */
+const SEED_CUSTOM_INSTRUMENTS: readonly Instrument[] = [];
 
 /**
  * Repositorio sobre almacenamiento clave-valor.
@@ -397,6 +404,38 @@ export class StoredRepository implements AuroraRepository {
       : [...current, songId];
     await this.store.set(this.favoritesKey(actor), next);
     return next;
+  }
+
+  /**
+   * Instrumentos añadidos por el ministerio, más allá del catálogo de
+   * fábrica (§19). Guardar o borrar exige `settings:write` — solo super
+   * admin — porque el catálogo es compartido por todo el ministerio, no una
+   * preferencia personal.
+   */
+  async listInstruments(_actor: Actor): Promise<readonly Instrument[]> {
+    const custom = await this.collection<Instrument>(KEYS.customInstruments, SEED_CUSTOM_INSTRUMENTS);
+    registerCustomInstruments(custom);
+    return custom;
+  }
+
+  async saveInstrument(actor: Actor, instrument: Instrument): Promise<Instrument> {
+    require(actor, 'settings:write');
+    const custom = await this.collection<Instrument>(KEYS.customInstruments, SEED_CUSTOM_INSTRUMENTS);
+    const marcado = { ...instrument, custom: true as const };
+    const index = custom.findIndex((i) => i.id === marcado.id);
+    if (index >= 0) custom[index] = marcado;
+    else custom.push(marcado);
+    await this.store.set(KEYS.customInstruments, custom);
+    registerCustomInstruments(custom);
+    return marcado;
+  }
+
+  async deleteInstrument(actor: Actor, id: string): Promise<void> {
+    require(actor, 'settings:write');
+    const custom = await this.collection<Instrument>(KEYS.customInstruments, SEED_CUSTOM_INSTRUMENTS);
+    const restantes = custom.filter((i) => i.id !== id);
+    await this.store.set(KEYS.customInstruments, restantes);
+    registerCustomInstruments(restantes);
   }
 
   async listMembers(actor: Actor): Promise<readonly Member[]> {

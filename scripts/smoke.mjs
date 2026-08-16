@@ -239,7 +239,10 @@ console.log('EL NUEVO APARECE:', await page.isVisible('text=Vigilia de prueba'))
 // El servicio anterior no se ha visto afectado. Se busca por nombre: la lista
 // va por fecha, y el nuevo puede caer antes que el de ejemplo.
 await page.locator('main li a', { hasText: 'Servicio de ejemplo' }).click();
-await page.waitForSelector('h1');
+// "h1" a secas ya existe en el DOM (lo tiene la propia lista): esperar solo
+// eso resuelve antes de que la navegación SPA termine. Se espera el
+// encabezado que solo aparece en ServicePage.
+await page.getByRole('heading', { name: 'Servicio', exact: true }).waitFor();
 const otroServicio = await page.locator('main').innerText();
 console.log('EL ANTERIOR SIGUE INTACTO:', !otroServicio.includes('Vigilia de prueba'));
 

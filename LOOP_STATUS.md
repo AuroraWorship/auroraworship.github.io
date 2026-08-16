@@ -4,15 +4,15 @@
 
 ## LOOP actual
 
-**LOOP 011 — VARIOS SERVICIOS** · completado
+**LOOP 012 — HUECOS DEL BRIEF (RECURSOS, CATÁLOGO, VERSIONES)** · completado
 
 ## Objetivo
 
-Cerrar el hueco funcional más grande que quedaba: la aplicación soportaba un solo servicio y un
-solo repertorio, así que planificar el sábado siguiente pisaba el anterior — y con él, el historial
-de lo que realmente se tocó.
+Auditar el proyecto entero contra el brief original (59 secciones) — no de memoria, grep contra
+el código — y cerrar los huecos que no dependían de ningún bloqueo. Resultado completo en
+`BRIEF_COVERAGE.md`, que sustituye a este resumen para esa pregunta específica.
 
-Loops 001 a 010 completados y verificados.
+Loops 001 a 011 completados y verificados.
 
 ## Completado
 
@@ -97,6 +97,16 @@ Loops 001 a 010 completados y verificados.
 - [x] Los favoritos no viajan en la copia: son personales
 - [x] 173 pruebas; comprobación en navegador con descarga y restauración reales
 
+## Añadido en LOOP 012
+
+- [x] `BRIEF_COVERAGE.md`: checklist de las 59 secciones del brief, para no re-auditar desde cero
+- [x] Recursos (vídeo/audio/PDF/enlace) editables en canciones y en cada voz — antes solo en tutoriales
+- [x] `ResourceListEditor` compartido por canción, voz y tutorial (ADR-017)
+- [x] `SongVersion`: variantes de arreglo con su propio material, sin duplicar letra/acordes
+- [x] Catálogo de instrumentos ampliable por el ministerio, `settings:write` (ADR-016)
+- [x] Modo en vivo muestra la parte instrumental de cada sección, no solo acordes y letra
+- [x] 212 pruebas; comprobación en navegador y accesibilidad ampliadas
+
 ## Añadido en LOOP 011
 
 - [x] Varios servicios a la vez, cada uno con su propio repertorio
@@ -166,6 +176,7 @@ El producto cubre las fases 1 a 3 del roadmap. Lo que queda depende de los bloqu
 | Calentar la caché desde la página dependía de ganar una carrera con `clients.claim()` | Tres arranques idénticos con resultados distintos |
 | La comprobación offline fijaba el rol sin recargar, y la aplicación seguía con el anterior | Falso negativo revisado |
 | La comprobación de varios servicios abría «el primero» de una lista ordenada por fecha, que ya era el nuevo | Falso negativo revisado |
+| `waitForSelector('h1')` resolvía contra el h1 de la página vieja antes de que terminara la navegación SPA | Falso negativo revisado, se espera el encabezado específico |
 
 ## Bloqueos abiertos
 

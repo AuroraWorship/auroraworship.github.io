@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.12.0] — LOOP 012 · Huecos del brief
+
+Auditoría completa contra las 59 secciones del encargo original (`BRIEF_COVERAGE.md`),
+y cierre de lo que no dependía de ningún bloqueo.
+
+### Añadido
+
+- Recursos (vídeo, audio, PDF, enlace) editables en canciones y en cada voz — antes solo
+  existía el editor para tutoriales, aunque el modelo ya los soportaba en los tres.
+- `SongVersion`: variantes de arreglo (acústica, en vivo, del artista) con nombre, notas y
+  su propio material, sin duplicar letra ni acordes.
+- Catálogo de instrumentos ampliable por el ministerio, gestionado en Ajustes.
+- El modo en vivo muestra la parte instrumental de cada sección, no solo acordes y letra.
+
+### Interno
+
+- `ResourceListEditor` único, reutilizado por canción, voz y tutorial (ADR-017).
+- `instrumentById` resuelve instrumentos personalizados por una caché de módulo en vez de
+  enhebrar el catálogo como prop hasta cada pantalla (ADR-016).
+- `BRIEF_COVERAGE.md`: checklist de cobertura contra el brief, para no re-auditar desde cero.
+
 ## [0.11.0] — LOOP 011 · Varios servicios
 
 Se acabó el servicio único.

@@ -298,6 +298,49 @@ function SongDetail({
         )}
       </Block>
 
+      {song.versions.length > 0 && (
+        <Block title="Otras versiones">
+          <ul className="space-y-2">
+            {song.versions.map((version) => (
+              <li key={version.id}>
+                <p className="font-medium">{version.label || 'Sin nombre'}</p>
+                {version.notes && <p className="text-aurora-muted">{version.notes}</p>}
+                {version.resources.map((r) => (
+                  <a
+                    key={r.id}
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 flex h-9 items-center text-aurora-violet-soft underline underline-offset-2"
+                  >
+                    {r.title || r.url}
+                  </a>
+                ))}
+              </li>
+            ))}
+          </ul>
+        </Block>
+      )}
+
+      {song.resources.length > 0 && (
+        <Block title="Material">
+          <ul className="space-y-1">
+            {song.resources.map((r) => (
+              <li key={r.id}>
+                <a
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 items-center text-aurora-violet-soft underline underline-offset-2"
+                >
+                  {r.title || r.url}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Block>
+      )}
+
       <Block title="Derechos">
         <p className="text-aurora-muted">
           {song.rights.holder ?? 'Titular sin confirmar'} — {rightsLabel(song.rights.status)}

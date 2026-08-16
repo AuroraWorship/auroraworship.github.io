@@ -3,10 +3,14 @@ import {
   instrumentById,
   type InstrumentId,
   type InstrumentPart,
+  type SongVersion,
   type VoiceLine,
   type VoicePart,
 } from '../../domain/model';
 import { classifySection, parseSongBody } from '../../domain/music/song-body';
+import { newId } from '../../domain/song-factory';
+import type { Scope } from '../../domain/rbac/roles';
+import { ResourceListEditor } from './ResourceListEditor';
 
 const inputClass =
   'h-11 w-full rounded-lg border border-aurora-border bg-aurora-surface-2 px-3 text-base text-aurora-text';
@@ -68,6 +72,14 @@ export function VoicesEditor({
               placeholder="Indicaciones para quien la canta"
               className={`${inputClass} mt-2 text-sm`}
             />
+            <div className="mt-2">
+              <ResourceListEditor
+                resources={voice.resources}
+                defaultScope="internal"
+                label="Pista de referencia"
+                onChange={(resources) => patch(index, { resources })}
+              />
+            </div>
           </li>
         ))}
       </ul>
@@ -230,4 +242,74 @@ function sectionHint(label: string): string {
     other: 'Sección libre',
   };
   return tipos[classifySection(label)] ?? 'Sección libre';
+}
+
+/** Otros arreglos de la misma canción: nombre, notas y su propia referencia. */
+export function SongVersionsEditor({
+  versions,
+  defaultScope,
+  onChange,
+}: {
+  versions: readonly SongVersion[];
+  defaultScope: Scope;
+  onChange: (versions: readonly SongVersion[]) => void;
+}) {
+  const patch = (index: number, cambios: Partial<SongVersion>) =>
+    onChange(versions.map((v, i) => (i === index ? { ...v, ...cambios } : v)));
+
+  return (
+    <div>
+      {versions.length === 0 && (
+        <p className="mb-2 text-sm text-aurora-muted">Solo la versión que el equipo toca.</p>
+      )}
+      <ul className="space-y-2">
+        {versions.map((version, index) => (
+          <li key={version.id} className="rounded-xl border border-aurora-border bg-aurora-surface p-3">
+            <div className="flex gap-2">
+              <input
+                aria-label={`Nombre de la versión ${index + 1}`}
+                value={version.label}
+                onChange={(e) => patch(index, { label: e.target.value })}
+                placeholder="Acústica, en vivo, del artista…"
+                className="h-11 min-w-0 flex-1 rounded-lg border border-aurora-border bg-aurora-surface-2 px-3 text-base"
+              />
+              <button
+                type="button"
+                aria-label={`Quitar versión ${index + 1}`}
+                onClick={() => onChange(versions.filter((_, i) => i !== index))}
+                className="h-11 w-11 shrink-0 rounded-lg border border-red-500/40 text-red-300"
+              >
+                ×
+              </button>
+            </div>
+            <input
+              aria-label={`Notas de la versión ${index + 1}`}
+              value={version.notes ?? ''}
+              onChange={(e) => patch(index, { notes: e.target.value || null })}
+              placeholder="Qué cambia en este arreglo"
+              className="mt-2 h-11 w-full rounded-lg border border-aurora-border bg-aurora-surface-2 px-3 text-sm"
+            />
+            <div className="mt-2">
+              <ResourceListEditor
+                resources={version.resources}
+                defaultScope={defaultScope}
+                label="Referencia"
+                onChange={(resources) => patch(index, { resources })}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <button
+        type="button"
+        onClick={() =>
+          onChange([...versions, { id: newId('version'), label: '', notes: null, resources: [] }])
+        }
+        className="mt-2 h-11 w-full rounded-xl border border-aurora-border text-sm"
+      >
+        Añadir versión
+      </button>
+    </div>
+  );
 }

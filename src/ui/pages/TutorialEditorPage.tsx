@@ -6,28 +6,18 @@ import {
   TUTORIAL_CATEGORY_LABELS,
   VOICE_PART_LABELS,
   type InstrumentId,
-  type ResourceKind,
-  type ResourceRef,
   type RightsStatus,
   type Song,
   type Tutorial,
   type TutorialCategory,
   type VoicePart,
 } from '../../domain/model';
+import { ResourceListEditor, hasIncompleteResource } from '../components/ResourceListEditor';
 import { newId } from '../../domain/song-factory';
 import { can, type Scope } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
 import { EmptyState, NoAccess } from '../components/Notices';
-
-const KIND_LABELS: Record<ResourceKind, string> = {
-  video: 'Vídeo',
-  audio: 'Audio',
-  pdf: 'PDF',
-  image: 'Imagen',
-  link: 'Enlace',
-  text: 'Texto',
-};
 
 const SCOPE_LABELS: Record<Scope, string> = {
   internal: 'Interno — solo el equipo',
@@ -91,18 +81,12 @@ export function TutorialEditorPage() {
 
   const patch = (changes: Partial<Tutorial>) => setTutorial({ ...tutorial, ...changes });
 
-  const patchResource = (index: number, changes: Partial<ResourceRef>) =>
-    patch({
-      resources: tutorial.resources.map((r, i) => (i === index ? { ...r, ...changes } : r)),
-    });
-
   const save = async () => {
     if (!tutorial.title.trim()) {
       setError('El tutorial necesita un título.');
       return;
     }
-    const sinUrl = tutorial.resources.some((r) => !r.url.trim());
-    if (sinUrl) {
+    if (hasIncompleteResource(tutorial.resources)) {
       setError('Hay material sin enlace. Complétalo o quítalo.');
       return;
     }
@@ -217,90 +201,14 @@ export function TutorialEditorPage() {
       </label>
 
       <section>
-        <div className="mb-2 flex items-baseline justify-between gap-3">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-aurora-violet-soft">
-            Material
-          </h2>
-          <p className="text-xs text-aurora-muted">Por enlace</p>
-        </div>
-
-        {tutorial.resources.length === 0 && (
-          <p className="mb-2 text-sm text-aurora-muted">
-            Todavía no hay material. Añade enlaces a los vídeos, audios o PDF donde el ministerio ya
-            los tenga guardados.
-          </p>
-        )}
-
-        <ul className="space-y-2">
-          {tutorial.resources.map((resource, index) => (
-            <li key={resource.id} className="rounded-xl border border-aurora-border bg-aurora-surface p-3">
-              <div className="flex gap-2">
-                <input
-                  aria-label={`Título del material ${index + 1}`}
-                  value={resource.title}
-                  onChange={(e) => patchResource(index, { title: e.target.value })}
-                  placeholder="Cómo se llama"
-                  className="h-11 min-w-0 flex-1 rounded-lg border border-aurora-border bg-aurora-surface-2 px-3 text-base"
-                />
-                <button
-                  type="button"
-                  aria-label={`Quitar material ${index + 1}`}
-                  onClick={() =>
-                    patch({ resources: tutorial.resources.filter((_, i) => i !== index) })
-                  }
-                  className="h-11 w-11 shrink-0 rounded-lg border border-red-500/40 text-red-300"
-                >
-                  ×
-                </button>
-              </div>
-              <div className="mt-2 flex gap-2">
-                <select
-                  aria-label={`Tipo del material ${index + 1}`}
-                  value={resource.kind}
-                  onChange={(e) => patchResource(index, { kind: e.target.value as ResourceKind })}
-                  className="h-11 w-32 shrink-0 rounded-lg border border-aurora-border bg-aurora-surface-2 px-2 text-sm"
-                >
-                  {(Object.keys(KIND_LABELS) as ResourceKind[]).map((k) => (
-                    <option key={k} value={k}>
-                      {KIND_LABELS[k]}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  aria-label={`Enlace del material ${index + 1}`}
-                  value={resource.url}
-                  onChange={(e) => patchResource(index, { url: e.target.value })}
-                  placeholder="https://…"
-                  inputMode="url"
-                  className="h-11 min-w-0 flex-1 rounded-lg border border-aurora-border bg-aurora-surface-2 px-3 text-sm"
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        <button
-          type="button"
-          onClick={() =>
-            patch({
-              resources: [
-                ...tutorial.resources,
-                {
-                  id: newId('resource'),
-                  kind: 'video',
-                  title: '',
-                  url: '',
-                  sizeBytes: null,
-                  rights: { status: 'reference', holder: null, notes: null },
-                  scope: tutorial.scope,
-                },
-              ],
-            })
-          }
-          className="mt-2 h-11 w-full rounded-xl border border-aurora-border text-sm"
-        >
-          Añadir material
-        </button>
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-aurora-violet-soft">
+          Material
+        </h2>
+        <ResourceListEditor
+          resources={tutorial.resources}
+          defaultScope={tutorial.scope}
+          onChange={(resources) => patch({ resources })}
+        />
       </section>
 
       <label className="block">

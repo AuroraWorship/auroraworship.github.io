@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   INSTRUMENTS,
   type Difficulty,
+  type Instrument,
   type InstrumentId,
   isRedistributable,
   type Member,
@@ -15,7 +16,8 @@ import { can, type Scope } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
 import { ChordSheet } from '../components/ChordSheet';
-import { InstrumentPartsEditor, VoicesEditor } from '../components/VoicesEditor';
+import { InstrumentPartsEditor, SongVersionsEditor, VoicesEditor } from '../components/VoicesEditor';
+import { ResourceListEditor } from '../components/ResourceListEditor';
 import { EmptyState, NoAccess } from '../components/Notices';
 
 const ALL_KEYS = [...COMMON_MAJOR_KEYS, ...COMMON_MINOR_KEYS];
@@ -41,6 +43,7 @@ export function SongEditorPage() {
   const isNew = !songId;
   const [song, setSong] = useState<Song | null | undefined>(undefined);
   const [members, setMembers] = useState<readonly Member[]>([]);
+  const [catalogo, setCatalogo] = useState<readonly Instrument[]>(INSTRUMENTS);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -51,6 +54,16 @@ export function SongEditorPage() {
     let active = true;
     repository.listMembers(actor).then((list) => {
       if (active) setMembers(list);
+    });
+    return () => {
+      active = false;
+    };
+  }, [actor]);
+
+  useEffect(() => {
+    let active = true;
+    repository.listInstruments(actor).then((custom) => {
+      if (active) setCatalogo([...INSTRUMENTS, ...custom]);
     });
     return () => {
       active = false;
@@ -229,7 +242,7 @@ export function SongEditorPage() {
 
       <Field label="Instrumentos">
         <div className="flex flex-wrap gap-2">
-          {INSTRUMENTS.map((instrument) => {
+          {catalogo.map((instrument) => {
             const active = song.instruments.includes(instrument.id);
             return (
               <button
@@ -333,6 +346,32 @@ export function SongEditorPage() {
             })}
           </ul>
         )}
+      </div>
+
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-aurora-muted">
+          Versiones
+        </p>
+        <p className="mb-2 text-xs text-aurora-muted">
+          Otros arreglos de esta canción — acústica, en vivo, la del artista original — sin
+          reescribir la letra: solo el nombre y dónde escucharla.
+        </p>
+        <SongVersionsEditor
+          versions={song.versions}
+          defaultScope={song.scope}
+          onChange={(versions) => patch({ versions })}
+        />
+      </div>
+
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-aurora-muted">
+          Material de la canción
+        </p>
+        <ResourceListEditor
+          resources={song.resources}
+          defaultScope={song.scope}
+          onChange={(resources) => patch({ resources })}
+        />
       </div>
 
       <Field label="Derechos" hint="Solo lo propio y el dominio público pueden hacerse públicos">

@@ -3,8 +3,10 @@
 ## Antes de tocar nada
 
 1. Lee `LOOP_STATUS.md`. Dice en qué punto está el proyecto y qué está bloqueado.
-2. Lee solo la documentación que el trabajo de hoy necesite.
-3. Inspecciona los archivos concretos que vas a cambiar.
+2. Si la pregunta es «¿qué falta del encargo original?», la respuesta ya está en
+   `BRIEF_COVERAGE.md` — no releas el brief ni re-audites el código desde cero.
+3. Lee solo la documentación que el trabajo de hoy necesite.
+4. Inspecciona los archivos concretos que vas a cambiar.
 
 No releas el proyecto entero cada sesión. Si un archivo ya explica algo, no lo repitas.
 

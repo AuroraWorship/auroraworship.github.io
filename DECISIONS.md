@@ -277,3 +277,37 @@ hash del JS y el CSS, y los precachea él mismo. No depende de la página ni del
 
 **Consecuencias.** Arranque de 90 KB en vez de 97, y un modo sin conexión que ya no descansa sobre
 una caché que no controlamos. Verificado en tres arranques limpios seguidos.
+
+---
+
+## ADR-016 — El catálogo de instrumentos se resuelve por caché, no por prop
+
+**Contexto.** §19 pedía un catálogo extensible. `instrumentById(id)` se llama de forma
+síncrona en más de diez sitios solo para mostrar un nombre en una lista.
+
+**Alternativas.** Enhebrar el catálogo completo como prop desde cada pantalla hasta cada
+componente que muestra un nombre de instrumento — correcto, pero una cascada de cambios
+por un dato que casi nunca cambia en la sesión.
+
+**Decisión.** `repository.listInstruments()` guarda lo añadido por el ministerio en una
+caché de módulo (`registerCustomInstruments`), y `instrumentById` la consulta como
+segundo escalón tras el catálogo de fábrica. Los dos puntos donde de verdad se *elige*
+un instrumento (Equipo, editor de canción) cargan el catálogo combinado; el resto de
+pantallas sigue leyendo `instrumentById` sin cambios.
+
+**Consecuencias.** Impureza deliberada y documentada: el nombre de un instrumento
+personalizado no se ve hasta que algo haya llamado a `listInstruments` una vez en la
+sesión. Aceptable porque Equipo y el editor de canciones —los puntos de entrada— ya lo
+hacen al montar.
+
+## ADR-017 — Recursos y versiones no se implementan tres veces
+
+**Contexto.** Canción, voz y tutorial ya tenían cada uno una lista de `ResourceRef` en
+el modelo (§14, §18, §26), pero solo tutoriales tenía editor — copiado a mano.
+
+**Decisión.** `ResourceListEditor` único, parametrizado por ámbito y etiqueta, usado por
+los tres. `SongVersion` (§14) reutiliza el mismo componente para el material de cada
+variante en vez de inventar un cuarto editor de recursos.
+
+**Consecuencias.** Un solo sitio que arreglar cuando llegue storage real (B-03): el
+componente cambia una vez y las tres pantallas lo heredan.

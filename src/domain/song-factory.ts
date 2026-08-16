@@ -37,6 +37,7 @@ export function emptySong(): Song {
     voices: [],
     vocalistKeys: [],
     resources: [],
+    versions: [],
     rights: { status: 'reference', holder: null, notes: null },
     scope: 'internal',
   };
