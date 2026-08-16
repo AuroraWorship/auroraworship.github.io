@@ -45,12 +45,14 @@ privacidad, copyright, diseño, MVP, calidad, testing, auto-recovery, deploy:
 ## Fase 4 — Aurora Academy (§37, §54)
 - §37 Academia — OK (LOOP 016: cursos, clases, matrícula, progreso, profesores,
   certificado imprimible — ADR-022)
-- §54 pagos → **BLOQUEADO**, requiere autorización expresa (sin gastos, `CLAUDE.md`)
+- §54 pagos → **BLOQUEADO** B-06; plan listo (ADR-023: Stripe Checkout, depende de B-03)
 
 ## Bloqueado por acción humana
-- §3 autenticación externa, §53 dominio propio → **BLOQUEADO** B-01/B-02/B-03
+- §3 autenticación externa → **BLOQUEADO** B-03; plan y esquema listos (ADR-023, `supabase/schema.sql`)
+- §53 dominio propio → **BLOQUEADO** B-01/B-02 (nota: la URL en `auroraworship.github.io` ya
+  está resuelta, ver `LOOP_STATUS.md` § Bloqueos resueltos; falta un dominio propio si se quiere uno)
 - §33 storage de archivos pesados → **BLOQUEADO** B-03 (hoy: enlaces, ADR-014-bis)
-- §54 pagos de Academia → **BLOQUEADO**, requiere autorización expresa
+- §54 pagos de Academia → **BLOQUEADO** B-06; plan listo (ADR-023)
 - §38 IA → **DIFERIDO**, fase 5 explícita del brief
 
 ## Estado general

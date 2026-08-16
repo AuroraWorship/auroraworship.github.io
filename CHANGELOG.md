@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.16.1] — LOOP 017 · Autenticación y pagos: el plan
+
+Aurora confirmó interés en resolver la autenticación real (B-03) y los pagos de Academia
+(B-06). Ninguno se puede construir sin una cuenta externa que solo el ministerio puede
+crear, así que este loop deja listo el plan y se detiene ahí — nada que no se pueda
+comprobar en navegador se publica.
+
+### Añadido
+
+- ADR-023: plan de autenticación (Supabase) y de pagos (Stripe, dependiente de B-03).
+- `supabase/schema.sql`: esquema listo para pegar en cuanto exista un proyecto —
+  `profiles` con roles, RLS calcada del permiso `role:assign` ya existente.
+- `.env.example` con las dos variables que hacen falta cuando llegue el momento.
+
+### Sin construir a propósito
+
+Ningún cliente de Supabase ni de Stripe: escribir esa integración sin nada real al otro
+lado produciría código sin forma de probarse. Falta que Aurora cree el proyecto de
+Supabase y pase dos datos (URL y clave pública) — el detalle exacto está en
+`LOOP_STATUS.md`.
+
 ## [0.16.0] — LOOP 016 · Aurora Academy
 
 Primer paso de la fase 4 del brief (§37). Cursos con clases propias, no enlaces sueltos
