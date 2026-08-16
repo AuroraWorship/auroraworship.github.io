@@ -13,7 +13,7 @@
  * otro no tendría sentido.
  */
 
-import type { Member, Rehearsal, Service, Setlist, Song, Tutorial } from '../domain/model';
+import type { Course, Member, Rehearsal, Service, Setlist, Song, Tutorial } from '../domain/model';
 import { type Actor, can } from '../domain/rbac/roles';
 import { PermissionError } from './repository';
 import type { KeyValueStore } from './store';
@@ -31,6 +31,7 @@ export interface Backup {
     services: Service[];
     rehearsals: Rehearsal[];
     tutorials: Tutorial[];
+    courses: Course[];
     members: Member[];
   };
 }
@@ -42,7 +43,9 @@ export class BackupError extends Error {
   }
 }
 
-const COLECCIONES = ['songs', 'setlists', 'services', 'rehearsals', 'tutorials', 'members'] as const;
+const COLECCIONES = [
+  'songs', 'setlists', 'services', 'rehearsals', 'tutorials', 'courses', 'members',
+] as const;
 
 export async function exportBackup(actor: Actor, store: KeyValueStore): Promise<Backup> {
   if (!can(actor, 'data:export')) throw new PermissionError('data:export');
@@ -110,6 +113,7 @@ export interface ImportSummary {
   services: number;
   rehearsals: number;
   tutorials: number;
+  courses: number;
   members: number;
 }
 

@@ -370,3 +370,53 @@ export interface Tutorial {
   rights: Rights;
   scope: Scope;
 }
+
+// ----------------------------------------------------------------- Academia
+
+/** Una clase dentro de un curso, con su propio material. */
+export interface Lesson {
+  id: Id;
+  title: string;
+  description: string | null;
+  resources: readonly ResourceRef[];
+}
+
+/**
+ * Publicación, no preparación (a diferencia de `SongStatus`): un curso en
+ * borrador no aparece para nadie fuera de quien lo edita.
+ */
+export type CourseStatus = 'draft' | 'published' | 'archived';
+
+export const COURSE_STATUS_LABELS: Record<CourseStatus, string> = {
+  draft: 'Borrador',
+  published: 'Publicado',
+  archived: 'Archivado',
+};
+
+export interface Course {
+  id: Id;
+  title: string;
+  description: string | null;
+  category: TutorialCategory;
+  /** Quién lo enseña. Sin rol propio en RBAC: son integrantes de Equipo. */
+  teacherIds: readonly Id[];
+  lessons: readonly Lesson[];
+  status: CourseStatus;
+  rights: Rights;
+  scope: Scope;
+}
+
+/**
+ * Progreso de un integrante en un curso.
+ *
+ * Personal, guardado por actor — mismo patrón que favoritos y "preparado"
+ * (ADR-014-bis, LOOP 013) — no dentro del curso: matricularse no modifica el
+ * contenido que ve el resto.
+ */
+export interface Enrollment {
+  courseId: Id;
+  enrolledAt: string;
+  completedLessonIds: readonly Id[];
+  /** Se marca sola cuando `completedLessonIds` cubre todas las lecciones del curso. */
+  completedAt: string | null;
+}

@@ -359,6 +359,38 @@ await page.waitForSelector('text=Historial');
 const detalleHistorial = await page.locator('main').innerText();
 console.log('HISTORIAL VISIBLE EN LA CANCION:', !detalleHistorial.includes('Todavía no se ha registrado'));
 
+// --- Academia -----------------------------------------------------------
+
+await page.selectOption('select[aria-label="Rol de demostración"]', 'editor');
+await page.goto('http://localhost:4173/#/academia', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Academia');
+await page.getByRole('link', { name: 'Nuevo' }).click();
+await page.waitForSelector('text=Nuevo curso');
+await page.getByPlaceholder('Qué se aprende en este curso').fill('Piano para acompañar');
+await page.getByLabel('Estado').selectOption('published');
+await page.getByRole('button', { name: 'Añadir clase' }).click();
+await page.getByPlaceholder('Clase 1').fill('Acordes básicos');
+await page.getByRole('button', { name: 'Guardar' }).click();
+await page.waitForSelector('text=Piano para acompañar');
+console.log('CURSO CREADO:', await page.isVisible('text=Piano para acompañar'));
+
+// La misma identidad de "Integrante de prueba" sigue activa: se matricula y
+// completa el curso como esa persona, no como un rol de demostración suelto.
+await page.getByText('Piano para acompañar').click();
+await page.waitForSelector('text=Empezar curso');
+await page.getByRole('button', { name: 'Empezar curso' }).click();
+await page.waitForTimeout(200);
+await page.locator('button[aria-label^="Marcar"]').first().click();
+await page.waitForTimeout(200);
+console.log('CERTIFICADO AL COMPLETAR:', await page.isVisible('text=Certificado'));
+await page.screenshot({ path: `${shots}/20-academia-certificado.png` });
+
+// Quien gestiona cursos ve el progreso de quien se matriculó.
+await page.selectOption('select[aria-label="Rol de demostración"]', 'admin');
+await page.reload({ waitUntil: 'networkidle' });
+console.log('PROGRESO DEL EQUIPO VISIBLE:', await page.isVisible('text=Progreso del equipo'));
+console.log('MUESTRA A QUIEN COMPLETO:', await page.isVisible('text=Integrante de prueba'));
+
 // --- Historial global, estado y progreso ------------------------------------
 
 await page.goto('http://localhost:4173/#/servicio', { waitUntil: 'networkidle' });

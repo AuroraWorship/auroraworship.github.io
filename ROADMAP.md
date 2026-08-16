@@ -57,10 +57,10 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 
 ## Fase 4 — Aurora Academy
 
-- [ ] Cursos, clases y lecciones
-- [ ] Estudiantes y progreso
-- [ ] Profesores
-- [ ] Certificados
+- [x] Cursos, clases y lecciones
+- [x] Estudiantes y progreso (personal, y roster para quien enseña)
+- [x] Profesores (`Course.teacherIds`, sin rol nuevo de RBAC)
+- [x] Certificados (panel imprimible, sin PDF ni verificación externa — ADR-022)
 - [!] Pagos — requiere autorización expresa del usuario
 
 ## Fase 5 — Escala

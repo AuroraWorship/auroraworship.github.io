@@ -75,6 +75,16 @@ export function TutorialsPage() {
         )}
       </div>
 
+      {can(actor, 'course:read') && (
+        <Link
+          to="/academia"
+          className="flex h-12 items-center justify-between rounded-xl border border-aurora-border bg-aurora-surface px-4 text-sm"
+        >
+          <span>Academia — cursos con clases y certificado</span>
+          <span aria-hidden className="text-aurora-muted">→</span>
+        </Link>
+      )}
+
       {categorias.length > 1 && (
         <div className="flex flex-wrap gap-2">
           <FilterChip active={categoria === 'todas'} onClick={() => setCategoria('todas')}>

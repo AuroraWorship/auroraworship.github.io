@@ -32,6 +32,8 @@ const RUTAS = [
   ['/historial', 'leader'],
   ['/tutoriales/nuevo', 'editor'],
   ['/vivo?modo=servicio', 'musician'],
+  ['/academia', 'musician'],
+  ['/academia/nuevo', 'leader'],
 ];
 
 let problemas = 0;

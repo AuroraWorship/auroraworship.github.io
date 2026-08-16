@@ -48,6 +48,7 @@ export type Permission =
   | 'service:read' | 'service:write'
   | 'rehearsal:read' | 'rehearsal:write'
   | 'tutorial:read' | 'tutorial:write'
+  | 'course:read' | 'course:write'
   | 'member:read' | 'member:write'
   | 'assignment:read' | 'assignment:write'
   | 'file:upload'
@@ -61,7 +62,7 @@ export type Permission =
 /** Permisos de cada rol. La herencia es explícita: se leen tal cual. */
 const READ_ONLY_INTERNAL: readonly Permission[] = [
   'song:read', 'setlist:read', 'service:read', 'rehearsal:read',
-  'tutorial:read', 'assignment:read',
+  'tutorial:read', 'course:read', 'assignment:read',
   // Incluye `member:read` porque un músico necesita saber quién canta y en qué
   // tonalidad. El modelo de `Member` no guarda teléfonos ni correos, así que
   // leerlo no expone datos personales: solo nombre visible e instrumentos.
@@ -75,6 +76,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'service:read', 'service:write',
     'rehearsal:read', 'rehearsal:write',
     'tutorial:read', 'tutorial:write',
+    'course:read', 'course:write',
     'member:read', 'member:write',
     'assignment:read', 'assignment:write',
     'file:upload', 'role:assign', 'settings:write',
@@ -86,6 +88,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'service:read', 'service:write',
     'rehearsal:read', 'rehearsal:write',
     'tutorial:read', 'tutorial:write',
+    'course:read', 'course:write',
     'member:read', 'member:write',
     'assignment:read', 'assignment:write',
     'file:upload', 'role:assign',
@@ -97,6 +100,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'service:read', 'service:write',
     'rehearsal:read', 'rehearsal:write',
     'tutorial:read', 'tutorial:write',
+    'course:read', 'course:write',
     'member:read',
     'assignment:read', 'assignment:write',
     'file:upload',
@@ -110,6 +114,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'service:read',
     'rehearsal:read', 'rehearsal:write',
     'tutorial:read', 'tutorial:write',
+    'course:read', 'course:write',
     'member:read',
     'assignment:read', 'assignment:write',
     'file:upload',
@@ -121,18 +126,19 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'service:read',
     'rehearsal:read',
     'tutorial:read', 'tutorial:write',
+    'course:read', 'course:write',
     'assignment:read',
     'file:upload',
   ],
   musician: READ_ONLY_INTERNAL,
   vocalist: READ_ONLY_INTERNAL,
   tech: READ_ONLY_INTERNAL,
-  student: ['tutorial:read', 'song:read'],
-  member: ['song:read', 'tutorial:read'],
+  student: ['tutorial:read', 'course:read', 'song:read'],
+  member: ['song:read', 'tutorial:read', 'course:read'],
   // Permiso y ámbito son ejes distintos: el público puede leer canciones y
   // tutoriales, pero el filtro de `scope` solo le entrega los marcados como
   // públicos. Sin este permiso no habría aplicación pública posible.
-  public: ['song:read', 'tutorial:read'],
+  public: ['song:read', 'tutorial:read', 'course:read'],
 };
 
 export interface Actor {

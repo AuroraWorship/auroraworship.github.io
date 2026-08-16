@@ -50,10 +50,21 @@ describe('exportar', () => {
     expect(JSON.stringify(copia)).not.toContain('favorites');
   });
 
-  it('incluye las seis colecciones aunque estén vacías', async () => {
+  it('el progreso de Academia tampoco viaja: es personal', async () => {
+    await repo.saveCourse(admin, {
+      id: 'c1', title: 'Curso', description: null, category: 'piano',
+      teacherIds: [], lessons: [{ id: 'l1', title: 'L1', description: null, resources: [] }],
+      status: 'published', rights: { status: 'own', holder: null, notes: null }, scope: 'internal',
+    });
+    await repo.toggleCourseLesson(musician, 'c1', 'l1');
+    const copia = await exportBackup(admin, store);
+    expect(JSON.stringify(copia)).not.toContain('academy');
+  });
+
+  it('incluye las siete colecciones aunque estén vacías', async () => {
     const copia = await exportBackup(admin, store);
     expect(Object.keys(copia.datos).sort()).toEqual(
-      ['members', 'rehearsals', 'services', 'setlists', 'songs', 'tutorials'].sort(),
+      ['courses', 'members', 'rehearsals', 'services', 'setlists', 'songs', 'tutorials'].sort(),
     );
   });
 });

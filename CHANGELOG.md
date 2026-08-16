@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.16.0] — LOOP 016 · Aurora Academy
+
+Primer paso de la fase 4 del brief (§37). Cursos con clases propias, no enlaces sueltos
+como en Tutoriales: matricularse, marcar clases vistas y certificado al terminar.
+
+### Añadido
+
+- **Cursos y clases** (`Course`/`Lesson`), con su propio material por enlace igual que
+  canciones y tutoriales (`ResourceListEditor`, ADR-017).
+- **Matrícula y progreso personal**: guardado por actor, mismo patrón que favoritos y
+  "preparado" — no viaja en la copia de datos.
+- **Certificado** al completar todas las clases de un curso: panel con nombre, curso y
+  fecha, imprimible desde el navegador. No genera un PDF ni un código de verificación.
+- **Progreso del equipo**, para quien enseña: qué integrante ha avanzado cuánto en cada
+  curso. Exige `course:write` y `member:read` a la vez (ADR-022).
+- Enlace a Academia desde Aprender.
+
+### Sin construir a propósito
+
+Pagos: la regla del proyecto es explícita — sin gastos ni integraciones de cobro sin
+autorización expresa. El resto de la fase 4 (más cursos, contenido real) lo carga Aurora.
+
+### Interno
+
+- 254 pruebas de dominio (13 nuevas).
+
 ## [0.15.2] — Más naranja, con criterio
 
 Se pidió más presencia del naranja. Las insignias de tonalidad que se repetían en cinco

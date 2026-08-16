@@ -713,3 +713,103 @@ describe('progreso personal de preparación', () => {
     expect(await repo.listPrepared(musician)).toEqual(['service-1:song-1']);
   });
 });
+
+describe('academia', () => {
+  const editor: Actor = { id: 'e', roles: ['editor'] };
+  const curso = {
+    id: 'course-1',
+    title: 'Piano para acompañar',
+    description: null,
+    category: 'piano' as const,
+    teacherIds: [],
+    lessons: [
+      { id: 'l1', title: 'Acordes básicos', description: null, resources: [] },
+      { id: 'l2', title: 'Acompañar un himno', description: null, resources: [] },
+    ],
+    status: 'published' as const,
+    rights: { status: 'own' as const, holder: 'Aurora', notes: null },
+    scope: 'internal' as const,
+  };
+
+  it('arranca sin cursos: ninguno se inventa', async () => {
+    expect(await repo.listCourses(leader)).toEqual([]);
+  });
+
+  it('un músico no puede crear cursos', async () => {
+    await expect(repo.saveCourse(musician, curso)).rejects.toThrow(PermissionError);
+  });
+
+  it('el líder crea, edita y borra', async () => {
+    await repo.saveCourse(leader, curso);
+    expect((await repo.getCourse(leader, curso.id))!.title).toBe('Piano para acompañar');
+    await repo.saveCourse(leader, { ...curso, title: 'Piano I' });
+    expect((await repo.getCourse(leader, curso.id))!.title).toBe('Piano I');
+    await repo.deleteCourse(leader, curso.id);
+    expect(await repo.getCourse(leader, curso.id)).toBeNull();
+  });
+
+  it('matricularse no duplica si ya estaba matriculado', async () => {
+    await repo.saveCourse(leader, curso);
+    await repo.enroll(musician, curso.id);
+    const otra = await repo.enroll(musician, curso.id);
+    expect(otra.filter((e) => e.courseId === curso.id).length).toBe(1);
+  });
+
+  it('marcar todas las clases certifica; desmarcar una lo quita', async () => {
+    await repo.saveCourse(leader, curso);
+    await repo.toggleCourseLesson(musician, curso.id, 'l1');
+    let [enrollment] = await repo.listEnrollments(musician);
+    expect(enrollment.completedAt).toBeNull();
+
+    await repo.toggleCourseLesson(musician, curso.id, 'l2');
+    [enrollment] = await repo.listEnrollments(musician);
+    expect(enrollment.completedAt).not.toBeNull();
+
+    await repo.toggleCourseLesson(musician, curso.id, 'l1');
+    [enrollment] = await repo.listEnrollments(musician);
+    expect(enrollment.completedAt).toBeNull();
+  });
+
+  it('el progreso es personal: no se comparte entre integrantes', async () => {
+    await repo.saveCourse(leader, curso);
+    await repo.toggleCourseLesson(musician, curso.id, 'l1');
+    expect(await repo.listEnrollments(leader)).toEqual([]);
+    expect((await repo.listEnrollments(musician))[0].completedLessonIds).toEqual(['l1']);
+  });
+
+  it('la copia de datos no lleva el progreso personal', async () => {
+    // El progreso vive bajo su propia clave (`academy:{actor}`), fuera de las
+    // colecciones que exporta la copia — mismo principio que favoritos.
+    await repo.saveCourse(leader, curso);
+    await repo.toggleCourseLesson(musician, curso.id, 'l1');
+    const cursos = await repo.listCourses(leader);
+    expect(cursos).toHaveLength(1);
+    expect((cursos[0] as unknown as { completedLessonIds?: unknown }).completedLessonIds).toBeUndefined();
+  });
+
+  it('ver el progreso del equipo exige course:write y member:read a la vez', async () => {
+    await repo.saveCourse(leader, curso);
+    // El editor gestiona cursos pero no tiene member:read.
+    await expect(repo.listCourseProgress(editor, curso.id)).rejects.toThrow(PermissionError);
+    // El músico ni siquiera gestiona cursos.
+    await expect(repo.listCourseProgress(musician, curso.id)).rejects.toThrow(PermissionError);
+  });
+
+  it('el progreso del equipo solo lista a quien se matriculó', async () => {
+    // `musician.id` ('m') hace de identificador de integrante, igual que en
+    // "Mi preparación": el actor de sesión y el Member comparten id.
+    await repo.saveCourse(leader, curso);
+    await repo.saveMember(admin, {
+      id: musician.id,
+      displayName: 'Músico Uno',
+      instruments: [],
+      comfortableKeys: [],
+    });
+    await repo.toggleCourseLesson(musician, curso.id, 'l1');
+
+    const progreso = await repo.listCourseProgress(leader, curso.id);
+    expect(progreso).toHaveLength(1);
+    expect(progreso[0].member.displayName).toBe('Músico Uno');
+    expect(progreso[0].enrollment!.completedLessonIds).toEqual(['l1']);
+  });
+});
