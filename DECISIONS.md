@@ -355,3 +355,27 @@ números. Los diagramas heredan el tema y pesan bytes, porque son SVG generado. 
 el buscador tiene que puntuar bien: las reglas están en `voicing.ts`, y las pruebas las
 fijan comprobando que el algoritmo encuentra solo las posturas estándar de Am y Do — que
 es la verificación de que no se ha inventado nada.
+
+## ADR-020 — Un fondo más claro sube toda la escala, no solo el fondo
+
+**Contexto.** Se pidió aclarar el color de fondo un 15%. Aplicado solo a
+`--color-aurora-bg`, el fondo pasaba de 5.9% a 20.9% de luminosidad — más claro que
+`--color-aurora-surface-2` (16.1%) y casi tan claro como `--color-aurora-border` (21.6%).
+Capturado en el navegador, las tarjetas dejaban de leerse como tarjetas: parecían huecos
+más oscuros sobre una página más clara, al revés de la jerarquía que el diseño usa en
+todas partes (fondo < superficie < borde).
+
+**Decisión.** Se sube un 15% de luminosidad la escala completa —fondo, superficie,
+superficie-2 y borde— para conservar la misma distancia relativa entre capas. Además,
+`--color-aurora-violet` (el único color que se usa como texto sobre el fondo, no solo
+como borde) sube de 66.3% a 72.9% de luminosidad para mantener el mismo 4.6:1 de
+contraste que tenía antes; el resto de la paleta (texto, muted, violet-soft, ember) ya
+quedaba por encima de AA sin tocarlo.
+
+**Motivo.** "Más claro" pedía un fondo menos oscuro, no una paleta distinta. Tocar un solo
+token rompía tanto la jerarquía visual como el contraste que ADR-012 ya había afinado una
+vez; subir la escala entera mantiene el mismo diseño, solo que un peldaño más arriba.
+
+**Consecuencias.** La paleta sigue siendo provisional (B-04): cuando el ministerio
+confirme colores e identidad propios, esta escala se sustituye entera, no se ajusta color
+a color.
