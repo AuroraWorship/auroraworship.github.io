@@ -29,8 +29,8 @@ describe('copyEntries', () => {
     name: 'Anterior',
     kind: 'service' as const,
     entries: [
-      { songId: 'b', order: 2, key: 'D', leadVocalistId: 'm1', notes: null },
-      { songId: 'a', order: 1, key: 'G', leadVocalistId: 'm2', notes: null },
+      { songId: 'b', order: 2, key: 'D', leadVocalistId: 'm1', notes: null, sequencePlanId: null },
+      { songId: 'a', order: 1, key: 'G', leadVocalistId: 'm2', notes: null, sequencePlanId: null },
     ],
     scope: 'internal' as const,
   };

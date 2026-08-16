@@ -204,6 +204,7 @@ export interface Song {
   vocalistKeys: readonly VocalistKey[];
   resources: readonly ResourceRef[];
   versions: readonly SongVersion[];
+  sequences: readonly SequencePlan[];
   status: SongStatus;
   rights: Rights;
   scope: Scope;
@@ -228,6 +229,39 @@ export interface ResourceRef {
   scope: Scope;
 }
 
+// -------------------------------------------------------------- Secuencias
+
+/**
+ * Punto de extensión previsto para secuencias (§27): click, pads, loops,
+ * stems. El brief pide para esta fase solo el modelo — la pantalla de edición,
+ * el motor de reproducción y la sincronización con el modo en vivo son
+ * trabajo de una fase posterior, cuando haya pistas reales del ministerio que
+ * enlazar (ver `ARCHITECTURE.md`).
+ */
+export type SequenceTrackKind = 'click' | 'pad' | 'loop' | 'stem';
+
+/** Una pista de audio de la secuencia. El binario vive en storage (ADR-004). */
+export interface SequenceTrack {
+  id: Id;
+  kind: SequenceTrackKind;
+  label: string;
+  /** Si difiere del bpm de la canción, por ejemplo un click a media velocidad. */
+  bpm: number | null;
+  resource: ResourceRef;
+}
+
+/**
+ * Conjunto de pistas para tocar una canción con secuencias. Una canción puede
+ * tener más de uno (distinta banda, distinto arreglo), igual que ya ocurre
+ * con `SongVersion`; `SetlistEntry.sequencePlanId` elige cuál toca cada vez.
+ */
+export interface SequencePlan {
+  id: Id;
+  label: string;
+  tracks: readonly SequenceTrack[];
+  notes: string | null;
+}
+
 // ------------------------------------------------- Repertorios y servicios
 
 export type SetlistKind = 'base' | 'rehearsal' | 'service' | 'event' | 'archive';
@@ -239,6 +273,8 @@ export interface SetlistEntry {
   key: string | null;
   leadVocalistId: Id | null;
   notes: string | null;
+  /** Qué `SequencePlan` de la canción se usa esta ocasión; ver §Secuencias. */
+  sequencePlanId: Id | null;
 }
 
 export interface Setlist {

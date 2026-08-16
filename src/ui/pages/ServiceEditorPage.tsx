@@ -299,7 +299,14 @@ export function ServiceEditorPage() {
                 if (!e.target.value) return;
                 updateEntries([
                   ...entries,
-                  { songId: e.target.value, order: entries.length + 1, key: null, leadVocalistId: null, notes: null },
+                  {
+                    songId: e.target.value,
+                    order: entries.length + 1,
+                    key: null,
+                    leadVocalistId: null,
+                    notes: null,
+                    sequencePlanId: null,
+                  },
                 ]);
               }}
               className={inputClass}

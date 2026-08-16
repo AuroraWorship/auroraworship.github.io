@@ -51,7 +51,8 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] PWA instalable
 - [~] Offline (funciona sin conexión; la sincronización llega con el backend)
 - [ ] Notificaciones
-- [ ] Secuencias: click, pads, loops, stems
+- [x] Secuencias: modelo (`SequencePlan`/`SequenceTrack`, ADR-018)
+- [ ] Secuencias: pantalla, reproductor e integración con el modo en vivo
 
 ## Fase 4 — Aurora Academy
 

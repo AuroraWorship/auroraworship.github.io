@@ -80,6 +80,10 @@ reescribe rutas y recargar una ruta profunda daría 404 (ADR-003).
 
 ## Puntos de extensión previstos
 
-Existen como hueco en el modelo, sin implementación: secuencias (click, pads, stems), tablatura y
-partituras, academia, notificaciones, offline, IA. Se construyen cuando los datos estructurados que
-necesitan ya existan — primero el dato, después el asistente.
+Existen como hueco en el modelo, sin implementación: tablatura y partituras, academia,
+notificaciones, IA. Se construyen cuando los datos estructurados que necesitan ya existan —
+primero el dato, después el asistente.
+
+Secuencias (§27) tiene un paso más: el modelo ya existe (`SequencePlan`, `SequenceTrack` en
+`model.ts`, ver ADR-018), pero sin pantalla de edición ni motor de reproducción. Sigue en la
+misma lista hasta que haya pistas reales que enlazar — el modelo solo no basta para tocarlas.
