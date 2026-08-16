@@ -4,15 +4,24 @@
 
 ## LOOP actual
 
-**LOOP 013 — HISTORIAL GLOBAL, PROGRESO Y ESTADO** · completado
+**LOOP 014 — ARQUITECTURA DE SECUENCIAS** · completado
 
 ## Objetivo
 
-Cerrar los tres últimos huecos de `BRIEF_COVERAGE.md` que no dependían de ningún bloqueo: vista
-global de historial, progreso personal en Mi preparación, y estado de canción para buscar. Con
-esto, fases 1-3 del brief quedan completas.
+Cerrar el último hueco de `BRIEF_COVERAGE.md` que no dependía de ningún bloqueo: §27 pedía
+preparar la arquitectura de secuencias (click, pads, loops, stems) aunque la función en sí esté
+diferida a una fase posterior por el propio brief. Ese hueco llevaba trece loops sin tocarse.
 
-Loops 001 a 012 completados y verificados.
+Loops 001 a 013 completados y verificados.
+
+## Añadido en LOOP 014
+
+- [x] `SequencePlan` y `SequenceTrack` en `model.ts`, mismo patrón que `SongVersion` (ADR-018)
+- [x] `Song.sequences`, análogo a `Song.versions`
+- [x] `SetlistEntry.sequencePlanId`: qué plan toca cada servicio o ensayo concreto
+- [x] 219 pruebas de dominio; typecheck y build en verde
+- [x] Sin pantalla ni reproductor a propósito: la función es de fase posterior, solo el modelo
+      tocaba a esta
 
 ## Completado
 
@@ -159,7 +168,8 @@ El producto cubre las fases 1 a 3 del roadmap. Lo que queda depende de los bloqu
 1. Autenticación real y sincronización entre dispositivos (B-03). Mientras tanto, la copia de
    datos del LOOP 007 hace de puente.
 2. Subida de archivos a storage. Hoy el material se enlaza, que funciona; subirlo necesita cuenta.
-3. Secuencias, academia y extensiones de IA — fases 4 y 5.
+3. Pantalla y reproductor de secuencias (modelo ya preparado, LOOP 014), academia y
+   extensiones de IA — fases 4 y 5.
 
 ## Errores corregidos en este loop
 

@@ -311,3 +311,25 @@ variante en vez de inventar un cuarto editor de recursos.
 
 **Consecuencias.** Un solo sitio que arreglar cuando llegue storage real (B-03): el
 componente cambia una vez y las tres pantallas lo heredan.
+
+## ADR-018 — Secuencias: solo el modelo, no la pantalla
+
+**Contexto.** El brief (§27) diferís explícitamente la función de secuencias (click, pads,
+loops, stems) a una fase posterior, pero pide preparar su arquitectura ya. `BRIEF_COVERAGE.md`
+llevaba trece loops marcando esto como pendiente: "ni eso se hizo".
+
+**Decisión.** Se añade `SequencePlan` y `SequenceTrack` a `model.ts`, con el mismo patrón que
+`SongVersion`: una canción puede tener más de un plan (distinta banda, distinto arreglo), y
+`SequenceTrack.resource` es un `ResourceRef` — nunca el binario en el modelo (ADR-004), porque
+subir audio pesado necesita storage real y sigue bloqueado por B-03. `SetlistEntry.sequencePlanId`
+elige qué plan toca cada ocasión, igual que `key` ya elige la tonalidad de esa ocasión. No se
+construye pantalla de edición, reproductor ni integración con el modo en vivo: eso es la función
+en sí, que el brief pide para más adelante.
+
+**Alternativas consideradas.** Esperar a tener storage real para tocar el modelo entero de una
+vez. Se descarta: el propio brief separa "preparar arquitectura" de "construir la función", y
+tener el hueco ya tipado evita una migración de datos cuando llegue la fase 3 tardía o la 4.
+
+**Consecuencias.** `Song.sequences` y `SetlistEntry.sequencePlanId` viajan vacíos/nulos en todas
+partes hasta que exista una pantalla que los rellene. Ningún flujo actual los usa, así que no hay
+riesgo de mostrar algo a medio construir.

@@ -538,14 +538,18 @@ describe('varios servicios', () => {
       id: 'sl1',
       name: 'Primero',
       kind: 'service',
-      entries: [{ songId: 'song-sublime-gracia', order: 1, key: 'G', leadVocalistId: null, notes: null }],
+      entries: [
+        { songId: 'song-sublime-gracia', order: 1, key: 'G', leadVocalistId: null, notes: null, sequencePlanId: null },
+      ],
       scope: 'internal',
     });
     await repo.saveSetlist(leader, {
       id: 'sl2',
       name: 'Segundo',
       kind: 'service',
-      entries: [{ songId: 'song-santo-santo-santo', order: 1, key: 'D', leadVocalistId: null, notes: null }],
+      entries: [
+        { songId: 'song-santo-santo-santo', order: 1, key: 'D', leadVocalistId: null, notes: null, sequencePlanId: null },
+      ],
       scope: 'internal',
     });
     expect((await repo.getSetlist(leader, 'sl1'))!.entries[0].songId).toBe('song-sublime-gracia');
@@ -602,10 +606,11 @@ describe('catálogo de instrumentos', () => {
 });
 
 describe('recursos y versiones de canción', () => {
-  it('una canción trae resources y versions vacíos por defecto', async () => {
+  it('una canción trae resources, versions y sequences vacíos por defecto', async () => {
     const song = await repo.getSong(leader, 'song-sublime-gracia');
     expect(song!.resources).toEqual([]);
     expect(song!.versions).toEqual([]);
+    expect(song!.sequences).toEqual([]);
   });
 
   it('se pueden guardar versiones con su propio material', async () => {
@@ -634,6 +639,41 @@ describe('recursos y versiones de canción', () => {
     const guardada = await repo.getSong(leader, 'song-sublime-gracia');
     expect(guardada!.versions[0].label).toBe('Acústica');
     expect(guardada!.versions[0].resources[0].url).toBe('https://ejemplo.test/acustica');
+  });
+
+  it('se puede guardar un plan de secuencias con sus pistas', async () => {
+    const song = (await repo.getSong(leader, 'song-sublime-gracia'))!;
+    await repo.saveSong(leader, {
+      ...song,
+      sequences: [
+        {
+          id: 'sp1',
+          label: 'Banda completa',
+          notes: null,
+          tracks: [
+            {
+              id: 't1',
+              kind: 'click',
+              label: 'Click 4/4',
+              bpm: 72,
+              resource: {
+                id: 'r2',
+                kind: 'audio',
+                title: 'Click',
+                url: 'https://ejemplo.test/click.mp3',
+                sizeBytes: null,
+                rights: { status: 'own', holder: 'Aurora', notes: null },
+                scope: 'internal',
+              },
+            },
+          ],
+        },
+      ],
+    });
+    const guardada = await repo.getSong(leader, 'song-sublime-gracia');
+    expect(guardada!.sequences[0].label).toBe('Banda completa');
+    expect(guardada!.sequences[0].tracks[0].kind).toBe('click');
+    expect(guardada!.sequences[0].tracks[0].resource.url).toBe('https://ejemplo.test/click.mp3');
   });
 });
 

@@ -24,12 +24,14 @@ privacidad, copyright, diseño, MVP, calidad, testing, auto-recovery, deploy:
 - §21 repertorios — OK (LOOP 011: varios independientes)
 
 ## Servicios, ensayos, preparación (§22–29)
-- §22 servicios — OK; campo de secuencias del servicio — **DIFERIDO** (ligado a §27)
+- §22 servicios — OK; campo de secuencias del servicio — OK (`SetlistEntry.sequencePlanId`,
+  LOOP 014); la función que lo usa sigue **DIFERIDO** (ligada a §27)
 - §23 historial — OK (LOOP 013: vista global en /historial)
 - §24 ensayos — OK (LOOP 006)
 - §25 «Mi preparación» — OK (LOOP 013: progreso personal por parte asignada, barra de avance)
 - §26 tutoriales — OK (LOOP 008)
-- §27 secuencias — **DIFERIDO**, el brief pide solo preparar arquitectura; ni eso se hizo
+- §27 secuencias — arquitectura OK (LOOP 014: `SequencePlan`/`SequenceTrack`, ver ADR-018);
+  pantalla, reproductor e integración con el modo en vivo — **DIFERIDO**, lo pide la propia fase
 - §28 modo ensayo — OK (LOOP 004 pantalla, LOOP 012 parte instrumental)
 - §29 modo servicio — OK, mismo componente que ensayo
 

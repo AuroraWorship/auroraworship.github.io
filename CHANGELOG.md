@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.14.0] — LOOP 014 · Arquitectura de secuencias
+
+Cierra el último hueco que quedaba abierto en `BRIEF_COVERAGE.md` sin depender de ningún
+bloqueo: §27 pedía preparar la arquitectura de secuencias, y no se había hecho.
+
+### Añadido
+
+- `SequencePlan` y `SequenceTrack` en el modelo (§27): click, pads, loops y pistas sueltas,
+  con el binario en storage, nunca en el modelo (mismo patrón que `SongVersion`, ver ADR-018).
+- `Song.sequences`, análogo a `Song.versions`: una canción puede tener más de un plan.
+- `SetlistEntry.sequencePlanId`: qué plan toca en cada servicio o ensayo concreto.
+
+### Sin construir a propósito
+
+Pantalla de edición, reproductor y su integración con el modo en vivo — el propio brief los
+pide para una fase posterior. El modelo existe para no migrar datos cuando llegue esa fase.
+
+### Interno
+
+- 219 pruebas de dominio.
+
 ## [0.13.0] — LOOP 013 · Historial global, progreso y estado
 
 Cierra el último barrido de `BRIEF_COVERAGE.md` que no dependía de ningún bloqueo. Fases 1-3
