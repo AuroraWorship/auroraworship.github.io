@@ -78,7 +78,8 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Marcado de información pendiente
 - [x] Despliegue continuo
 - [x] URL definitiva en `auroraworship.github.io` — org creada, repo transferido y Pages sirviendo el build
-- [ ] Límites de tamaño y tipo en subidas
+- [!] Límites de tamaño y tipo en subidas — depende de que haya subida real (B-03)
 - [x] Auditoría de accesibilidad ejecutable (`npm run a11y`)
 - [x] Contraste verificado contra WCAG AA
-- [ ] Registro de auditoría para cambios de rol
+- [!] Registro de auditoría para cambios de rol — depende de que `role:assign` tenga una
+      pantalla real; hoy el rol es un selector de demostración (B-03)
