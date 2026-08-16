@@ -14,6 +14,7 @@ import { useSession } from '../session';
 import { ChordSheet } from '../components/ChordSheet';
 import { KeySelector } from '../components/KeySelector';
 import { EmptyState, NoAccess } from '../components/Notices';
+import { DIAGRAM_INSTRUMENTS, useChordInstrument } from '../hooks/useChordInstrument';
 
 type Tab = 'sheet' | 'lyrics' | 'detail';
 
@@ -32,6 +33,7 @@ export function SongPage() {
   const [favorite, setFavorite] = useState(false);
   const [history, setHistory] = useState<readonly HistoryEntry[]>([]);
   const [key, setKey] = useState<string | null>(null);
+  const [instrument, setInstrument] = useChordInstrument();
   const [tab, setTab] = useState<Tab>('sheet');
 
   const allowed = can(actor, 'song:read');
@@ -177,12 +179,34 @@ export function SongPage() {
         ))}
       </div>
 
+      {tab === 'sheet' && (
+        <div className="flex items-center gap-2">
+          <label htmlFor="diagram-instrument" className="text-xs text-aurora-muted">
+            Digitaciones
+          </label>
+          <select
+            id="diagram-instrument"
+            value={instrument ?? ''}
+            onChange={(event) => setInstrument(event.target.value || null)}
+            className="h-11 flex-1 rounded-xl border border-aurora-border bg-aurora-surface px-3 text-sm"
+          >
+            <option value="">Sin diagramas</option>
+            {DIAGRAM_INSTRUMENTS.map((id) => (
+              <option key={id} value={id}>
+                {instrumentById(id)?.name ?? id}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {tab !== 'detail' && (
         <ChordSheet
           body={song.body}
           fromKey={song.originalKey}
           toKey={activeKey}
           lyricsOnly={tab === 'lyrics'}
+          instrument={instrument ?? undefined}
         />
       )}
 

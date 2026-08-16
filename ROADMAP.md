@@ -53,6 +53,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [ ] Notificaciones
 - [x] Secuencias: modelo (`SequencePlan`/`SequenceTrack`, ADR-018)
 - [ ] Secuencias: pantalla, reproductor e integración con el modo en vivo
+- [x] Diagramas de acordes por instrumento, calculados (ADR-019)
 
 ## Fase 4 — Aurora Academy
 
@@ -76,7 +77,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Estados de derechos de autor
 - [x] Marcado de información pendiente
 - [x] Despliegue continuo
-- [!] URL definitiva en `auroraworship.github.io` — bloqueo B-01
+- [x] URL definitiva en `auroraworship.github.io` — org creada, repo transferido y Pages sirviendo el build
 - [ ] Límites de tamaño y tipo en subidas
 - [x] Auditoría de accesibilidad ejecutable (`npm run a11y`)
 - [x] Contraste verificado contra WCAG AA
