@@ -11,14 +11,14 @@
  * penumbra, durante el ensayo y el servicio.
  */
 @theme {
-  --color-aurora-bg: #0d0a14;
-  --color-aurora-surface: #171226;
-  --color-aurora-surface-2: #221a38;
-  --color-aurora-border: #302549;
+  --color-aurora-bg: #2e2447;
+  --color-aurora-surface: #362b5a;
+  --color-aurora-surface-2: #42326c;
+  --color-aurora-border: #513f7c;
   --color-aurora-text: #ede9f6;
   --color-aurora-muted: #a297c4;
-  /* `violet` se usa como texto y borde sobre el fondo oscuro: 4.63:1. */
-  --color-aurora-violet: #8b5cf6;
+  /* `violet` se usa como texto y borde sobre el fondo oscuro: 4.64:1. */
+  --color-aurora-violet: #a27cf8;
   /* `violet-solid` es el relleno de los botones primarios, que llevan texto
      blanco encima. El violeta claro daba 4.23:1, por debajo de AA; este da
      5.70:1. La diferencia no se nota a simple vista y el botón sí se lee. */

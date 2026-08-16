@@ -17,6 +17,13 @@ dentro de tres años (ADR-019).
 
 Loops 001 a 014 completados y verificados.
 
+## Ajuste fuera de loop: fondo más claro
+
+Se pidió aclarar el fondo un 15%. Tocarlo solo a él rompía la jerarquía visual y bajaba el
+contraste del violeta usado como texto (comprobado con capturas de pantalla antes de tocar
+nada). Se subió toda la escala oscura en la misma proporción en su lugar (ADR-020).
+Comprobado en navegador y con `npm run a11y`; sin cambios en pruebas de dominio.
+
 ## Añadido en LOOP 015
 
 - [x] `chord-tones.ts`: de la estructura del acorde a las notas que suenan, marcando cuáles se

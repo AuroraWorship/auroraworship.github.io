@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.1] — Fondo más claro
+
+Se pidió aclarar el fondo un 15%. Tocar solo ese color rompía la jerarquía visual
+(las tarjetas dejaban de distinguirse del fondo) y el contraste del violeta usado como
+texto. Se sube en su lugar toda la escala oscura —fondo, superficie, superficie-2,
+borde— la misma proporción, y el violeta se reajusta para conservar su contraste
+(ADR-020). Paleta provisional (B-04): sin cambios de comportamiento ni de datos.
+
 ## [0.15.0] — LOOP 015 · Digitaciones de acordes
 
 Primera de las mejoras que pidió el ministerio tras ver la aplicación en uso. Tocar un
