@@ -24,6 +24,9 @@ import { LivePage } from './pages/LivePage';
 const RehearsalEditorPage = lazy(() => import('./pages/RehearsalEditorPage').then((m) => ({ default: m.RehearsalEditorPage })));
 const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const TutorialEditorPage = lazy(() => import('./pages/TutorialEditorPage').then((m) => ({ default: m.TutorialEditorPage })));
+import { CoursesPage } from './pages/CoursesPage';
+import { CoursePage } from './pages/CoursePage';
+const CourseEditorPage = lazy(() => import('./pages/CourseEditorPage').then((m) => ({ default: m.CourseEditorPage })));
 
 const NAV = [
   { to: '/canciones', label: 'Canciones', icon: '♪' },
@@ -104,6 +107,7 @@ function usePrefetchEditors() {
       void import('./pages/TutorialEditorPage');
       void import('./pages/SettingsPage');
       void import('./pages/TeamPage');
+      void import('./pages/CourseEditorPage');
     };
 
     if ('requestIdleCallback' in window) {
@@ -160,6 +164,11 @@ function Shell() {
           {/* Estática antes que dinámica: "nuevo" no es un identificador. */}
           <Route path="/tutoriales/nuevo" element={<TutorialEditorPage />} />
           <Route path="/tutoriales/:tutorialId" element={<TutorialEditorPage />} />
+          <Route path="/academia" element={<CoursesPage />} />
+          {/* Estática antes que dinámica: "nuevo" no es un identificador. */}
+          <Route path="/academia/nuevo" element={<CourseEditorPage />} />
+          <Route path="/academia/:courseId" element={<CoursePage />} />
+          <Route path="/academia/:courseId/editar" element={<CourseEditorPage />} />
           <Route path="/ajustes" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/canciones" replace />} />
         </Routes>

@@ -42,13 +42,19 @@ privacidad, copyright, diseño, MVP, calidad, testing, auto-recovery, deploy:
 - §32 notificaciones — **DIFERIDO**, el brief las marca «a futuro»
 - §41 aplicación pública — el ámbito `public` filtra correctamente; no hay pantalla dedicada — **DIFERIDO** (fase 5)
 
+## Fase 4 — Aurora Academy (§37, §54)
+- §37 Academia — OK (LOOP 016: cursos, clases, matrícula, progreso, profesores,
+  certificado imprimible — ADR-022)
+- §54 pagos → **BLOQUEADO**, requiere autorización expresa (sin gastos, `CLAUDE.md`)
+
 ## Bloqueado por acción humana
 - §3 autenticación externa, §53 dominio propio → **BLOQUEADO** B-01/B-02/B-03
 - §33 storage de archivos pesados → **BLOQUEADO** B-03 (hoy: enlaces, ADR-014-bis)
-- §37 Academia, §54 pagos → **DIFERIDO**, fase 4 explícita del brief
+- §54 pagos de Academia → **BLOQUEADO**, requiere autorización expresa
 - §38 IA → **DIFERIDO**, fase 5 explícita del brief
 
-## Fases 1–3: completas
-Todo lo que no dependía de un bloqueo (§1–36, §42–59) está hecho a fecha del
-LOOP 013. Lo que queda son las fases 4–5 (diferidas por el propio brief) y
-los tres bloqueos B-01/B-02/B-03.
+## Estado general
+Fases 1–3 completas desde el LOOP 013 (§1–36, §42–59). De la fase 4, Academia está
+hecha (§37); solo falta pagos, bloqueado por la regla "sin gastos" del proyecto hasta que
+el ministerio autorice expresamente contratar algo (ver B-06 en `LOOP_STATUS.md`). La
+fase 5 sigue diferida por el propio brief.

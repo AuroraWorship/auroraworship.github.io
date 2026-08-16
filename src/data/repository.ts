@@ -13,6 +13,8 @@
 
 import { PENDING, registerCustomInstruments, type Instrument } from '../domain/model';
 import type {
+  Course,
+  Enrollment,
   HistoryEntry,
   Id,
   Member,
@@ -24,9 +26,16 @@ import type {
   Tutorial,
 } from '../domain/model';
 import { lyricsOf, parseSongBody } from '../domain/music/song-body';
+import { newEnrollment, toggleLesson } from '../domain/course-factory';
 import { type Actor, type Permission, can, canView } from '../domain/rbac/roles';
 import { SEED_SERVICES, SEED_SETLISTS, SEED_SONGS, SEED_TUTORIALS } from './seed';
 import { type KeyValueStore, createDefaultStore } from './store';
+
+/** Progreso de un integrante en un curso, visto por quien enseña. */
+export interface CourseProgress {
+  member: Member;
+  enrollment: Enrollment | null;
+}
 
 export interface SongQuery {
   /** Busca en título, artista, etiquetas y letra. */
@@ -71,6 +80,16 @@ export interface AuroraRepository {
   getTutorial(actor: Actor, id: Id): Promise<Tutorial | null>;
   saveTutorial(actor: Actor, tutorial: Tutorial): Promise<Tutorial>;
   deleteTutorial(actor: Actor, id: Id): Promise<void>;
+  listCourses(actor: Actor): Promise<readonly Course[]>;
+  getCourse(actor: Actor, id: Id): Promise<Course | null>;
+  saveCourse(actor: Actor, course: Course): Promise<Course>;
+  deleteCourse(actor: Actor, id: Id): Promise<void>;
+  /** Progreso personal en Academia: guardado por actor, no dentro del curso. */
+  listEnrollments(actor: Actor): Promise<readonly Enrollment[]>;
+  enroll(actor: Actor, courseId: Id): Promise<readonly Enrollment[]>;
+  toggleCourseLesson(actor: Actor, courseId: Id, lessonId: Id): Promise<readonly Enrollment[]>;
+  /** Vista de quien enseña: requiere `course:write` y `member:read`. */
+  listCourseProgress(actor: Actor, courseId: Id): Promise<readonly CourseProgress[]>;
   listHistory(actor: Actor, songId?: Id): Promise<readonly HistoryEntry[]>;
   addHistory(actor: Actor, entries: readonly HistoryEntry[]): Promise<number>;
   listFavorites(actor: Actor): Promise<readonly Id[]>;
@@ -138,6 +157,7 @@ const KEYS = {
   setlists: 'setlists',
   services: 'services',
   tutorials: 'tutorials',
+  courses: 'courses',
   members: 'members',
   rehearsals: 'rehearsals',
   history: 'history',
@@ -165,6 +185,9 @@ const SEED_HISTORY: readonly HistoryEntry[] = [];
 
 /** Sin instrumentos añadidos al arrancar: solo el catálogo de fábrica. */
 const SEED_CUSTOM_INSTRUMENTS: readonly Instrument[] = [];
+
+/** Sin cursos inventados: la Academia la arma Aurora con su propio material. */
+const SEED_COURSES: readonly Course[] = [];
 
 /**
  * Repositorio sobre almacenamiento clave-valor.
@@ -354,6 +377,94 @@ export class StoredRepository implements AuroraRepository {
       KEYS.tutorials,
       tutorials.filter((t) => t.id !== id),
     );
+  }
+
+  async listCourses(actor: Actor): Promise<readonly Course[]> {
+    require(actor, 'course:read');
+    return visible(actor, await this.collection<Course>(KEYS.courses, SEED_COURSES))
+      .slice()
+      .sort((a, b) => a.title.localeCompare(b.title, 'es'));
+  }
+
+  async getCourse(actor: Actor, id: Id): Promise<Course | null> {
+    require(actor, 'course:read');
+    const courses = await this.collection<Course>(KEYS.courses, SEED_COURSES);
+    return visible(actor, courses).find((c) => c.id === id) ?? null;
+  }
+
+  async saveCourse(actor: Actor, course: Course): Promise<Course> {
+    require(actor, 'course:write');
+    const courses = await this.collection<Course>(KEYS.courses, SEED_COURSES);
+    const index = courses.findIndex((c) => c.id === course.id);
+    if (index >= 0) courses[index] = course;
+    else courses.push(course);
+    await this.store.set(KEYS.courses, courses);
+    return course;
+  }
+
+  async deleteCourse(actor: Actor, id: Id): Promise<void> {
+    require(actor, 'course:write');
+    const courses = await this.collection<Course>(KEYS.courses, SEED_COURSES);
+    await this.store.set(
+      KEYS.courses,
+      courses.filter((c) => c.id !== id),
+    );
+  }
+
+  /**
+   * Matrícula y progreso de Academia.
+   *
+   * Personales, guardados por actor — mismo patrón que favoritos (§31) y
+   * "preparado" (LOOP 013) — así que NO viajan en la copia de datos: son de
+   * cada persona, no del ministerio.
+   */
+  private academyKey(id: string): string {
+    return `academy:${id}`;
+  }
+
+  async listEnrollments(actor: Actor): Promise<readonly Enrollment[]> {
+    require(actor, 'course:read');
+    return (await this.store.get<Enrollment[]>(this.academyKey(actor.id))) ?? [];
+  }
+
+  async enroll(actor: Actor, courseId: Id): Promise<readonly Enrollment[]> {
+    require(actor, 'course:read');
+    const current = await this.listEnrollments(actor);
+    if (current.some((e) => e.courseId === courseId)) return current;
+    const next = [...current, newEnrollment(courseId)];
+    await this.store.set(this.academyKey(actor.id), next);
+    return next;
+  }
+
+  async toggleCourseLesson(actor: Actor, courseId: Id, lessonId: Id): Promise<readonly Enrollment[]> {
+    require(actor, 'course:read');
+    const course = await this.getCourse(actor, courseId);
+    if (!course) throw new Error('Curso no encontrado.');
+    const current = await this.listEnrollments(actor);
+    const existing = current.find((e) => e.courseId === courseId) ?? newEnrollment(courseId);
+    const updated = toggleLesson(existing, course.lessons, lessonId);
+    const next = [...current.filter((e) => e.courseId !== courseId), updated];
+    await this.store.set(this.academyKey(actor.id), next);
+    return next;
+  }
+
+  /**
+   * Progreso de cada integrante en un curso, para quien enseña.
+   *
+   * Exige `member:read` además de `course:write`: gestionar el contenido de
+   * un curso no da automáticamente acceso al listado de integrantes.
+   */
+  async listCourseProgress(actor: Actor, courseId: Id): Promise<readonly CourseProgress[]> {
+    require(actor, 'course:write');
+    require(actor, 'member:read');
+    const members = await this.collection<Member>(KEYS.members, SEED_MEMBERS);
+    const progreso: CourseProgress[] = [];
+    for (const member of members) {
+      const enrollments = (await this.store.get<Enrollment[]>(this.academyKey(member.id))) ?? [];
+      const enrollment = enrollments.find((e) => e.courseId === courseId) ?? null;
+      if (enrollment) progreso.push({ member, enrollment });
+    }
+    return progreso.sort((a, b) => a.member.displayName.localeCompare(b.member.displayName, 'es'));
   }
 
   /**

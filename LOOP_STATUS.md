@@ -4,18 +4,48 @@
 
 ## LOOP actual
 
-**LOOP 015 — DIGITACIONES DE ACORDES** · completado
+**LOOP 016 — AURORA ACADEMY** · completado
 
 ## Objetivo
 
-Primera de las once mejoras que pidió el ministerio tras ver la aplicación funcionando: tocar un
-acorde y ver cómo se hace en el instrumento propio.
+Primer paso de la fase 4 del brief (§37), sin que nadie lo pidiera todavía en esta sesión: era
+lo siguiente sin bloqueo en el roadmap tras cerrar fases 1-3. Cursos con sus propias clases,
+matrícula y progreso personal, certificado al terminar. Sin pagos (B-06): la regla del proyecto
+es "sin gastos sin autorización expresa", y pagos es justo eso.
 
-Ninguna digitación está guardada a mano. Se calculan desde las notas del acorde y la afinación del
-instrumento, así que funcionan igual con un `Am` que con un `Am7b5` o con lo que alguien escriba
-dentro de tres años (ADR-019).
+Loops 001 a 015 completados y verificados.
 
-Loops 001 a 014 completados y verificados.
+## Añadido en LOOP 016
+
+- [x] `Course`/`Lesson` en el modelo, mismo patrón de recursos y derechos que `Tutorial`
+- [x] `course:read`/`course:write` en RBAC: super-admin, admin, leader, music-director y editor
+      gestionan contenido; el resto (incluido público) solo lee lo publicado
+- [x] Matrícula y progreso personal (`Enrollment`), guardado por actor — mismo patrón que
+      favoritos y "preparado"; no viaja en la copia de datos (ADR-022)
+- [x] `toggleLesson`: marca o desmarca una clase, certifica sola al completar todas, y no se
+      rompe si una lección se borra del curso después de completarse
+- [x] Certificado: panel imprimible con nombre, curso y fecha — sin PDF ni código de
+      verificación, no se pidió que saliera del ecosistema
+- [x] "Progreso del equipo" para quien enseña: exige `course:write` y `member:read` a la vez,
+      no solo el primero
+- [x] `CoursesPage`, `CoursePage`, `CourseEditorPage`; enlace desde Aprender
+- [x] 254 pruebas (13 nuevas); accesibilidad y comprobación en navegador ampliadas a Academia,
+      incluida la vuelta completa: crear curso → matricularse → certificarse → verlo el profesor
+
+## Ajuste fuera de loop: fondo más claro
+
+Se pidió aclarar el fondo un 15%. Tocarlo solo a él rompía la jerarquía visual y bajaba el
+contraste del violeta usado como texto (comprobado con capturas de pantalla antes de tocar
+nada). Se subió toda la escala oscura en la misma proporción en su lugar (ADR-020).
+Comprobado en navegador y con `npm run a11y`; sin cambios en pruebas de dominio.
+
+## Ajuste fuera de loop: más naranja
+
+Se pidió más presencia del naranja. Las seis insignias de tonalidad repetidas por la
+aplicación pasan de violeta a naranja (ADR-021): ahora "esto es un dato musical" se lee en
+naranja en toda la app, no solo en los acordes. El primer intento (naranja translúcido)
+fallaba contraste; se corrigió antes de subirlo. Comprobado en navegador, `npm run a11y` y
+`npm run smoke`; sin cambios en pruebas de dominio.
 
 ## Ajuste fuera de loop: fondo más claro
 
@@ -198,13 +228,15 @@ fallaba contraste; se corrigió antes de subirlo. Comprobado en navegador, `npm 
 
 ## Pendiente
 
-El producto cubre las fases 1 a 3 del roadmap. Lo que queda depende de los bloqueos de abajo:
+El producto cubre las fases 1 a 3 del roadmap, y de la fase 4, Academia (§37). Lo que queda
+depende de los bloqueos de abajo:
 
 1. Autenticación real y sincronización entre dispositivos (B-03). Mientras tanto, la copia de
    datos del LOOP 007 hace de puente.
 2. Subida de archivos a storage. Hoy el material se enlaza, que funciona; subirlo necesita cuenta.
-3. Pantalla y reproductor de secuencias (modelo ya preparado, LOOP 014), academia y
-   extensiones de IA — fases 4 y 5.
+3. Pagos de Academia (B-06) — requiere autorización expresa.
+4. Pantalla y reproductor de secuencias (modelo ya preparado, LOOP 014) y extensiones de
+   IA — resto de la fase 3 tardía y fase 5.
 
 ## Errores corregidos en este loop
 
@@ -268,6 +300,13 @@ colores, logo y tipografía oficiales.
 
 No se ha inventado nada. Falta que Aurora facilite: integrantes y sus instrumentos, vocalistas y
 sus tonalidades, repertorio real con su estado de derechos, calendario de servicios y ensayos.
+
+### B-06 · Pagos de Aurora Academy
+
+El resto de la fase 4 (§37) está construido: cursos, clases, matrícula, progreso y certificado
+(LOOP 016, ADR-022). Pagos es el único punto que falta, y la regla del proyecto es explícita
+("Sin gastos", `CLAUDE.md`): no se contrata ni se prepara una pasarela de cobro sin que el
+ministerio lo autorice expresamente y decida con quién.
 
 ## Decisiones registradas
 

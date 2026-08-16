@@ -20,6 +20,7 @@ const ETIQUETAS: Record<keyof ImportSummary, string> = {
   services: 'servicios',
   rehearsals: 'ensayos',
   tutorials: 'tutoriales',
+  courses: 'cursos',
   members: 'integrantes',
 };
 

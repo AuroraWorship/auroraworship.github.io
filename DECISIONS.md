@@ -399,3 +399,40 @@ cualquier tarjeta encima, verificado antes de subir.
 **Consecuencias.** Si se añade una insignia de tonalidad nueva en otra pantalla, debe
 seguir este mismo patrón (`bg-aurora-bg` + `text-aurora-ember`) y no el translúcido, que
 falla contraste sobre superficies claras.
+
+## ADR-022 — Academia: progreso personal por actor, certificado sin PDF, sin pagos
+
+**Contexto.** Fase 4 del brief (§37): cursos, clases, estudiantes y progreso, profesores,
+certificados y pagos. Es la primera vez que se toca esta fase — fases 1-3 ya estaban
+completas (`BRIEF_COVERAGE.md`).
+
+**Decisión.**
+- `Course`/`Lesson` en el modelo, con `rights` y `scope` igual que `Tutorial`: contenido
+  del ministerio, no personal.
+- Matrícula y progreso (`Enrollment`) se guardan por actor bajo `academy:{id}`, el mismo
+  patrón que favoritos (§31) y "preparado" (LOOP 013). No viajan en la copia de datos
+  (ADR-014), igual que esos dos.
+- "Profesores" no es un rol nuevo de RBAC: `Course.teacherIds` referencia `Member`, como ya
+  hace `leadVocalistId` en un repertorio. Añadir un profesor no es un permiso distinto de
+  gestionar el curso.
+- "Progreso del equipo" (vista de quien enseña) lee `academy:{memberId}` para cada
+  integrante — funciona porque la identidad de sesión ya vincula actor y `Member`
+  (LOOP 003). Exige `course:write` y `member:read` a la vez: gestionar contenido no da
+  automáticamente acceso al listado de integrantes.
+- El certificado no es un archivo: es el mismo panel de "curso completo" con un botón
+  "Imprimir" que usa el diálogo de impresión del navegador. No hay generador de PDF ni
+  código de verificación — no se ha pedido que el certificado salga del ecosistema Aurora.
+- Sin pagos. La regla del proyecto ("Sin gastos", `CLAUDE.md`) es explícita: no se activa
+  ni se prepara integración de cobro sin autorización expresa del ministerio.
+
+**Motivo.** Nada de esto necesita datos nuevos ni una capa de permisos distinta: reutiliza
+tres patrones que ya existían (recursos con `ResourceListEditor`, progreso personal por
+actor, referencia a `Member` sin rol dedicado). Construir Academia como una cuarta
+variación de patrones probados es más barato que inventar uno nuevo, y mantiene la promesa
+de `ARCHITECTURE.md` de que los puntos de extensión se construyen cuando el dato ya existe.
+
+**Consecuencias.** El certificado no imprime nada verificable fuera de la aplicación —
+correcto para uso interno, insuficiente si el ministerio algún día necesita certificados
+que un tercero pueda validar. La vista de progreso del equipo solo ve a integrantes con
+`Member` real y "soy yo" marcado; un actor sin identidad asignada avanza el curso pero
+ningún profesor puede verlo en el roster, mismo límite que ya tenía "Mi preparación".
