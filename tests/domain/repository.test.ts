@@ -497,3 +497,80 @@ describe('búsqueda avanzada', () => {
     expect(await repo.listSongs(leader, { tag: 'himno', difficulty: 1, bpmMin: 80 })).toEqual([]);
   });
 });
+
+describe('varios servicios', () => {
+  const base = {
+    id: 's1',
+    date: '2026-09-05',
+    event: 'Servicio de septiembre',
+    setlistId: null,
+    assignments: [],
+    notes: null,
+    scope: 'internal' as const,
+  };
+
+  it('el líder puede tener más de uno a la vez', async () => {
+    await repo.saveService(leader, base);
+    await repo.saveService(leader, { ...base, id: 's2', date: '2026-09-12' });
+    // Más el de ejemplo que trae la semilla.
+    expect((await repo.listServices(leader)).length).toBe(3);
+  });
+
+  it('ordena por fecha, y los que no la tienen van al final', async () => {
+    await repo.saveService(leader, { ...base, id: 'b', date: '2026-09-12' });
+    await repo.saveService(leader, { ...base, id: 'a', date: '2026-09-05' });
+    const fechas = (await repo.listServices(leader)).map((s) => s.date);
+    expect(fechas.slice(0, 2)).toEqual(['2026-09-05', '2026-09-12']);
+    expect(fechas.at(-1)).toBe('INFORMACIÓN PENDIENTE');
+  });
+
+  it('planificar uno no pisa el otro', async () => {
+    await repo.saveService(leader, base);
+    await repo.saveService(leader, { ...base, id: 's2', date: '2026-09-12', event: 'Otro' });
+    await repo.saveService(leader, { ...base, event: 'Renombrado' });
+
+    expect((await repo.getService(leader, 's1'))!.event).toBe('Renombrado');
+    expect((await repo.getService(leader, 's2'))!.event).toBe('Otro');
+  });
+
+  it('cada servicio lleva su propio repertorio', async () => {
+    await repo.saveSetlist(leader, {
+      id: 'sl1',
+      name: 'Primero',
+      kind: 'service',
+      entries: [{ songId: 'song-sublime-gracia', order: 1, key: 'G', leadVocalistId: null, notes: null }],
+      scope: 'internal',
+    });
+    await repo.saveSetlist(leader, {
+      id: 'sl2',
+      name: 'Segundo',
+      kind: 'service',
+      entries: [{ songId: 'song-santo-santo-santo', order: 1, key: 'D', leadVocalistId: null, notes: null }],
+      scope: 'internal',
+    });
+    expect((await repo.getSetlist(leader, 'sl1'))!.entries[0].songId).toBe('song-sublime-gracia');
+    expect((await repo.getSetlist(leader, 'sl2'))!.entries[0].songId).toBe('song-santo-santo-santo');
+  });
+
+  it('borrar un servicio no toca los demás', async () => {
+    await repo.saveService(leader, base);
+    await repo.saveService(leader, { ...base, id: 's2' });
+    await repo.deleteService(leader, 's1');
+    expect(await repo.getService(leader, 's1')).toBeNull();
+    expect(await repo.getService(leader, 's2')).not.toBeNull();
+  });
+
+  it('un músico no puede borrar servicios ni repertorios', async () => {
+    await expect(repo.deleteService(musician, 's1')).rejects.toThrow(PermissionError);
+    await expect(repo.deleteSetlist(musician, 'setlist-base')).rejects.toThrow(PermissionError);
+  });
+
+  it('el historial de dos servicios distintos convive', async () => {
+    await repo.addHistory(leader, [
+      { id: 'h-s1', songId: 'song-sublime-gracia', date: '2026-09-05', serviceId: 's1', key: 'G', leadVocalistId: null, memberIds: [] },
+      { id: 'h-s2', songId: 'song-sublime-gracia', date: '2026-09-12', serviceId: 's2', key: 'A', leadVocalistId: null, memberIds: [] },
+    ]);
+    const historial = await repo.listHistory(leader, 'song-sublime-gracia');
+    expect(historial.map((h) => h.key)).toEqual(['A', 'G']);
+  });
+});

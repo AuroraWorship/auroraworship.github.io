@@ -127,7 +127,8 @@ console.log('TONALIDAD POR VOCALISTA GUARDADA:', detalle.includes('Integrante de
 // --- Planificación y modo en vivo -------------------------------------------
 
 await page.selectOption('select[aria-label="Rol de demostración"]', 'leader');
-await page.goto('http://localhost:4173/#/servicio/planificar', { waitUntil: 'networkidle' });
+await page.goto('http://localhost:4173/#/servicio', { waitUntil: 'networkidle' });
+await page.getByRole('link', { name: 'Planificar' }).click();
 await page.waitForSelector('text=Planificar servicio');
 
 await page.locator('input[type="date"]').fill('2026-09-05');
@@ -208,6 +209,39 @@ await page.screenshot({ path: `${shots}/12-ensayos.png` });
 await page.goto('http://localhost:4173/#/preparacion', { waitUntil: 'networkidle' });
 await page.waitForSelector('text=Mi preparación');
 console.log('PREPARACION MUESTRA ENSAYO:', await page.isVisible('text=Próximo ensayo'));
+
+// --- Varios servicios -------------------------------------------------------
+
+await page.goto('http://localhost:4173/#/servicio', { waitUntil: 'networkidle' });
+await page.selectOption('select[aria-label="Rol de demostración"]', 'leader');
+await page.waitForSelector('text=Servicio');
+
+await page.getByRole('link', { name: 'Nuevo servicio' }).click();
+await page.waitForSelector('text=Nuevo servicio');
+const fechaServicio = await page.locator('input[type="date"]').inputValue();
+console.log('PROPONE SABADO:', new Date(`${fechaServicio}T12:00:00`).getDay() === 6);
+
+await page.getByLabel('Evento').fill('Vigilia de prueba');
+await page.waitForTimeout(400);
+console.log('PUEDE REPETIR REPERTORIO ANTERIOR:', await page.isVisible('text=Repetir el repertorio anterior'));
+await page.getByRole('button', { name: /Repetir el repertorio anterior/ }).click();
+await page.waitForTimeout(500);
+const cancionesCopiadas = await page.locator('ol li p.font-medium').count();
+console.log('REPERTORIO COPIADO:', cancionesCopiadas > 0);
+await page.screenshot({ path: `${shots}/17-nuevo-servicio.png` });
+
+await page.goto('http://localhost:4173/#/servicios', { waitUntil: 'networkidle' });
+await page.waitForSelector('text=Todos los servicios');
+const listaServicios = await page.locator('main li a').count();
+console.log('CONVIVEN VARIOS SERVICIOS:', listaServicios >= 2);
+console.log('EL NUEVO APARECE:', await page.isVisible('text=Vigilia de prueba'));
+
+// El servicio anterior no se ha visto afectado. Se busca por nombre: la lista
+// va por fecha, y el nuevo puede caer antes que el de ejemplo.
+await page.locator('main li a', { hasText: 'Servicio de ejemplo' }).click();
+await page.waitForSelector('h1');
+const otroServicio = await page.locator('main').innerText();
+console.log('EL ANTERIOR SIGUE INTACTO:', !otroServicio.includes('Vigilia de prueba'));
 
 // --- Búsqueda avanzada, voces y partes --------------------------------------
 

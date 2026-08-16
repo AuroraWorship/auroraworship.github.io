@@ -13,7 +13,7 @@ import { RoleSwitcher } from './components/RoleSwitcher';
 import { SongsPage } from './pages/SongsPage';
 import { SongPage } from './pages/SongPage';
 const SongEditorPage = lazy(() => import('./pages/SongEditorPage').then((m) => ({ default: m.SongEditorPage })));
-import { ServicePage } from './pages/ServicePage';
+import { ServicePage, ServicesPage } from './pages/ServicePage';
 import { RehearsalPage } from './pages/RehearsalPage';
 import { TutorialsPage } from './pages/TutorialsPage';
 import { PreparationPage } from './pages/PreparationPage';
@@ -145,7 +145,11 @@ function Shell() {
           <Route path="/preparacion" element={<PreparationPage />} />
           <Route path="/equipo" element={<TeamPage />} />
           <Route path="/servicio" element={<ServicePage />} />
-          <Route path="/servicio/planificar" element={<ServiceEditorPage />} />
+          <Route path="/servicios" element={<ServicesPage />} />
+          {/* Estática antes que dinámica: "nuevo" no es un identificador. */}
+          <Route path="/servicio/nuevo" element={<ServiceEditorPage />} />
+          <Route path="/servicio/:serviceId" element={<ServicePage />} />
+          <Route path="/servicio/:serviceId/planificar" element={<ServiceEditorPage />} />
           <Route path="/ensayo" element={<RehearsalPage />} />
           {/* Estática antes que dinámica: "nuevo" no es un identificador. */}
           <Route path="/ensayo/nuevo" element={<RehearsalEditorPage />} />

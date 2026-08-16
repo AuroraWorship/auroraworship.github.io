@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   PENDING,
   isPending,
@@ -15,6 +15,7 @@ import {
   type VoicePart,
 } from '../../domain/model';
 import { COMMON_MAJOR_KEYS, COMMON_MINOR_KEYS } from '../../domain/music/key';
+import { copyEntries, emptyService, nextSaturday } from '../../domain/service-factory';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -30,14 +31,19 @@ const ALL_KEYS = [...COMMON_MAJOR_KEYS, ...COMMON_MINOR_KEYS];
  * cada una y quién hace qué.
  */
 export function ServiceEditorPage() {
+  const { serviceId } = useParams();
   const navigate = useNavigate();
   const { actor } = useSession();
 
+  const isNew = !serviceId;
   const [service, setService] = useState<Service | null | undefined>(undefined);
   const [setlist, setSetlist] = useState<Setlist | null>(null);
   const [songs, setSongs] = useState<readonly Song[]>([]);
   const [members, setMembers] = useState<readonly Member[]>([]);
   const [saving, setSaving] = useState(false);
+  /** Un servicio nuevo no existe en el almacén hasta el primer cambio. */
+  const [persistido, setPersistido] = useState(!isNew);
+  const [anterior, setAnterior] = useState<Setlist | null>(null);
 
   const allowed = can(actor, 'service:write');
 
@@ -46,14 +52,31 @@ export function ServiceEditorPage() {
     let active = true;
 
     (async () => {
-      const services = await repository.listServices(actor);
-      const found = services[0] ?? null;
-      const list = found?.setlistId ? await repository.getSetlist(actor, found.setlistId) : null;
+      const servicios = await repository.listServices(actor);
+      let found: Service | null;
+      let list: Setlist | null;
+
+      if (isNew) {
+        const creado = emptyService();
+        found = { ...creado.service, date: nextSaturday() };
+        list = creado.setlist;
+      } else {
+        found = await repository.getService(actor, serviceId);
+        list = found?.setlistId ? await repository.getSetlist(actor, found.setlistId) : null;
+      }
+
+      // Repertorio del servicio anterior, para poder repetirlo de un toque.
+      const previo = servicios.filter((s) => s.id !== found?.id).at(-1);
+      const previoSetlist = previo?.setlistId
+        ? await repository.getSetlist(actor, previo.setlistId)
+        : null;
+
       const allSongs = await repository.listSongs(actor);
       const team = can(actor, 'member:read') ? await repository.listMembers(actor) : [];
       if (!active) return;
       setService(found);
       setSetlist(list);
+      setAnterior(previoSetlist && previoSetlist.entries.length > 0 ? previoSetlist : null);
       setSongs(allSongs);
       setMembers(team);
     })();
@@ -61,11 +84,11 @@ export function ServiceEditorPage() {
     return () => {
       active = false;
     };
-  }, [actor, allowed]);
+  }, [actor, serviceId, isNew, allowed]);
 
   if (!allowed) return <NoAccess />;
   if (service === undefined) return <p className="text-aurora-muted">Cargando…</p>;
-  if (service === null) return <EmptyState title="No hay servicios registrados" />;
+  if (service === null) return <EmptyState title="Servicio no encontrado" />;
 
   const entries = [...(setlist?.entries ?? [])].sort((a, b) => a.order - b.order);
 
@@ -74,7 +97,13 @@ export function ServiceEditorPage() {
     const renumbered = next.map((entry, i) => ({ ...entry, order: i + 1 }));
     const updated = { ...setlist, entries: renumbered };
     setSetlist(updated);
+    setSaving(true);
     await repository.saveSetlist(actor, updated);
+    if (!persistido) {
+      await repository.saveService(actor, service);
+      setPersistido(true);
+    }
+    setSaving(false);
   };
 
   const move = (index: number, delta: number) => {
@@ -89,8 +118,22 @@ export function ServiceEditorPage() {
     const updated = { ...service, ...changes };
     setService(updated);
     setSaving(true);
+    // Un servicio nuevo arrastra su repertorio la primera vez que se guarda.
+    if (!persistido && setlist) {
+      await repository.saveSetlist(actor, setlist);
+      setPersistido(true);
+    }
     await repository.saveService(actor, updated);
     setSaving(false);
+  };
+
+  const borrar = async () => {
+    if (!confirm('¿Borrar este servicio y su repertorio? No se puede deshacer.')) return;
+    if (persistido) {
+      await repository.deleteService(actor, service.id);
+      if (service.setlistId) await repository.deleteSetlist(actor, service.setlistId);
+    }
+    navigate('/servicio');
   };
 
   const addAssignment = (assignment: Assignment) =>
@@ -105,8 +148,12 @@ export function ServiceEditorPage() {
         <button type="button" onClick={() => navigate('/servicio')} className="-my-2.5 inline-flex h-11 items-center text-sm text-aurora-muted">
           ← Servicio
         </button>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Planificar servicio</h1>
-        {saving && <p className="text-xs text-aurora-muted">Guardando…</p>}
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+          {isNew ? 'Nuevo servicio' : 'Planificar servicio'}
+        </h1>
+        <p className="text-xs text-aurora-muted">
+          {saving ? 'Guardando…' : persistido ? 'Los cambios se guardan solos' : 'Sin guardar todavía'}
+        </p>
       </div>
 
       <label className="block">
@@ -141,6 +188,16 @@ export function ServiceEditorPage() {
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-aurora-violet-soft">
           Repertorio
         </h2>
+
+        {entries.length === 0 && anterior && (
+          <button
+            type="button"
+            onClick={() => updateEntries([...copyEntries(anterior)])}
+            className="mb-2 h-12 w-full rounded-xl border border-aurora-border bg-aurora-surface text-sm"
+          >
+            Repetir el repertorio anterior ({anterior.entries.length} canciones)
+          </button>
+        )}
 
         <ol className="space-y-2">
           {entries.map((entry, index) => {
@@ -309,6 +366,14 @@ export function ServiceEditorPage() {
           </>
         )}
       </section>
+
+      <button
+        type="button"
+        onClick={borrar}
+        className="h-12 w-full rounded-xl border border-red-500/40 bg-red-500/10 text-sm font-medium text-red-300"
+      >
+        {persistido ? 'Borrar este servicio' : 'Descartar'}
+      </button>
     </div>
   );
 }

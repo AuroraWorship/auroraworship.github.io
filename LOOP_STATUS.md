@@ -4,15 +4,15 @@
 
 ## LOOP actual
 
-**LOOP 010 — BÚSQUEDA, VOCES Y PARTES** · completado
+**LOOP 011 — VARIOS SERVICIOS** · completado
 
 ## Objetivo
 
-Cerrar tres huecos entre el modelo y la interfaz: la búsqueda solo exponía texto aunque el
-repositorio filtraba por más, y las voces y las partes por instrumento existían en los datos pero
-no se podían editar desde ninguna pantalla.
+Cerrar el hueco funcional más grande que quedaba: la aplicación soportaba un solo servicio y un
+solo repertorio, así que planificar el sábado siguiente pisaba el anterior — y con él, el historial
+de lo que realmente se tocó.
 
-Loops 001 a 009 completados y verificados.
+Loops 001 a 010 completados y verificados.
 
 ## Completado
 
@@ -97,6 +97,16 @@ Loops 001 a 009 completados y verificados.
 - [x] Los favoritos no viajan en la copia: son personales
 - [x] 173 pruebas; comprobación en navegador con descarga y restauración reales
 
+## Añadido en LOOP 011
+
+- [x] Varios servicios a la vez, cada uno con su propio repertorio
+- [x] Lista completa de servicios, con los pasados atenuados
+- [x] «Repetir el repertorio anterior», que copia canciones y tonalidades pero no quién cantó
+- [x] Borrar un servicio, que se lleva su repertorio y deja los demás intactos
+- [x] Servicio y ensayo proponen su día habitual: sábado y miércoles
+- [x] «Mi preparación» y el modo en vivo apuntan al próximo servicio, no al primero de la lista
+- [x] 206 pruebas; comprobación en navegador ampliada a varios servicios
+
 ## Añadido en LOOP 010
 
 - [x] Filtros de repertorio: tonalidad, instrumento, vocalista, etiqueta, dificultad y rango de BPM
@@ -155,6 +165,7 @@ El producto cubre las fases 1 a 3 del roadmap. Lo que queda depende de los bloqu
 | El JS y el CSS de arranque nunca entraban en la caché del service worker: se piden antes de que tome el control | Inspección de la caché tras dividir el paquete (ADR-015) |
 | Calentar la caché desde la página dependía de ganar una carrera con `clients.claim()` | Tres arranques idénticos con resultados distintos |
 | La comprobación offline fijaba el rol sin recargar, y la aplicación seguía con el anterior | Falso negativo revisado |
+| La comprobación de varios servicios abría «el primero» de una lista ordenada por fecha, que ya era el nuevo | Falso negativo revisado |
 
 ## Bloqueos abiertos
 

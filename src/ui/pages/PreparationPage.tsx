@@ -41,7 +41,9 @@ export function PreparationPage() {
 
     (async () => {
       const services = await repository.listServices(actor);
-      const service = services[0] ?? null;
+      const hoy = new Date().toISOString().slice(0, 10);
+      const service =
+        services.find((s) => isPending(s.date) || s.date >= hoy) ?? services.at(-1) ?? null;
       const setlist = service?.setlistId
         ? await repository.getSetlist(actor, service.setlistId)
         : null;
@@ -60,7 +62,6 @@ export function PreparationPage() {
       }
 
       // Próximo ensayo: el primero que no ha pasado todavía.
-      const hoy = new Date().toISOString().slice(0, 10);
       const rehearsal = can(actor, 'rehearsal:read')
         ? ((await repository.listRehearsals(actor)).find((r) => r.date >= hoy) ?? null)
         : null;

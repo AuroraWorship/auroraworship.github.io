@@ -19,7 +19,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Modelo de voces (melodía, 1ª, 2ª, 3ª, armonía)
 - [x] Modelo de canciones completo
 - [x] RBAC: 11 roles, 19 permisos, 3 ámbitos
-- [x] Repertorios (modelo + repertorio base)
+- [x] Repertorios: base, de servicio y por evento, cada uno independiente
 - [x] Biblioteca de canciones con búsqueda
 - [x] Hoja de acordes mobile-first
 - [!] Autenticación real — bloqueo B-03
@@ -28,7 +28,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 
 ## Fase 2 — Operación del ministerio
 
-- [x] Modelo de servicios
+- [x] Varios servicios, cada uno con su repertorio
 - [x] Modelo de ensayos con bloques configurables
 - [x] Vista de servicio
 - [x] Vista de estructura de ensayo

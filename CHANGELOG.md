@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.11.0] — LOOP 011 · Varios servicios
+
+Se acabó el servicio único.
+
+### Añadido
+
+- **Varios servicios a la vez**, cada uno con su propio repertorio. Antes solo cabía uno:
+  planificar el sábado siguiente pisaba el anterior, y con él el historial de lo que se tocó.
+- **Lista completa de servicios**, con los pasados atenuados. La pantalla principal sigue
+  mostrando el próximo, que es lo que quiere ver alguien que abre la aplicación un viernes.
+- **«Repetir el repertorio anterior».** Copia canciones y tonalidades, pero no quién cantó: eso se
+  decide cada vez.
+- **Borrar un servicio**, que se lleva su repertorio consigo y deja los demás intactos.
+- El servicio propone el próximo sábado, igual que el ensayo propone el miércoles. Es solo el valor
+  inicial: no se guarda nada que el ministerio no haya creado.
+
+### Cambiado
+
+- «Mi preparación» y el modo en vivo apuntan al **próximo** servicio, no al primero de la lista.
+- Los servicios sin fecha van al final: un servicio sin fecha es una plantilla a medio hacer, no lo
+  próximo que ocurre.
+
 ## [0.10.0] — LOOP 010 · Búsqueda, voces y partes
 
 Tres cosas que estaban en los datos pero no llegaban a la pantalla.

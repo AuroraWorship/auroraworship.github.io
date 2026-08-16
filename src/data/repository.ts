@@ -11,6 +11,7 @@
  *    puede saltarse la regla, porque el repositorio la aplica igualmente.
  */
 
+import { PENDING } from '../domain/model';
 import type {
   HistoryEntry,
   Id,
@@ -56,7 +57,10 @@ export interface AuroraRepository {
   getSetlist(actor: Actor, id: Id): Promise<Setlist | null>;
   saveSetlist(actor: Actor, setlist: Setlist): Promise<Setlist>;
   listServices(actor: Actor): Promise<readonly Service[]>;
+  getService(actor: Actor, id: Id): Promise<Service | null>;
   saveService(actor: Actor, service: Service): Promise<Service>;
+  deleteService(actor: Actor, id: Id): Promise<void>;
+  deleteSetlist(actor: Actor, id: Id): Promise<void>;
   listRehearsals(actor: Actor): Promise<readonly Rehearsal[]>;
   getRehearsal(actor: Actor, id: Id): Promise<Rehearsal | null>;
   saveRehearsal(actor: Actor, rehearsal: Rehearsal): Promise<Rehearsal>;
@@ -212,9 +216,47 @@ export class StoredRepository implements AuroraRepository {
     return visible(actor, setlists).find((s) => s.id === id) ?? null;
   }
 
+  /**
+   * Servicios ordenados por fecha ascendente.
+   *
+   * Las fechas sin confirmar van al final: un servicio sin fecha es una
+   * plantilla a medio hacer, no lo próximo que ocurre.
+   */
   async listServices(actor: Actor): Promise<readonly Service[]> {
     require(actor, 'service:read');
-    return visible(actor, await this.collection<Service>(KEYS.services, SEED_SERVICES));
+    const services = await this.collection<Service>(KEYS.services, SEED_SERVICES);
+    return visible(actor, services)
+      .slice()
+      .sort((a, b) => {
+        const aPend = a.date === PENDING;
+        const bPend = b.date === PENDING;
+        if (aPend !== bPend) return aPend ? 1 : -1;
+        return a.date.localeCompare(b.date);
+      });
+  }
+
+  async getService(actor: Actor, id: Id): Promise<Service | null> {
+    require(actor, 'service:read');
+    const services = await this.collection<Service>(KEYS.services, SEED_SERVICES);
+    return visible(actor, services).find((s) => s.id === id) ?? null;
+  }
+
+  async deleteService(actor: Actor, id: Id): Promise<void> {
+    require(actor, 'service:write');
+    const services = await this.collection<Service>(KEYS.services, SEED_SERVICES);
+    await this.store.set(
+      KEYS.services,
+      services.filter((s) => s.id !== id),
+    );
+  }
+
+  async deleteSetlist(actor: Actor, id: Id): Promise<void> {
+    require(actor, 'setlist:write');
+    const setlists = await this.collection<Setlist>(KEYS.setlists, SEED_SETLISTS);
+    await this.store.set(
+      KEYS.setlists,
+      setlists.filter((s) => s.id !== id),
+    );
   }
 
   async saveSetlist(actor: Actor, setlist: Setlist): Promise<Setlist> {

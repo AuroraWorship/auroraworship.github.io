@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import type { Setlist, Song } from '../../domain/model';
+import { PENDING, type Setlist, type Song } from '../../domain/model';
 import { can } from '../../domain/rbac/roles';
 import { repository } from '../../data/repository';
 import { useSession } from '../session';
@@ -51,7 +51,10 @@ export function LivePage() {
       }
 
       if (!setlist && can(actor, 'service:read')) {
-        const service = (await repository.listServices(actor))[0] ?? null;
+        const servicios = await repository.listServices(actor);
+        const hoy = new Date().toISOString().slice(0, 10);
+        const service =
+          servicios.find((s) => s.date >= hoy || s.date === PENDING) ?? servicios.at(-1) ?? null;
         if (service?.setlistId) setlist = await repository.getSetlist(actor, service.setlistId);
       }
 
