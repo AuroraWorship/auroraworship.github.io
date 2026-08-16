@@ -269,22 +269,6 @@ depende de los bloqueos de abajo:
 
 Requieren acción humana. Todo lo demás siguió adelante.
 
-### B-01 · Organización de GitHub `auroraworship` — **bloquea la URL final**
-
-Las organizaciones solo se crean desde la web, no por API. Para que la aplicación quede en
-`auroraworship.github.io` hace falta:
-
-1. Crear la organización en `github.com/organizations/plan` (gratis).
-2. Transferir este repositorio: Settings → Danger Zone → Transfer ownership.
-3. Renombrarlo a `auroraworship.github.io` para que sirva desde la raíz.
-
-Mientras tanto el despliegue funciona en la cuenta personal.
-
-### B-02 · Activar GitHub Pages — **bloquea el despliegue**
-
-En Settings → Pages, elegir origen **GitHub Actions**. El workflow ya está en el repositorio y se
-ejecuta solo al hacer merge.
-
 ### B-03 · Autenticación real
 
 Hoy hay un selector de rol de demostración, marcado como tal, que **no es autenticación**. La real
@@ -307,6 +291,19 @@ El resto de la fase 4 (§37) está construido: cursos, clases, matrícula, progr
 (LOOP 016, ADR-022). Pagos es el único punto que falta, y la regla del proyecto es explícita
 ("Sin gastos", `CLAUDE.md`): no se contrata ni se prepara una pasarela de cobro sin que el
 ministerio lo autorice expresamente y decida con quién.
+
+## Bloqueos resueltos
+
+### B-01 · Organización de GitHub `auroraworship` — resuelto
+
+La organización se creó, el repositorio se transfirió y se renombró a `auroraworship.github.io`.
+Confirmado por el remoto (`git remote -v` apunta a `AuroraWorship/auroraworship.github.io`) y
+porque los PR de este loop se abrieron y combinaron sobre ese mismo repositorio.
+
+### B-02 · Activar GitHub Pages — resuelto
+
+El origen de Pages quedó en GitHub Actions. El flujo "Verificar y desplegar" se ejecuta solo al
+combinar con `main` y ha terminado en éxito en cada uno de los últimos merges de este loop.
 
 ## Decisiones registradas
 
