@@ -190,7 +190,7 @@ export function PreparationPage() {
                       <p className="text-xs text-aurora-muted">Canción {index + 1}</p>
                       <p className="truncate font-medium">{song.title}</p>
                     </div>
-                    <span className="shrink-0 rounded-lg bg-aurora-surface-2 px-2.5 py-1 font-semibold text-aurora-violet-soft">
+                    <span className="shrink-0 rounded-lg bg-aurora-bg px-2.5 py-1 font-semibold text-aurora-ember">
                       {key}
                     </span>
                   </div>

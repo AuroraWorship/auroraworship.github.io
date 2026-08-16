@@ -144,7 +144,7 @@ export function LivePage() {
       {current && (
         <>
           <div className="flex items-center gap-3 border-b border-aurora-border px-4 py-2 text-sm">
-            <span className="rounded-lg bg-aurora-surface-2 px-2.5 py-1 text-base font-semibold text-aurora-violet-soft">
+            <span className="rounded-lg bg-aurora-bg px-2.5 py-1 text-base font-semibold text-aurora-ember">
               {current.key}
             </span>
             {current.song.bpm && <span className="text-aurora-muted">{current.song.bpm} BPM</span>}

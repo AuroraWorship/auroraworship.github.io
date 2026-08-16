@@ -127,7 +127,7 @@ export function SongsPage() {
                   {song.bpm ? ` · ${song.bpm} BPM` : ''}
                 </span>
               </span>
-              <span className="shrink-0 rounded-lg bg-aurora-surface-2 px-2.5 py-1 text-sm font-semibold text-aurora-violet-soft">
+              <span className="shrink-0 rounded-lg bg-aurora-bg px-2.5 py-1 text-sm font-semibold text-aurora-ember">
                 {song.currentKey}
               </span>
             </Link>
