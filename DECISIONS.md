@@ -436,3 +436,59 @@ correcto para uso interno, insuficiente si el ministerio algún día necesita ce
 que un tercero pueda validar. La vista de progreso del equipo solo ve a integrantes con
 `Member` real y "soy yo" marcado; un actor sin identidad asignada avanza el curso pero
 ningún profesor puede verlo en el roster, mismo límite que ya tenía "Mi preparación".
+
+## ADR-023 — Autenticación real: el plan, no todavía el código
+
+**Contexto.** El ministerio confirmó interés en resolver B-03 (autenticación) y B-06 (pagos
+de Academia). Ninguno de los dos se puede construir de verdad sin una cuenta externa: no
+existe ni un proyecto de Supabase ni una cuenta de cobro, y esta sesión no puede crearlas
+—necesitan que una persona pase por un formulario web y acepte términos de servicio—.
+
+**Decisión.** Esta sesión deja listo el plan y el esquema, no el código de sesión. Nada se
+conecta a un backend que no existe todavía, porque no se puede comprobar en el navegador
+(regla de este proyecto: nada se da por terminado sin esa comprobación).
+
+Plan de autenticación, en el orden en que se construirá en cuanto haya proyecto:
+
+1. **Proveedor:** Supabase (ya apuntado en ADR-001: "cuando entre autenticación real habrá
+   que añadir backend, no reemplazar el frontend"). Auth + Postgres en el plan gratuito
+   alcanza para el tamaño de Aurora.
+2. **Esquema** (`supabase/schema.sql`, en este commit): tabla `profiles` que extiende
+   `auth.users` de Supabase con `display_name`, `roles` (el mismo `Role[]` de
+   `rbac/roles.ts`) y `member_id` opcional, para enlazar la cuenta con su `Member` de
+   Equipo — la misma idea que "soy yo" (LOOP 003), ya no elegida a mano sino heredada del
+   login. RLS activado desde el primer `CREATE TABLE`: nadie lee `profiles` de otra
+   persona salvo quien ya tiene `role:assign`.
+3. **Cliente:** `@supabase/supabase-js` en `src/data/auth.ts`, detrás de
+   `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`. Sin esas variables, la aplicación sigue
+   exactamente como hoy — el selector de rol de demostración no desaparece hasta que haya
+   algo real que lo sustituya.
+4. **Sesión:** `session.tsx` gana una rama que, si hay proyecto configurado, pide la
+   sesión real a Supabase y construye el `Actor` desde `profiles.roles` en vez de
+   `localStorage`. El contrato (`Actor` con `id` + `roles`, consumido por `can`/`canView`)
+   no cambia — por eso ADR-004 podía prometer esto sin tocar las pantallas, y se cumple.
+5. **Datos del ministerio:** login es la primera pieza, no toda la migración. Sincronizar
+   canciones/servicios/cursos de IndexedDB a Postgres es un loop propio y más grande,
+   posterior a que el login esté probado en el navegador de verdad.
+
+Plan de pagos de Academia (B-06), aparte y más corto porque depende del anterior:
+
+1. Requiere que el ministerio elija proveedor (Stripe es lo habitual para cursos: pago
+   único o suscripción, checkout alojado por ellos, así que Aurora nunca toca tarjetas) y
+   cree la cuenta — otra vez, un paso solo suyo.
+2. Solo entonces se añade `Course.price` al modelo. No antes: un precio en pantalla sin
+   una forma real de cobrarlo confundiría más de lo que ayuda.
+3. El cobro pasa por Stripe Checkout (redirección), no por una integración de tarjetas a
+   medida — más simple, y ninguna clave secreta de pago pasa por el cliente ni por este
+   repositorio.
+
+**Motivo.** Escribir el cliente de Supabase o de Stripe ahora, sin nada real al otro lado,
+produciría código que nadie puede probar y que este proyecto no publica sin comprobación en
+navegador. El esquema SQL sí es útil ya: es texto, no código de la aplicación, y ahorra la
+primera vuelta de ida y vuelta el día que exista el proyecto.
+
+**Consecuencias.** Falta exactamente una cosa para seguir con el código: que el ministerio
+cree el proyecto de Supabase (gratis, cinco minutos) y pase la URL y la clave `anon` — nunca
+la clave de servicio — por variable de entorno, nunca en el repositorio (regla del
+proyecto). En cuanto lleguen, `auth.ts` y la rama de `session.tsx` se escriben y se
+verifican en el mismo loop.

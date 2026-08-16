@@ -23,7 +23,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Repertorios: base, de servicio y por evento, cada uno independiente
 - [x] Biblioteca de canciones con búsqueda
 - [x] Hoja de acordes mobile-first
-- [!] Autenticación real — bloqueo B-03
+- [!] Autenticación real — bloqueo B-03; plan y esquema listos (ADR-023, `supabase/schema.sql`)
 - [x] Edición de canciones desde la aplicación
 - [x] Tonalidad por vocalista conectada a la UI
 
@@ -61,7 +61,7 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Estudiantes y progreso (personal, y roster para quien enseña)
 - [x] Profesores (`Course.teacherIds`, sin rol nuevo de RBAC)
 - [x] Certificados (panel imprimible, sin PDF ni verificación externa — ADR-022)
-- [!] Pagos — requiere autorización expresa del usuario
+- [!] Pagos — requiere autorización expresa del usuario; plan listo (ADR-023, depende de B-03)
 
 ## Fase 5 — Escala
 

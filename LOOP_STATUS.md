@@ -4,16 +4,27 @@
 
 ## LOOP actual
 
-**LOOP 016 — AURORA ACADEMY** · completado
+**LOOP 017 — AUTENTICACIÓN Y PAGOS: EL PLAN** · completado
 
 ## Objetivo
 
-Primer paso de la fase 4 del brief (§37), sin que nadie lo pidiera todavía en esta sesión: era
-lo siguiente sin bloqueo en el roadmap tras cerrar fases 1-3. Cursos con sus propias clases,
-matrícula y progreso personal, certificado al terminar. Sin pagos (B-06): la regla del proyecto
-es "sin gastos sin autorización expresa", y pagos es justo eso.
+Aurora confirmó interés en B-03 (autenticación real) y B-06 (pagos de Academia). Ninguno de los
+dos se puede construir de verdad sin una cuenta externa que solo una persona puede crear — así
+que este loop deja el plan completo, el esquema SQL listo para pegar, y las variables de entorno
+documentadas (ADR-023), y se detiene justo antes de escribir código que no se podría comprobar en
+navegador. Bloqueo reducido al mínimo: dos datos de un proyecto gratuito de Supabase.
 
-Loops 001 a 015 completados y verificados.
+Loops 001 a 016 completados y verificados.
+
+## Añadido en LOOP 017
+
+- [x] ADR-023: plan completo de autenticación (Supabase Auth + Postgres, `profiles` con roles,
+      cómo se conecta a `session.tsx` sin tocar las pantallas) y de pagos (Stripe Checkout,
+      dependiente de B-03, `Course.price` se añade recién cuando haya cuenta)
+- [x] `supabase/schema.sql`: tabla `profiles`, RLS calcada de `role:assign`, trigger de alta —
+      listo para ejecutar en cuanto exista un proyecto
+- [x] `.env.example`: `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`, documentadas y vacías
+- [x] Sin cambios de código de aplicación: nada que no se pueda probar se publica
 
 ## Añadido en LOOP 016
 
@@ -271,9 +282,20 @@ Requieren acción humana. Todo lo demás siguió adelante.
 
 ### B-03 · Autenticación real
 
-Hoy hay un selector de rol de demostración, marcado como tal, que **no es autenticación**. La real
-necesita cuenta en un proveedor externo (Supabase encaja: auth + Postgres + storage, plan gratuito
-suficiente). Requiere que el usuario cree la cuenta y facilite las claves. No se ha contratado nada.
+Hoy hay un selector de rol de demostración, marcado como tal, que **no es autenticación**. El plan
+completo — proveedor, esquema, cómo se conecta sin tocar las pantallas — está en ADR-023, y el
+esquema SQL ya está escrito en `supabase/schema.sql`, listo para pegar en cuanto exista proyecto.
+
+Lo único que falta es que Aurora:
+
+1. Cree un proyecto gratuito en [supabase.com](https://supabase.com) (correo y contraseña, cinco
+   minutos).
+2. Pegue el contenido de `supabase/schema.sql` en el editor SQL del proyecto y lo ejecute.
+3. Pase la **URL del proyecto** y la **clave `anon` / `public`** (Project Settings → API) — nunca la
+   clave `service_role` — a esta sesión, para ponerlas como variables de entorno (nunca en el
+   repositorio).
+
+Con esos dos datos, el código de sesión real se escribe y se comprueba en navegador en el mismo loop.
 
 ### B-04 · Identidad visual de Aurora
 
@@ -288,9 +310,13 @@ sus tonalidades, repertorio real con su estado de derechos, calendario de servic
 ### B-06 · Pagos de Aurora Academy
 
 El resto de la fase 4 (§37) está construido: cursos, clases, matrícula, progreso y certificado
-(LOOP 016, ADR-022). Pagos es el único punto que falta, y la regla del proyecto es explícita
-("Sin gastos", `CLAUDE.md`): no se contrata ni se prepara una pasarela de cobro sin que el
-ministerio lo autorice expresamente y decida con quién.
+(LOOP 016, ADR-022). Pagos es el único punto que falta. El plan está en ADR-023: Stripe Checkout
+(el ministerio nunca toca tarjetas, Stripe aloja el pago), `Course.price` se añade recién cuando
+haya cuenta, no antes — un precio en pantalla sin forma de cobrarlo confunde más de lo que ayuda.
+
+Depende de B-03: primero cuentas reales, para saber quién pagó qué. Falta que Aurora cree la cuenta
+de Stripe y decida el proveedor si prefiere otro. Regla del proyecto sin excepción ("Sin gastos",
+`CLAUDE.md`): no se contrata ni se activa nada sin esa autorización expresa.
 
 ## Bloqueos resueltos
 
