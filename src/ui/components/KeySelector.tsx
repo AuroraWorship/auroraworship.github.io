@@ -35,7 +35,7 @@ export function KeySelector({ originalKey, value, onChange }: Props) {
           <p className="text-sm">
             <span className="text-aurora-muted">Original {originalKey}</span>
             {offset !== 0 && (
-              <span className="ml-2 rounded bg-aurora-violet/20 px-1.5 py-0.5 text-xs text-aurora-violet-soft">
+              <span className="ml-2 rounded bg-aurora-bg px-1.5 py-0.5 text-xs text-aurora-ember">
                 {offset > 0 ? `+${offset}` : offset} semitonos
               </span>
             )}

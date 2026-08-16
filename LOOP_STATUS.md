@@ -24,6 +24,14 @@ contraste del violeta usado como texto (comprobado con capturas de pantalla ante
 nada). Se subió toda la escala oscura en la misma proporción en su lugar (ADR-020).
 Comprobado en navegador y con `npm run a11y`; sin cambios en pruebas de dominio.
 
+## Ajuste fuera de loop: más naranja
+
+Se pidió más presencia del naranja. Las seis insignias de tonalidad repetidas por la
+aplicación pasan de violeta a naranja (ADR-021): ahora "esto es un dato musical" se lee en
+naranja en toda la app, no solo en los acordes. El primer intento (naranja translúcido)
+fallaba contraste; se corrigió antes de subirlo. Comprobado en navegador, `npm run a11y` y
+`npm run smoke`; sin cambios en pruebas de dominio.
+
 ## Añadido en LOOP 015
 
 - [x] `chord-tones.ts`: de la estructura del acorde a las notas que suenan, marcando cuáles se

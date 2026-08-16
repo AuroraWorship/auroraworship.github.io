@@ -80,7 +80,7 @@ export function HistoryPage() {
                     {vocalista ? ` · ${vocalista}` : ''}
                   </span>
                 </span>
-                <span className="shrink-0 rounded-lg bg-aurora-surface-2 px-2.5 py-1 text-sm font-semibold text-aurora-violet-soft">
+                <span className="shrink-0 rounded-lg bg-aurora-bg px-2.5 py-1 text-sm font-semibold text-aurora-ember">
                   {entry.key}
                 </span>
               </Link>

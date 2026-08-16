@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.15.2] — Más naranja, con criterio
+
+Se pidió más presencia del naranja. Las insignias de tonalidad que se repetían en cinco
+pantallas (lista de canciones, servicio, historial, modo en vivo, mi preparación) y el
+chip de "±N semitonos" del selector pasan de violeta a naranja, para que lo musical
+(acordes, tonalidad) se lea siempre en naranja y la interfaz en violeta (ADR-021). El
+primer intento con un naranja translúcido fallaba el contraste (3.3–3.7:1); el fondo
+sólido final da 5.13:1, verificado antes de subir.
+
 ## [0.15.1] — Fondo más claro
 
 Se pidió aclarar el fondo un 15%. Tocar solo ese color rompía la jerarquía visual

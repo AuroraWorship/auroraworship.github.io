@@ -379,3 +379,23 @@ vez; subir la escala entera mantiene el mismo diseño, solo que un peldaño más
 **Consecuencias.** La paleta sigue siendo provisional (B-04): cuando el ministerio
 confirme colores e identidad propios, esta escala se sustituye entera, no se ajusta color
 a color.
+
+## ADR-021 — El naranja marca lo musical, el violeta marca la interfaz
+
+**Contexto.** Se pidió más presencia del color naranja. El naranja ya tenía dos usos: los
+acordes de la hoja y el estado "favorito". El violeta cubría todo lo demás, incluidas las
+insignias de tonalidad repetidas en cinco pantallas (lista de canciones, servicio,
+historial, modo en vivo, mi preparación) y el chip de "±N semitonos" del selector de
+tonalidad.
+
+**Decisión.** Esas seis insignias de tonalidad pasan de violeta a naranja, para que "esto
+es un dato musical" (acorde, tonalidad) se lea siempre en naranja y "esto es
+navegación/interfaz" se lea en violeta. El primer intento usó un naranja translúcido sobre
+la tarjeta (`bg-aurora-ember/15`), pero el cálculo de contraste dio 3.3–3.7:1 con texto del
+mismo color de fondo tras la mezcla — por debajo de AA, y empeora cuanto más opaco. Se
+cambió a fondo sólido `bg-aurora-bg` (el más oscuro de la escala), que da 5.13:1 con
+cualquier tarjeta encima, verificado antes de subir.
+
+**Consecuencias.** Si se añade una insignia de tonalidad nueva en otra pantalla, debe
+seguir este mismo patrón (`bg-aurora-bg` + `text-aurora-ember`) y no el translúcido, que
+falla contraste sobre superficies claras.
