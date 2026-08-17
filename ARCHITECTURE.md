@@ -78,11 +78,27 @@ no ha confirmado se muestra como pendiente en pantalla en lugar de rellenarse co
 Salida estática, servida por GitHub Pages. `HashRouter` en vez de `BrowserRouter` porque Pages no
 reescribe rutas y recargar una ruta profunda daría 404 (ADR-003).
 
+## Dónde vive cada cosa
+
+Mapa por carpeta, no por archivo: sirve para saber dónde mirar sin explorar el árbol entero,
+y no se queda obsoleto cada vez que se añade una pantalla.
+
+| Carpeta | Qué contiene | Puntos de entrada |
+|---|---|---|
+| `src/domain/` | Reglas puras, sin React ni almacenamiento. Es lo que cubren las pruebas | `model.ts` (todas las entidades), `*-factory.ts` |
+| `src/domain/music/` | Motor musical: notas, acordes, tonalidades, transposición, digitaciones | `chord.ts`, `transpose.ts`, `voicing.ts` |
+| `src/domain/rbac/` | Roles, permisos y ámbitos de visibilidad | `roles.ts` (11 roles, 21 permisos) |
+| `src/data/` | Acceso a datos y sesión. La UI nunca habla con un backend directo (ADR-004) | `repository.ts`, `auth.ts`, `backup.ts` |
+| `src/ui/pages/` | Una pantalla por ruta; las rutas se declaran en `App.tsx` | `App.tsx` para el índice de rutas |
+| `src/ui/components/` | Piezas compartidas entre pantallas | `ChordSheet.tsx`, `ResourceListEditor.tsx` |
+| `scripts/` | Verificación en navegador real y auditoría de accesibilidad | `smoke.mjs`, `a11y.mjs` |
+| `supabase/` | Esquema SQL del backend, para ejecutar en el panel de Supabase | `schema.sql` |
+
 ## Puntos de extensión previstos
 
-Existen como hueco en el modelo, sin implementación: tablatura y partituras, academia,
-notificaciones, IA. Se construyen cuando los datos estructurados que necesitan ya existan —
-primero el dato, después el asistente.
+Existen como hueco en el modelo, sin implementación: tablatura y partituras, notificaciones,
+IA. Se construyen cuando los datos estructurados que necesitan ya existan — primero el dato,
+después el asistente.
 
 Secuencias (§27) tiene un paso más: el modelo ya existe (`SequencePlan`, `SequenceTrack` en
 `model.ts`, ver ADR-018), pero sin pantalla de edición ni motor de reproducción. Sigue en la
