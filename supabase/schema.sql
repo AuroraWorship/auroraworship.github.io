@@ -58,16 +58,26 @@ create policy "role:assign edita cualquier perfil"
   );
 
 -- Una cuenta nueva entra sin rol asignado (equivalente a `public` en
--- rbac/roles.ts) hasta que alguien con `role:assign` se lo dé. Nadie se
--- autoasigna un rol interno al registrarse.
+-- rbac/roles.ts) hasta que alguien con `role:assign` se lo dé — con una
+-- excepción: la primera cuenta que exista se vuelve super-admin sola,
+-- porque si no, nadie podría asignar roles a nadie más. Nadie después de
+-- esa primera cuenta se autoasigna un rol interno al registrarse.
 create function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
+declare
+  es_la_primera_cuenta boolean;
 begin
-  insert into public.profiles (id, display_name)
-  values (new.id, coalesce(new.raw_user_meta_data->>'display_name', ''));
+  select not exists (select 1 from public.profiles) into es_la_primera_cuenta;
+
+  insert into public.profiles (id, display_name, roles)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'display_name', ''),
+    case when es_la_primera_cuenta then array['super-admin']::public.aurora_role[] else '{}' end
+  );
   return new;
 end;
 $$;

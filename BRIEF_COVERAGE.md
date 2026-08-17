@@ -48,7 +48,8 @@ privacidad, copyright, diseño, MVP, calidad, testing, auto-recovery, deploy:
 - §54 pagos → **BLOQUEADO** B-06; plan listo (ADR-023: Stripe Checkout, depende de B-03)
 
 ## Bloqueado por acción humana
-- §3 autenticación externa → **BLOQUEADO** B-03; plan y esquema listos (ADR-023, `supabase/schema.sql`)
+- §3 autenticación externa → código escrito y verificado en modo demo (ADR-024, LOOP 018);
+  **BLOQUEADO** B-03 en el último paso: secretos de GitHub y verificación en vivo de Aurora
 - §53 dominio propio → **BLOQUEADO** B-01/B-02 (nota: la URL en `auroraworship.github.io` ya
   está resuelta, ver `LOOP_STATUS.md` § Bloqueos resueltos; falta un dominio propio si se quiere uno)
 - §33 storage de archivos pesados → **BLOQUEADO** B-03 (hoy: enlaces, ADR-014-bis)

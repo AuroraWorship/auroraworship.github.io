@@ -13,6 +13,7 @@ import { can } from '../../domain/rbac/roles';
 import { useSession } from '../session';
 import { NoAccess, PendingNotice } from '../components/Notices';
 import { InstrumentCatalog } from '../components/InstrumentCatalog';
+import { AccountsAdmin } from '../components/AccountsAdmin';
 
 const ETIQUETAS: Record<keyof ImportSummary, string> = {
   songs: 'canciones',
@@ -41,8 +42,9 @@ export function SettingsPage() {
 
   const puedeExportar = can(actor, 'data:export');
   const puedeImportar = can(actor, 'data:import');
+  const puedeAsignar = can(actor, 'role:assign');
 
-  if (!puedeExportar && !puedeImportar) return <NoAccess />;
+  if (!puedeExportar && !puedeImportar && !puedeAsignar) return <NoAccess />;
 
   const exportar = async () => {
     setError(null);
@@ -182,6 +184,8 @@ export function SettingsPage() {
           )}
         </section>
       )}
+
+      <AccountsAdmin />
 
       <InstrumentCatalog />
 

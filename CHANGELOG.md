@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.17.0] — LOOP 018 · Autenticación real: el código
+
+Con el proyecto de Supabase ya creado (LOOP 017), esta versión escribe la autenticación de
+verdad: entrar, registrarse, sesión real, y asignar roles a cuentas reales.
+
+### Añadido
+
+- Entrar / registrarse / salir, sobre Supabase Auth. Reemplaza el selector de demostración
+  en la cabecera solo cuando hay backend configurado — sin configurar, todo sigue igual.
+- Sesión real en `session.tsx`: sin cuenta, o con cuenta sin rol, el actor se trata como
+  cualquier visitante (`public`), nunca con más acceso.
+- "Cuentas y roles" en Ajustes: la pantalla real del permiso `role:assign`, que existía en
+  el control de acceso desde el principio sin que nada la usara.
+- La primera cuenta que se registra queda como super-admin sola.
+
+### Límite de esta versión
+
+El sandbox de esta sesión no tiene permiso de red para llegar al proyecto real de
+Supabase (confirmado, no es un error de la app — ADR-024), así que el ciclo completo
+—registrarse, confirmar correo, entrar, ver el rol— no se pudo probar de punta a punta
+desde aquí. Sí se verificó todo lo demás: typecheck, pruebas, build, y las 60
+comprobaciones existentes de accesibilidad y navegador en modo demo, todas en verde. Falta
+que Aurora añada dos secretos en GitHub y confirme el ciclo completo una vez publicado —
+el detalle exacto está en `LOOP_STATUS.md`.
+
+### Interno
+
+- `@supabase/supabase-js` se carga con `import()`: el paquete principal baja de ~322 KB a
+  ~218 KB para quien sigue en modo demo.
+- Bug real encontrado y corregido al probar el login: el modal se salía de la pantalla por
+  el `backdrop-blur` del header; se resolvió con un portal a `document.body`.
+- 254 pruebas de dominio, sin cambios.
+
 ## [0.16.1] — LOOP 017 · Autenticación y pagos: el plan
 
 Aurora confirmó interés en resolver la autenticación real (B-03) y los pagos de Academia

@@ -492,3 +492,49 @@ cree el proyecto de Supabase (gratis, cinco minutos) y pase la URL y la clave `a
 la clave de servicio — por variable de entorno, nunca en el repositorio (regla del
 proyecto). En cuanto lleguen, `auth.ts` y la rama de `session.tsx` se escriben y se
 verifican en el mismo loop.
+
+## ADR-024 — Autenticación real: el código, con un límite de verificación que hay que conocer
+
+**Contexto.** Aurora creó el proyecto de Supabase y pasó URL y clave pública (ADR-023 ya
+resuelto). Se escribió el código real: `src/data/auth.ts`, la rama nueva de `session.tsx`,
+`AuthWidget` (entrar/salir) y `AccountsAdmin` (asignar roles). Al probarlo contra el
+proyecto real desde esta sesión, el entorno sandbox devolvió un 403 de política de red al
+intentar llegar a `*.supabase.co` — confirmado con `curl .../__agentproxy/status`, que
+registra el rechazo explícito. No es un error de la aplicación: es que este entorno no
+tiene permiso para salir a ese host.
+
+**Decisión.** Se construye y se verifica todo lo que sí se puede verificar sin esa
+conexión — typecheck, las 254 pruebas de dominio (sin cambios, ninguna toca auth real),
+build, y el modo demo completo (`npm run a11y` + `npm run smoke`, las 60 comprobaciones
+existentes, sin exportar `.env`) para confirmar que nada de lo existente se rompió. La
+pantalla de entrar/registrarse se probó hasta donde el sandbox lo permitió: se encontró y
+corrigió un fallo real ahí (el modal quedaba mal posicionado por el `backdrop-blur` del
+header, que crea su propio contenedor para `position: fixed`; se resolvió con un portal a
+`document.body`). Lo que no se pudo probar aquí — el viaje de ida y vuelta real contra
+Supabase, signup → confirmación de correo → entrar → ver el rol — se deja documentado como
+lo único pendiente de que Aurora confirme, con pasos concretos en `LOOP_STATUS.md`.
+
+**Motivo.** Publicar sin decir que una parte no se verificó en este entorno sería romper la
+regla del propio proyecto ("nada se da por terminado sin comprobación en navegador") por la
+puerta de atrás. Mejor ser explícito sobre qué sí y qué no se pudo comprobar, y pedirle a
+quien tiene la cuenta real que sea quien cierre esa última verificación — es su proyecto de
+Supabase, y el sandbox nunca va a poder alcanzarlo.
+
+**Decisiones de construcción, en breve:**
+- `@supabase/supabase-js` se carga con `import()`, no en el bloque principal: sin backend
+  configurado, nadie descarga sus ~220 KB (mismo cuidado de peso que LOOP 009).
+- Sin sesión (o con sesión pero sin rol asignado), el actor se trata como `public` — nunca
+  más acceso que un visitante anónimo, nunca menos.
+- La primera cuenta que exista se vuelve `super-admin` sola (el `handle_new_user` de
+  `supabase/schema.sql` lo revisa); nadie más se autoasigna nada.
+- `AccountsAdmin` (en Ajustes) es la pantalla real de `role:assign`, que existía en RBAC
+  desde el principio sin que nada la usara.
+- El despliegue (`.github/workflows/deploy.yml`) ya pasa `VITE_SUPABASE_URL` y
+  `VITE_SUPABASE_ANON_KEY` al build, leyéndolas de secretos del repositorio — sin
+  configurarlos ahí, el sitio publicado sigue en modo demo, no se rompe.
+
+**Consecuencias.** Dos cosas quedan en manos de Aurora, ninguna de código: confirmar el
+correo de la primera cuenta y probar el ciclo completo una vez publicado (esta sesión no
+puede hacerlo por el bloqueo de red), y añadir las dos claves como secretos del
+repositorio de GitHub para que el sitio en vivo las use. Ver `LOOP_STATUS.md` para los
+pasos exactos.
