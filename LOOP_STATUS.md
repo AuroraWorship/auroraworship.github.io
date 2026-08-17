@@ -4,17 +4,58 @@
 
 ## LOOP actual
 
-**LOOP 017 — AUTENTICACIÓN Y PAGOS: EL PLAN** · completado
+**LOOP 018 — AUTENTICACIÓN REAL: EL CÓDIGO** · completado, con una verificación pendiente de Aurora
 
 ## Objetivo
 
-Aurora confirmó interés en B-03 (autenticación real) y B-06 (pagos de Academia). Ninguno de los
-dos se puede construir de verdad sin una cuenta externa que solo una persona puede crear — así
-que este loop deja el plan completo, el esquema SQL listo para pegar, y las variables de entorno
-documentadas (ADR-023), y se detiene justo antes de escribir código que no se podría comprobar en
-navegador. Bloqueo reducido al mínimo: dos datos de un proyecto gratuito de Supabase.
+Aurora creó el proyecto de Supabase (LOOP 017) y pasó las dos claves. Este loop escribe la
+autenticación real: entrar/registrarse, sesión de verdad en vez del selector de demostración,
+y una pantalla para asignar roles a cuentas reales. **Con un límite:** el sandbox de esta
+sesión no tiene permiso de red para llegar a `*.supabase.co` (confirmado, no es un bug — ver
+ADR-024), así que el viaje de ida y vuelta real —registrarse, confirmar correo, entrar, ver
+el rol— no se pudo probar desde aquí. Todo lo demás sí: typecheck, las 254 pruebas, build, y
+las 60 comprobaciones existentes de accesibilidad y navegador en modo demo, sin tocar ni una.
+Un fallo real sí se encontró y se corrigió al probar la pantalla de login hasta donde se pudo
+(el modal se posicionaba mal por el `backdrop-blur` del header).
 
-Loops 001 a 016 completados y verificados.
+Loops 001 a 017 completados y verificados.
+
+## Qué falta para que quede funcionando de verdad
+
+1. **En GitHub:** Settings → Secrets and variables → Actions → "New repository secret", dos
+   veces:
+   - `VITE_SUPABASE_URL` = `https://snvcogdmgafatdglogot.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = la clave pública (`sb_publishable_...`)
+   Sin esto, el sitio publicado se queda en modo demo — no se rompe, simplemente no activa
+   el login hasta que estén.
+2. **Probar el ciclo completo** una vez publicado: entrar con "Entrar" → "¿No tienes cuenta?
+   Créala" → registrarte con tu correo real → confirmar el correo que llega (Supabase lo
+   pide por defecto) → entrar → deberías verte como super-admin (la primera cuenta que se
+   registra lo es sola) → en Ajustes debería aparecer "Cuentas y roles".
+3. Avisar si algo de eso no sale como se describe, para revisarlo en el siguiente loop.
+
+## Añadido en LOOP 018
+
+- [x] `src/data/auth.ts`: entrar, registrarse, salir, perfil, asignar roles — sobre
+      `@supabase/supabase-js` cargado con `import()` para no pesarle a quien sigue en modo
+      demo (~220 KB que solo se descargan si hay backend configurado)
+- [x] `session.tsx`: con backend configurado, el actor sale de la sesión real de Supabase;
+      sin sesión (o con sesión pero sin rol) se trata igual que `public` — nunca más acceso
+      que un visitante anónimo
+- [x] `AuthWidget`: entrar/registrarse/salir, reemplaza el selector de demostración en la
+      cabecera solo cuando hay backend configurado
+- [x] `AccountsAdmin` (en Ajustes): la pantalla real del permiso `role:assign`, que existía
+      en RBAC desde el principio sin que nada la usara
+- [x] `supabase/schema.sql`: la primera cuenta que exista se vuelve super-admin sola —
+      si no, nadie podría asignar roles a nadie más
+- [x] Despliegue (`deploy.yml`) ya pasa las dos claves al build desde secretos del
+      repositorio — ver el punto 1 de arriba
+- [x] Bug real encontrado y corregido: el modal de login se salía de la pantalla por el
+      `backdrop-blur` del header (crea su propio contenedor para `fixed`); se resolvió con
+      un portal a `document.body` (ADR-024)
+- [x] 254 pruebas sin cambios; build separa Supabase en su propio trozo (main baja de
+      ~322 KB a ~218 KB); accesibilidad y comprobación en navegador en modo demo, sin
+      tocar ni una de las 60 comprobaciones existentes
 
 ## Añadido en LOOP 017
 
@@ -280,22 +321,17 @@ depende de los bloqueos de abajo:
 
 Requieren acción humana. Todo lo demás siguió adelante.
 
-### B-03 · Autenticación real
+### B-03 · Autenticación real — código listo, faltan los secretos y la verificación de Aurora
 
-Hoy hay un selector de rol de demostración, marcado como tal, que **no es autenticación**. El plan
-completo — proveedor, esquema, cómo se conecta sin tocar las pantallas — está en ADR-023, y el
-esquema SQL ya está escrito en `supabase/schema.sql`, listo para pegar en cuanto exista proyecto.
+El proyecto de Supabase ya existe y el esquema ya corrió (LOOP 017). El código real de login,
+sesión y asignación de roles ya está escrito y verificado hasta donde el sandbox de esta sesión
+lo permite (ADR-024, LOOP 018) — no puede alcanzar `*.supabase.co` por política de red del
+entorno, así que el ciclo completo con el backend real no se ha probado todavía de punta a punta.
 
-Lo único que falta es que Aurora:
+Lo que falta, ver el detalle exacto en "LOOP actual" arriba:
 
-1. Cree un proyecto gratuito en [supabase.com](https://supabase.com) (correo y contraseña, cinco
-   minutos).
-2. Pegue el contenido de `supabase/schema.sql` en el editor SQL del proyecto y lo ejecute.
-3. Pase la **URL del proyecto** y la **clave `anon` / `public`** (Project Settings → API) — nunca la
-   clave `service_role` — a esta sesión, para ponerlas como variables de entorno (nunca en el
-   repositorio).
-
-Con esos dos datos, el código de sesión real se escribe y se comprueba en navegador en el mismo loop.
+1. Añadir `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` como secretos del repositorio en GitHub.
+2. Que Aurora pruebe el ciclo completo una vez publicado (registrarse, confirmar correo, entrar).
 
 ### B-04 · Identidad visual de Aurora
 

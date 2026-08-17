@@ -23,7 +23,8 @@ Nada se marca `[x]` sin prueba o comprobación que lo respalde.
 - [x] Repertorios: base, de servicio y por evento, cada uno independiente
 - [x] Biblioteca de canciones con búsqueda
 - [x] Hoja de acordes mobile-first
-- [!] Autenticación real — bloqueo B-03; plan y esquema listos (ADR-023, `supabase/schema.sql`)
+- [!] Autenticación real — código escrito y verificado en modo demo (ADR-024); falta
+      configurar dos secretos en GitHub y que Aurora confirme el ciclo completo (B-03)
 - [x] Edición de canciones desde la aplicación
 - [x] Tonalidad por vocalista conectada a la UI
 

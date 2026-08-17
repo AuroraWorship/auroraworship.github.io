@@ -8,8 +8,9 @@
 
 import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { SessionProvider } from './session';
+import { SessionProvider, useSession } from './session';
 import { RoleSwitcher } from './components/RoleSwitcher';
+import { AuthWidget } from './components/AuthWidget';
 import { SongsPage } from './pages/SongsPage';
 import { SongPage } from './pages/SongPage';
 const SongEditorPage = lazy(() => import('./pages/SongEditorPage').then((m) => ({ default: m.SongEditorPage })));
@@ -37,6 +38,7 @@ const NAV = [
 ];
 
 function Header() {
+  const { auth } = useSession();
   return (
     <header className="sticky top-0 z-20 border-b border-aurora-border bg-aurora-bg/95 backdrop-blur">
       <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
@@ -48,7 +50,7 @@ function Header() {
           </p>
           <p className="truncate text-xs text-aurora-muted">Ministerio de Alabanza</p>
         </div>
-        <RoleSwitcher />
+        {auth.configured ? <AuthWidget /> : <RoleSwitcher />}
       </div>
     </header>
   );
@@ -122,7 +124,19 @@ function usePrefetchEditors() {
 function Shell() {
   usePrefetchEditors();
   const { pathname } = useLocation();
+  const { auth } = useSession();
   const live = pathname.startsWith('/vivo');
+
+  // Mientras se comprueba si ya hay sesión real, no se decide todavía qué
+  // puede ver el actor: mostrar "Sin acceso" un instante y luego el
+  // contenido de verdad sería peor que esperar el medio segundo.
+  if (auth.configured && auth.loading) {
+    return (
+      <div className="grid min-h-dvh place-items-center">
+        <p className="text-aurora-muted">Cargando…</p>
+      </div>
+    );
+  }
 
   if (live) {
     return (

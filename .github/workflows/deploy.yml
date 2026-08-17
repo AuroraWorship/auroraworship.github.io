@@ -73,10 +73,15 @@ jobs:
             echo "path=/$repo/" >> "$GITHUB_OUTPUT"
           fi
 
+      # Sin estos dos secretos configurados en el repositorio (Settings →
+      # Secrets and variables → Actions), el sitio sigue en modo demo — no
+      # se rompe nada, solo no hay autenticación real todavía (ADR-023).
       - name: Compilar
         run: npm run build
         env:
           AURORA_BASE_PATH: ${{ steps.base.outputs.path }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - uses: actions/configure-pages@v5
 
