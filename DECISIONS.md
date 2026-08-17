@@ -2,6 +2,37 @@
 
 Registro de decisiones con su razón. Existe para no volver a analizar lo ya analizado.
 
+**No hace falta leer este archivo entero.** El índice de abajo dice qué decide cada ADR; para
+leer uno suelto, `grep -n "^## ADR-0NN" DECISIONS.md` y luego `sed -n 'inicio,finp'`.
+
+| ADR | Decide |
+|---|---|
+| 001 | Stack: Vite + React + TypeScript + Tailwind |
+| 002 | La nota se guarda como (letra, alteración), no como semitono |
+| 003 | `HashRouter` en lugar de `BrowserRouter` |
+| 004 | La UI habla con una interfaz de repositorio, nunca con un backend |
+| 005 | El filtrado por permisos vive en el repositorio, no en las pantallas |
+| 006 | Solo dominio público en los datos de arranque |
+| 007 | Interfaz oscura (se usa sobre un atril, en penumbra) |
+| 008 | Persistencia local (IndexedDB) tras la interfaz de repositorio |
+| 009 | El rol público puede leer; el ámbito decide qué |
+| 010 | Service worker escrito a mano, sin generador |
+| 011 | El modo en vivo sale del armazón, no se superpone |
+| 012 | Dos violetas: uno para texto, otro para relleno |
+| 013 | Auditoría de accesibilidad ejecutable, no una lista de buenos propósitos |
+| 014 | Copia y restauración antes que sincronización |
+| 015 | Las pantallas de edición se cargan aparte, y el worker las precachea |
+| 016 | El catálogo de instrumentos se resuelve por caché, no por prop |
+| 017 | Recursos y versiones no se implementan tres veces |
+| 018 | Secuencias: solo el modelo, no la pantalla |
+| 019 | Las digitaciones de acordes se calculan, no se guardan |
+| 020 | Un fondo más claro sube toda la escala, no solo el fondo |
+| 021 | El naranja marca lo musical, el violeta marca la interfaz |
+| 022 | Academia: progreso personal por actor, certificado sin PDF, sin pagos |
+| 023 | Autenticación y pagos: el plan (Supabase, Stripe) |
+| 024 | Autenticación real: el código, y qué no se pudo verificar |
+| 025 | La documentación viva se separa de la histórica |
+
 ---
 
 ## ADR-001 — Stack: Vite + React + TypeScript + Tailwind
@@ -538,3 +569,47 @@ correo de la primera cuenta y probar el ciclo completo una vez publicado (esta s
 puede hacerlo por el bloqueo de red), y añadir las dos claves como secretos del
 repositorio de GitHub para que el sitio en vivo las use. Ver `LOOP_STATUS.md` para los
 pasos exactos.
+
+## ADR-025 — La documentación viva se separa de la histórica
+
+**Contexto.** A los dieciocho loops la documentación pesaba 1.800 líneas (~14.000 palabras).
+`LOOP_STATUS.md`, que `CLAUDE.md` obliga a leer **entero en cada sesión**, había llegado a 372
+líneas de las cuales unas 280 eran historial de loops ya cerrados. Además tenía dos secciones
+duplicadas literalmente y los loops desordenados: síntomas de un archivo al que se le añade por
+arriba sin releerlo nunca. Cada sesión pagaba ese coste antes de escribir una sola línea.
+
+**Decisión.** Separar lo vivo de lo histórico, sin borrar nada:
+
+- `LOOP_STATUS.md` (372 → 91 líneas): loop actual, qué falta, bloqueos abiertos y un índice de
+  una línea por loop. Es lo único de lectura obligatoria.
+- `docs/HISTORIAL.md`: el detalle de los 18 loops, los errores corregidos y los bloqueos ya
+  resueltos. Se consulta solo si la pregunta es histórica.
+- `docs/CHANGELOG-ANTERIOR.md`: versiones 0.1.0 a 0.14.0. `CHANGELOG.md` (440 → 126) conserva
+  las recientes, que son las que se comparan al escribir la siguiente.
+- `DECISIONS.md`: se mantiene en un solo archivo pero con un **índice de una línea por ADR** al
+  principio, para poder leer un ADR suelto en vez de las 540 líneas.
+- `ARCHITECTURE.md`: tabla «Dónde vive cada cosa», por carpeta y no por archivo, para no
+  explorar el árbol a ciegas ni quedarse obsoleta al añadir una pantalla.
+- `CLAUDE.md`: ruta de lectura explícita, y —más importante— qué **no** leer.
+
+**Alternativas descartadas, con su razón.** Fragmentar `DECISIONS.md` en 24 archivos
+`docs/adr/NNN.md`: costaría *más* lecturas para responder «¿por qué X?», porque habría que
+buscar entre archivos en vez de saltar dentro de uno. Fusionar `BRIEF_COVERAGE.md` en
+`ROADMAP.md`: se solapan en contenido pero no en propósito — `BRIEF_COVERAGE` conserva la
+numeración §N del encargo original, que es la trazabilidad, y `ROADMAP` no la tiene. Recortar
+los comentarios del código: es el activo del proyecto y este mismo archivo exige el porqué
+escrito.
+
+**Consecuencias.** La lectura obligatoria por sesión baja de ~437 líneas (`LOOP_STATUS` +
+`CLAUDE`) a ~165. El riesgo es que el historial se convierta en un vertedero que nadie mantiene;
+se acepta a cambio de que el archivo caliente quede legible, y `CLAUDE.md` ahora dice
+explícitamente que el detalle del loop va al historial y no a `LOOP_STATUS`.
+
+**De paso.** Comprimir la salida de `npm run smoke` (67 líneas fijas → las informativas más un
+resumen) destapó una comprobación falsa: `MUESTRA PROGRESO SI HAY ASIGNACIONES` estaba escrita
+como `tieneProgreso || true`, así que pasaba siempre. Al hacerla honesta empezó a fallar, y la
+causa era el propio guion: se comprobaba después de crear un servicio con fecha anterior, que
+pasa a ser «el próximo» y no tiene asignaciones. Movida al punto donde el dato existe, y otras
+dos tautologías (`comprobar(..., true)`) convertidas en aserciones reales. Ahora `smoke` también
+sale con código distinto de cero cuando algo falla, en vez de terminar en verde con un `false`
+perdido en la salida.
